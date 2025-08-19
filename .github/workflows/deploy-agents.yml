@@ -49,30 +49,25 @@ jobs:
       with:
         project_id: ${{ env.GOOGLE_CLOUD_PROJECT }}
 
-    - name: Install ADK CLI
+    - name: Configure Docker for Google Cloud
       run: |
-        echo "📦 Installing Google ADK CLI..."
-        
-        # Install ADK CLI using the official Google installer
-        curl -fsSL https://storage.googleapis.com/adk-cli/install.sh | bash
-        
-        # Add ADK to PATH
-        export PATH="$HOME/.adk/bin:$PATH"
-        echo "$HOME/.adk/bin" >> $GITHUB_PATH
-        
-        echo "✅ ADK CLI installed successfully"
+        gcloud auth configure-docker
 
-    - name: Verify ADK installation
-      run: |
-        echo "🔍 Verifying ADK installation..."
-        adk version
-        echo "✅ ADK CLI is ready"
-
-    - name: Deploy with ADK
+    - name: Deploy to Cloud Run
       run: |
         cd agents
-        echo "🚀 Deploying with ADK..."
-        adk deploy cloud_run --service_name="llm-summary-agent" .
+        echo "🚀 Deploying agents to Cloud Run..."
+        gcloud run deploy ${{ env.SERVICE_NAME }} \
+          --source . \
+          --platform managed \
+          --region ${{ env.REGION }} \
+          --allow-unauthenticated \
+          --project ${{ env.GOOGLE_CLOUD_PROJECT }} \
+          --memory=2Gi \
+          --cpu=1 \
+          --timeout=3600 \
+          --max-instances=10 \
+          --port=8080
 
     - name: Get service URL
       id: get-url
