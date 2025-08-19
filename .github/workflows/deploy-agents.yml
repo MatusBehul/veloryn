@@ -1,0 +1,88 @@
+name: Deploy Agents
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'test'
+        type: choice
+        options:
+        - test
+        - prod
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+  push:
+    branches:
+      - main
+    paths:
+      - 'agents/**'
+
+env:
+  SERVICE_NAME: llm-summary-agent
+  REGION: us-central1
+
+jobs:
+  deploy:
+    name: Deploy Agents
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || inputs.environment || 'test' }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Determine deployment environment
+      id: env-setup
+      run: |
+        DEPLOY_ENV="${{ github.event.inputs.environment || inputs.environment || 'test' }}"
+        echo "deploy_env=$DEPLOY_ENV" >> $GITHUB_OUTPUT
+        echo "Deploying to environment: $DEPLOY_ENV"
+
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+      with:
+        project_id: ${{ env.GOOGLE_CLOUD_PROJECT }}
+
+    - name: Check if ADK is available
+      id: check-adk
+      run: |
+        cd agents
+        if command -v adk &> /dev/null; then
+          echo "adk_available=true" >> $GITHUB_OUTPUT
+          echo "✅ ADK CLI is available"
+        else
+          echo "adk_available=false" >> $GITHUB_OUTPUT
+          echo "⚠️ ADK CLI not found, will use gcloud directly"
+        fi
+
+    - name: Deploy with ADK (if available)
+      if: steps.check-adk.outputs.adk_available == 'true'
+      run: |
+        cd agents
+        echo "🚀 Deploying with ADK..."
+        adk deploy cloud_run --service_name="llm-summary-agent" .
+
+    - name: Get service URL
+      id: get-url
+      run: |
+        SERVICE_URL=$(gcloud run services describe llm-summary-agent \
+          --platform managed \
+          --region eu-west1 \
+          --format 'value(status.url)' 2>/dev/null || echo "")
+        
+        if [ -n "$SERVICE_URL" ]; then
+          echo "service_url=$SERVICE_URL" >> $GITHUB_OUTPUT
+          echo "✅ Service URL: $SERVICE_URL"
+        else
+          echo "⚠️ Could not retrieve service URL"
+        fi

@@ -1,0 +1,51 @@
+# This file specifies files that are _not_ uploaded to Google Cloud
+# See https://cloud.google.com/sdk/gcloud/reference/topic/gcloudignore
+
+.git
+.gitignore
+
+#!include:.gitignore
+
+# Node.js dependencies:
+node_modules/
+
+# Explicitly include .env.dev (don't ignore it)
+!.env.dev
+
+# But ignore other .env files
+.env.local
+.env.production
+.env
+
+# Build outputs
+.next/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# NYC test coverage
+.nyc_output
+
+# IDEs
+.vscode/
+.idea/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

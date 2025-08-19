@@ -1,0 +1,10 @@
+infra/gcp.json
+__pycache__
+.env
+.venv
+*.pyc
+*.pyo
+*.pyd
+*.pkl
+*.db
+deploy.sh

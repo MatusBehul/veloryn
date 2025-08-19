@@ -1,0 +1,233 @@
+'use client';
+
+import React from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useSubscription } from '@/hooks/useSubscription';
+import { Button } from '@/components/ui/Button';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
+import { FavoriteTickersWidget } from '@/components/FavoriteTickersWidget';
+import Link from 'next/link';
+import { 
+  BarChart3, 
+  TrendingUp, 
+  Star, 
+  Settings, 
+  Mail,
+  User as UserIcon,
+  CheckCircle,
+  Clock,
+  ArrowRight
+} from 'lucide-react';
+
+export default function DashboardPage() {
+  const { user } = useAuth();
+  const { hasActiveSubscription, loading, subscriptionTier } = useSubscription();
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardContent className="py-8 text-center">
+            <h2 className="text-xl font-semibold mb-4">Authentication Required</h2>
+            <p className="text-gray-600 mb-4">Please log in to access your dashboard.</p>
+            <Link href="/login">
+              <Button>Go to Login</Button>
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  const quickActions = [
+    {
+      title: 'Browse Analysis',
+      description: 'View latest AI-generated financial analysis',
+      icon: BarChart3,
+      href: '/analysis',
+      color: 'bg-blue-500',
+    },
+    {
+      title: 'Favorite Tickers',
+      description: 'Manage your watchlist and daily updates',
+      icon: Star,
+      href: '/settings',
+      color: 'bg-yellow-500',
+    },
+    {
+      title: 'Account Settings',
+      description: 'Update preferences and subscription',
+      icon: Settings,
+      href: '/subscription',
+      color: 'bg-gray-500',
+    },
+  ];
+
+  return (
+    <div className="min-h-screen bg-slate-50 py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Welcome Section */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">
+            Welcome back{user.name ? `, ${user.name}` : ''}!
+          </h1>
+          <p className="text-slate-600">
+            Your AI-powered financial analysis dashboard
+          </p>
+        </div>
+
+        {/* Account Status */}
+        <Card className="mb-8">
+          <CardContent className="py-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="p-3 bg-blue-100 rounded-lg">
+                  <UserIcon className="h-6 w-6 text-blue-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900">Account Status</h3>
+                  <div className="flex items-center space-x-2 mt-1">
+                    {loading ? (
+                      <span className="text-gray-500">Checking subscription...</span>
+                    ) : hasActiveSubscription ? (
+                      <>
+                        <CheckCircle className="h-4 w-4 text-green-500" />
+                        <span className="text-green-600 font-medium">Membership Active</span>
+                      </>
+                    ) : (
+                      <>
+                        <Clock className="h-4 w-4 text-yellow-500" />
+                        <span className="text-yellow-600 font-medium">Free Tier</span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+              {!hasActiveSubscription && !loading && (
+                <Link href="/pricing">
+                  <Button>
+                    Upgrade to become a member
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Quick Actions */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          {quickActions.map((action) => (
+            <Card key={action.title} className="hover:shadow-lg transition-shadow">
+              <CardContent className="py-6">
+                <div className="flex items-start space-x-4">
+                  <div className={`p-3 ${action.color} rounded-lg`}>
+                    <action.icon className="h-6 w-6 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-900 mb-1">{action.title}</h3>
+                    <p className="text-sm text-gray-600 mb-3">{action.description}</p>
+                    <Link href={action.href}>
+                      <Button variant="outline" size="sm" className="w-full">
+                        Open
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Recent Activity / Statistics */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Favorite Tickers Widget */}
+          <FavoriteTickersWidget />
+
+          {/* Account Info */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Account Information</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Email</span>
+                  <span className="font-medium">{user.email}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Subscription</span>
+                  <span className={`font-medium ${subscriptionTier ? 'text-green-600' : 'text-gray-600'}`}>
+                    {subscriptionTier?.toUpperCase() || 'FREE'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Favorite Tickers</span>
+                  <span className="font-medium">
+                    {user.favoriteTickers?.length || 0} configured
+                  </span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Getting Started */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Getting Started</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-start space-x-3">
+                  <div className="flex-shrink-0 mt-1">
+                    <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
+                      <span className="text-xs font-medium text-blue-600">1</span>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900">Set up your favorite tickers</p>
+                    <p className="text-sm text-gray-600">Add stocks you want to follow for daily updates</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start space-x-3">
+                  <div className="flex-shrink-0 mt-1">
+                    <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
+                      <span className="text-xs font-medium text-blue-600">2</span>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900">Browse AI analysis</p>
+                    <p className="text-sm text-gray-600">Explore our comprehensive financial reports</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start space-x-3">
+                  <div className="flex-shrink-0 mt-1">
+                    <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
+                      <span className="text-xs font-medium text-blue-600">3</span>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900">Receive daily updates</p>
+                    <p className="text-sm text-gray-600">Get analysis delivered to your inbox</p>
+                  </div>
+                </div>
+                
+                <div className="pt-2">
+                  <Link href="/settings">
+                    <Button className="w-full">
+                      <Star className="mr-2 h-4 w-4" />
+                      Configure Favorite Tickers
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}

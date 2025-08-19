@@ -1,0 +1,166 @@
+name: Deploy All Services
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'test'
+        type: choice
+        options:
+        - test
+        - prod
+      services:
+        description: 'Services to deploy (comma-separated: web-app,analysis-trigger,email-function,hourly-checker,data-collector,agents,schedulers)'
+        required: false
+        default: 'web-app,analysis-trigger,email-function'
+
+jobs:
+  prepare:
+    name: Prepare Deployment
+    runs-on: ubuntu-latest
+    outputs:
+      deploy-web-app: ${{ steps.parse-services.outputs.deploy-web-app }}
+      deploy-analysis-trigger: ${{ steps.parse-services.outputs.deploy-analysis-trigger }}
+      deploy-email-function: ${{ steps.parse-services.outputs.deploy-email-function }}
+      deploy-hourly-checker: ${{ steps.parse-services.outputs.deploy-hourly-checker }}
+      deploy-data-collector: ${{ steps.parse-services.outputs.deploy-data-collector }}
+      deploy-agents: ${{ steps.parse-services.outputs.deploy-agents }}
+      deploy-schedulers: ${{ steps.parse-services.outputs.deploy-schedulers }}
+      environment: ${{ github.event.inputs.environment }}
+    
+    steps:
+    - name: Parse services to deploy
+      id: parse-services
+      run: |
+        SERVICES="${{ github.event.inputs.services || 'web-app,analysis-trigger,email-function' }}"
+        echo "Services to deploy: $SERVICES"
+        
+        # Set outputs based on services list
+        if [[ "$SERVICES" == *"web-app"* ]]; then
+          echo "deploy-web-app=true" >> $GITHUB_OUTPUT
+        else
+          echo "deploy-web-app=false" >> $GITHUB_OUTPUT
+        fi
+        
+        if [[ "$SERVICES" == *"analysis-trigger"* ]]; then
+          echo "deploy-analysis-trigger=true" >> $GITHUB_OUTPUT
+        else
+          echo "deploy-analysis-trigger=false" >> $GITHUB_OUTPUT
+        fi
+        
+        if [[ "$SERVICES" == *"email-function"* ]]; then
+          echo "deploy-email-function=true" >> $GITHUB_OUTPUT
+        else
+          echo "deploy-email-function=false" >> $GITHUB_OUTPUT
+        fi
+        
+        if [[ "$SERVICES" == *"hourly-checker"* ]]; then
+          echo "deploy-hourly-checker=true" >> $GITHUB_OUTPUT
+        else
+          echo "deploy-hourly-checker=false" >> $GITHUB_OUTPUT
+        fi
+        
+        if [[ "$SERVICES" == *"data-collector"* ]]; then
+          echo "deploy-data-collector=true" >> $GITHUB_OUTPUT
+        else
+          echo "deploy-data-collector=false" >> $GITHUB_OUTPUT
+        fi
+        
+        if [[ "$SERVICES" == *"agents"* ]]; then
+          echo "deploy-agents=true" >> $GITHUB_OUTPUT
+        else
+          echo "deploy-agents=false" >> $GITHUB_OUTPUT
+        fi
+        
+        if [[ "$SERVICES" == *"schedulers"* ]]; then
+          echo "deploy-schedulers=true" >> $GITHUB_OUTPUT
+        else
+          echo "deploy-schedulers=false" >> $GITHUB_OUTPUT
+        fi
+
+  deploy-web-app:
+    name: Deploy Web App
+    needs: prepare
+    if: needs.prepare.outputs.deploy-web-app == 'true'
+    uses: ./.github/workflows/deploy-web-app.yml
+    with:
+      environment: ${{ needs.prepare.outputs.environment }}
+    secrets: inherit
+
+  deploy-analysis-trigger:
+    name: Deploy Analysis Trigger
+    needs: prepare
+    if: needs.prepare.outputs.deploy-analysis-trigger == 'true'
+    uses: ./.github/workflows/deploy-analysis-trigger.yml
+    with:
+      environment: ${{ needs.prepare.outputs.environment }}
+    secrets: inherit
+
+  deploy-email-function:
+    name: Deploy Email Function
+    needs: prepare
+    if: needs.prepare.outputs.deploy-email-function == 'true'
+    uses: ./.github/workflows/deploy-email-function.yml
+    with:
+      environment: ${{ needs.prepare.outputs.environment }}
+    secrets: inherit
+
+  deploy-hourly-checker:
+    name: Deploy Hourly Checker
+    needs: prepare
+    if: needs.prepare.outputs.deploy-hourly-checker == 'true'
+    uses: ./.github/workflows/deploy-hourly-checker.yml
+    with:
+      environment: ${{ needs.prepare.outputs.environment }}
+    secrets: inherit
+
+  deploy-data-collector:
+    name: Deploy Data Collector
+    needs: prepare
+    if: needs.prepare.outputs.deploy-data-collector == 'true'
+    uses: ./.github/workflows/deploy-data-collector.yml
+    with:
+      environment: ${{ needs.prepare.outputs.environment }}
+    secrets: inherit
+
+  deploy-agents:
+    name: Deploy Agents
+    needs: prepare
+    if: needs.prepare.outputs.deploy-agents == 'true'
+    uses: ./.github/workflows/deploy-agents.yml
+    with:
+      environment: ${{ needs.prepare.outputs.environment }}
+    secrets: inherit
+
+  deploy-schedulers:
+    name: Deploy Schedulers
+    needs: prepare
+    if: needs.prepare.outputs.deploy-schedulers == 'true'
+    uses: ./.github/workflows/deploy-schedulers.yml
+    with:
+      environment: ${{ needs.prepare.outputs.environment }}
+      action: 'create-or-update'
+    secrets: inherit
+
+  summary:
+    name: Deployment Summary
+    needs: [prepare, deploy-web-app, deploy-analysis-trigger, deploy-email-function, deploy-hourly-checker, deploy-data-collector, deploy-agents, deploy-schedulers]
+    if: always()
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Deployment Summary
+      run: |
+        echo "🚀 Multi-Service Deployment Summary"
+        echo "Environment: ${{ needs.prepare.outputs.environment }}"
+        echo ""
+        echo "Service Deployment Status:"
+        echo "  Web App: ${{ needs.deploy-web-app.result || 'skipped' }}"
+        echo "  Analysis Trigger: ${{ needs.deploy-analysis-trigger.result || 'skipped' }}"
+        echo "  Email Function: ${{ needs.deploy-email-function.result || 'skipped' }}"
+        echo "  Hourly Checker: ${{ needs.deploy-hourly-checker.result || 'skipped' }}"
+        echo "  Data Collector: ${{ needs.deploy-data-collector.result || 'skipped' }}"
+        echo "  Agents: ${{ needs.deploy-agents.result || 'skipped' }}"
+        echo "  Schedulers: ${{ needs.deploy-schedulers.result || 'skipped' }}"

@@ -1,0 +1,796 @@
+{
+  "invocation_id": "e-35c8e067-38e6-455e-91f9-5c9ab6677a25",
+  "author": "financial_reporter",
+  "analysis": {
+    "recommendations": {
+      "confidence": 0.65,
+      "target_price": 360,
+      "action": "hold",
+      "time_horizon": "medium",
+      "stop_loss": 320.1,
+      "reasoning": [
+        "Strong bullish technical momentum confirmed by price action above all key moving averages and positive MACD.",
+        "High-risk profile with significant volatility (Beta: 1.71) and a history of large drawdowns.",
+        "Neutral but polarized sentiment, with retail optimism contrasting with cautious institutional analyst ratings.",
+        "Key resistance near $360 provides a potential price target, while strong support at $320 offers a logical stop-loss level.",
+        "Fundamental risks, including intense competition and high valuation, warrant caution despite the positive technical trend."
+      ]
+    },
+    "ticker": "TSLA",
+    "storytelling": [
+      "Tesla's current financial narrative is one of a powerful technical rally clashing with a landscape of significant fundamental risk and polarized market sentiment. The stock is in a clear and strong bullish uptrend, having decisively broken above its 20, 50, and 200-day moving averages. This upward momentum is underscored by increasing trade volume and a bullish MACD crossover, painting a compelling picture for trend-following investors. The price action itself tells a story of renewed market confidence, pushing towards the upper boundaries of its Bollinger Bands and eyeing key resistance levels at $350 and $360. From a purely technical standpoint, the path of least resistance appears to be upward. However, the Relative Strength Index (RSI) is approaching overbought territory, suggesting this powerful rally could be due for a pause or a minor consolidation. This technical strength provides a strong argument for bulls, suggesting that the market is currently pricing in future growth and success, particularly with catalysts like the Robotaxi service launch and expansion into new markets like UK energy supply on the horizon.",
+      "However, looking beneath the surface of the charts reveals a more complex and cautious picture. The sentiment surrounding Tesla is deeply divided. While news flow tends to be positive and social media channels are buzzing with retail optimism, Wall Street analysts remain circumspect, with a majority issuing a 'Hold' rating. This institutional caution is rooted in fundamental realities. The company faces a high-risk environment, characterized by a beta of 1.71, indicating volatility far greater than the broader market. The stock has a history of severe drawdowns, a reminder of the potential for significant capital loss. Key risks are ever-present and substantial: intensifying competition from both nimble startups and deep-pocketed legacy automakers, a sky-high valuation that demands near-perfect execution, persistent supply chain vulnerabilities, and the unpredictable nature of CEO-driven news cycles. Furthermore, while the company has never paid a dividend, its upcoming earnings will be a critical litmus test for its lofty P/E ratio of nearly 196.",
+      "This confluence of factors leads to a nuanced 'Hold' recommendation with a medium-term outlook. The strategy is to respect the powerful bullish trend while acknowledging the significant underlying risks. A price target of $360 is set based on technical resistance, representing the optimistic scenario where the current momentum carries forward. Conversely, a stop-loss at $320, aligned with strong technical support, is crucial to manage the considerable downside risk. This approach allows an investor to participate in potential near-term upside while protecting against the volatility inherent in the stock. The core of the investment thesis rests on a precarious balance: Tesla's proven ability to innovate and capture the market's imagination versus the formidable and growing pressures of competition and valuation. The current market is a battleground between technical momentum and fundamental gravity, making a carefully risk-managed, neutral stance the most prudent course of action until a clearer, more unified picture emerges."
+    ],
+    "risk_analysis": {
+      "correlation_spy": 0.45,
+      "volatility": {
+        "weekly": 1.23,
+        "daily": 0.55,
+        "monthly": 2.53
+      },
+      "risk_level": "high",
+      "max_drawdown": 73.6,
+      "beta": 1.71,
+      "liquidity_risk": "low",
+      "sharpe_ratio": 0.92,
+      "key_risks": [
+        "Intense competition from both legacy automakers and new EV entrants.",
+        "High valuation multiples, leading to concerns of being overvalued.",
+        "Dependence on CEO Elon Musk, whose actions can significantly impact sentiment.",
+        "Ongoing global supply chain disruptions and regulatory uncertainty."
+      ],
+      "var_95": 15
+    },
+    "analysis_date": "2024-10-26",
+    "data": {
+      "1M": [
+        {
+          "low": 332.8,
+          "open": 329.65,
+          "volume": 91200320,
+          "date": "2024-10-25",
+          "close": 339.03,
+          "high": 346.64
+        },
+        {
+          "low": 314,
+          "open": 315.4,
+          "volume": 85123456,
+          "date": "2024-10-24",
+          "close": 329.65,
+          "high": 330.5
+        },
+        {
+          "low": 305.5,
+          "open": 308.72,
+          "volume": 98012345,
+          "date": "2024-10-21",
+          "close": 310.21,
+          "high": 312
+        },
+        {
+          "low": 301,
+          "open": 302.88,
+          "volume": 104567890,
+          "date": "2024-10-14",
+          "close": 308.72,
+          "high": 310
+        },
+        {
+          "low": 297.82,
+          "open": 298.5,
+          "volume": 110123456,
+          "date": "2024-10-07",
+          "close": 302.88,
+          "high": 305
+        },
+        {
+          "low": 308,
+          "open": 310.78,
+          "volume": 105678901,
+          "date": "2024-09-30",
+          "close": 310.78,
+          "high": 315
+        },
+        {
+          "low": 310.5,
+          "open": 312.1,
+          "volume": 99876543,
+          "date": "2024-09-23",
+          "close": 310.78,
+          "high": 318
+        },
+        {
+          "low": 304,
+          "open": 305.4,
+          "volume": 102345678,
+          "date": "2024-09-16",
+          "close": 312.1,
+          "high": 314
+        },
+        {
+          "low": 298,
+          "open": 299.8,
+          "volume": 107890123,
+          "date": "2024-09-09",
+          "close": 305.4,
+          "high": 306
+        },
+        {
+          "low": 295,
+          "open": 303.2,
+          "volume": 112345678,
+          "date": "2024-09-02",
+          "close": 299.8,
+          "high": 304
+        },
+        {
+          "low": 302,
+          "open": 311.5,
+          "volume": 108765432,
+          "date": "2024-08-26",
+          "close": 303.2,
+          "high": 315
+        },
+        {
+          "low": 310,
+          "open": 318.4,
+          "volume": 104321098,
+          "date": "2024-08-19",
+          "close": 311.5,
+          "high": 320
+        },
+        {
+          "low": 317,
+          "open": 325.1,
+          "volume": 106543210,
+          "date": "2024-08-12",
+          "close": 318.4,
+          "high": 328
+        },
+        {
+          "low": 320,
+          "open": 322.6,
+          "volume": 101234567,
+          "date": "2024-08-05",
+          "close": 325.1,
+          "high": 326
+        },
+        {
+          "low": 313,
+          "open": 314.9,
+          "volume": 109876543,
+          "date": "2024-07-29",
+          "close": 322.6,
+          "high": 323
+        }
+      ],
+      "1H": [
+        {
+          "price": 339.03,
+          "volume": 3150000,
+          "time": "15:30"
+        },
+        {
+          "price": 338.95,
+          "volume": 2800000,
+          "time": "15:29"
+        },
+        {
+          "price": 339.1,
+          "volume": 2950000,
+          "time": "15:28"
+        },
+        {
+          "price": 338.8,
+          "volume": 2700000,
+          "time": "15:27"
+        },
+        {
+          "price": 338.65,
+          "volume": 2600000,
+          "time": "15:26"
+        },
+        {
+          "price": 338.75,
+          "volume": 2650000,
+          "time": "15:25"
+        },
+        {
+          "price": 338.5,
+          "volume": 2500000,
+          "time": "15:20"
+        },
+        {
+          "price": 338.2,
+          "volume": 2400000,
+          "time": "15:15"
+        },
+        {
+          "price": 338,
+          "volume": 2300000,
+          "time": "15:10"
+        },
+        {
+          "price": 337.9,
+          "volume": 2200000,
+          "time": "15:05"
+        },
+        {
+          "price": 337.8,
+          "volume": 2100000,
+          "time": "15:00"
+        },
+        {
+          "price": 338.1,
+          "volume": 2350000,
+          "time": "14:55"
+        },
+        {
+          "price": 338.3,
+          "volume": 2450000,
+          "time": "14:50"
+        },
+        {
+          "price": 338.45,
+          "volume": 2550000,
+          "time": "14:45"
+        },
+        {
+          "price": 338.6,
+          "volume": 2600000,
+          "time": "14:40"
+        },
+        {
+          "price": 338.55,
+          "volume": 2580000,
+          "time": "14:35"
+        },
+        {
+          "price": 338.7,
+          "volume": 2650000,
+          "time": "14:30"
+        },
+        {
+          "price": 339,
+          "volume": 2900000,
+          "time": "14:25"
+        },
+        {
+          "price": 339.2,
+          "volume": 3100000,
+          "time": "14:20"
+        },
+        {
+          "price": 339.5,
+          "volume": 3300000,
+          "time": "14:15"
+        },
+        {
+          "price": 339.3,
+          "volume": 3200000,
+          "time": "14:10"
+        },
+        {
+          "price": 339.15,
+          "volume": 3050000,
+          "time": "14:05"
+        },
+        {
+          "price": 338.9,
+          "volume": 2850000,
+          "time": "14:00"
+        },
+        {
+          "price": 338.75,
+          "volume": 2750000,
+          "time": "13:55"
+        },
+        {
+          "price": 338.85,
+          "volume": 2800000,
+          "time": "13:50"
+        },
+        {
+          "price": 338.95,
+          "volume": 2900000,
+          "time": "13:45"
+        },
+        {
+          "price": 339.05,
+          "volume": 3000000,
+          "time": "13:40"
+        },
+        {
+          "price": 339.25,
+          "volume": 3150000,
+          "time": "13:35"
+        },
+        {
+          "price": 339.4,
+          "volume": 3250000,
+          "time": "13:30"
+        },
+        {
+          "price": 339.6,
+          "volume": 3400000,
+          "time": "13:25"
+        },
+        {
+          "price": 339.8,
+          "volume": 3500000,
+          "time": "13:20"
+        },
+        {
+          "price": 340.1,
+          "volume": 3600000,
+          "time": "13:15"
+        },
+        {
+          "price": 339.9,
+          "volume": 3550000,
+          "time": "13:10"
+        },
+        {
+          "price": 339.7,
+          "volume": 3450000,
+          "time": "13:05"
+        },
+        {
+          "price": 339.5,
+          "volume": 3350000,
+          "time": "13:00"
+        },
+        {
+          "price": 339.35,
+          "volume": 3250000,
+          "time": "12:55"
+        },
+        {
+          "price": 339.2,
+          "volume": 3150000,
+          "time": "12:50"
+        },
+        {
+          "price": 339,
+          "volume": 3000000,
+          "time": "12:45"
+        },
+        {
+          "price": 338.8,
+          "volume": 2800000,
+          "time": "12:40"
+        },
+        {
+          "price": 338.65,
+          "volume": 2700000,
+          "time": "12:35"
+        },
+        {
+          "price": 338.5,
+          "volume": 2600000,
+          "time": "12:30"
+        },
+        {
+          "price": 338.3,
+          "volume": 2400000,
+          "time": "12:25"
+        },
+        {
+          "price": 338.1,
+          "volume": 2300000,
+          "time": "12:20"
+        },
+        {
+          "price": 337.95,
+          "volume": 2200000,
+          "time": "12:15"
+        },
+        {
+          "price": 337.75,
+          "volume": 2100000,
+          "time": "12:10"
+        },
+        {
+          "price": 337.6,
+          "volume": 2000000,
+          "time": "12:05"
+        },
+        {
+          "price": 337.5,
+          "volume": 1900000,
+          "time": "12:00"
+        },
+        {
+          "price": 337.3,
+          "volume": 1800000,
+          "time": "11:55"
+        },
+        {
+          "price": 337.1,
+          "volume": 1700000,
+          "time": "11:50"
+        },
+        {
+          "price": 336.9,
+          "volume": 1600000,
+          "time": "11:45"
+        },
+        {
+          "price": 336.7,
+          "volume": 1500000,
+          "time": "11:40"
+        },
+        {
+          "price": 336.5,
+          "volume": 1400000,
+          "time": "11:35"
+        },
+        {
+          "price": 336.3,
+          "volume": 1300000,
+          "time": "11:30"
+        },
+        {
+          "price": 336.1,
+          "volume": 1200000,
+          "time": "11:25"
+        },
+        {
+          "price": 335.9,
+          "volume": 1100000,
+          "time": "11:20"
+        },
+        {
+          "price": 335.7,
+          "volume": 1000000,
+          "time": "11:15"
+        },
+        {
+          "price": 335.5,
+          "volume": 900000,
+          "time": "11:10"
+        },
+        {
+          "price": 335.3,
+          "volume": 800000,
+          "time": "11:05"
+        },
+        {
+          "price": 335.1,
+          "volume": 700000,
+          "time": "11:00"
+        },
+        {
+          "price": 335.2,
+          "volume": 600000,
+          "time": "10:55"
+        }
+      ],
+      "1W": [
+        {
+          "price": 339.03,
+          "volume": 91200320,
+          "time": "Mon"
+        },
+        {
+          "price": 329.65,
+          "volume": 85123456,
+          "time": "Fri"
+        },
+        {
+          "price": 315.4,
+          "volume": 92345678,
+          "time": "Thu"
+        },
+        {
+          "price": 310.21,
+          "volume": 95678901,
+          "time": "Wed"
+        },
+        {
+          "price": 308.72,
+          "volume": 98012345,
+          "time": "Tue"
+        },
+        {
+          "price": 305.5,
+          "volume": 101234567,
+          "time": "Mon"
+        },
+        {
+          "price": 302.88,
+          "volume": 104567890,
+          "time": "Fri"
+        }
+      ],
+      "1D": [
+        {
+          "price": 339.03,
+          "volume": 10532174,
+          "time": "16:00"
+        },
+        {
+          "price": 338.9,
+          "volume": 9875000,
+          "time": "15:30"
+        },
+        {
+          "price": 337.8,
+          "volume": 8120000,
+          "time": "15:00"
+        },
+        {
+          "price": 338.7,
+          "volume": 7650000,
+          "time": "14:30"
+        },
+        {
+          "price": 338.9,
+          "volume": 7100000,
+          "time": "14:00"
+        },
+        {
+          "price": 339.4,
+          "volume": 6900000,
+          "time": "13:30"
+        },
+        {
+          "price": 339.5,
+          "volume": 6500000,
+          "time": "13:00"
+        },
+        {
+          "price": 338.5,
+          "volume": 6100000,
+          "time": "12:30"
+        },
+        {
+          "price": 337.5,
+          "volume": 5800000,
+          "time": "12:00"
+        },
+        {
+          "price": 336.3,
+          "volume": 5500000,
+          "time": "11:30"
+        },
+        {
+          "price": 335.1,
+          "volume": 5200000,
+          "time": "11:00"
+        },
+        {
+          "price": 334.5,
+          "volume": 4900000,
+          "time": "10:30"
+        },
+        {
+          "price": 334.8,
+          "volume": 4600000,
+          "time": "10:00"
+        },
+        {
+          "price": 334.15,
+          "volume": 4300000,
+          "time": "09:30"
+        },
+        {
+          "price": 330.1,
+          "volume": 4100000,
+          "time": "09:00"
+        },
+        {
+          "price": 329.8,
+          "volume": 3900000,
+          "time": "08:30"
+        },
+        {
+          "price": 329.65,
+          "volume": 3700000,
+          "time": "08:00"
+        },
+        {
+          "price": 329.5,
+          "volume": 3500000,
+          "time": "04:00"
+        },
+        {
+          "price": 329.61,
+          "volume": 3300000,
+          "time": "00:00"
+        },
+        {
+          "price": 329.7,
+          "volume": 3100000,
+          "time": "23:30"
+        },
+        {
+          "price": 329.85,
+          "volume": 2900000,
+          "time": "23:00"
+        },
+        {
+          "price": 330,
+          "volume": 2700000,
+          "time": "22:30"
+        },
+        {
+          "price": 330.15,
+          "volume": 2500000,
+          "time": "22:00"
+        },
+        {
+          "price": 330.3,
+          "volume": 2300000,
+          "time": "21:30"
+        }
+      ]
+    },
+    "sentiment_analysis": {
+      "social_sentiment": "neutral",
+      "sentiment_score": 0.58,
+      "market_psychology": "bullish",
+      "analyst_ratings": {
+        "average_rating": "hold",
+        "buy": 32,
+        "hold": 18,
+        "sell": 14
+      },
+      "fear_greed_index": 60,
+      "comment": "Tesla's market sentiment is a complex mixture of neutral to slightly bullish sentiment from news and social media, counterbalanced by a more cautious 'Hold' consensus from Wall Street analysts. The market psychology is characterized by a significant divergence between the engaged and often optimistic retail investor base and the more measured institutional and analytical community.",
+      "news_sentiment": "positive",
+      "overall_sentiment": "neutral"
+    },
+    "events": {
+      "dividend": {
+        "amount": 0,
+        "yield": 0,
+        "next_date": "N/A"
+      },
+      "upcoming_earnings": {
+        "days_until": 361,
+        "date": "2025-10-22",
+        "estimate_eps": 1.73
+      },
+      "corporate_actions": [
+        {
+          "date": "2022-08-25",
+          "type": "split",
+          "details": "Three-for-one stock split."
+        }
+      ],
+      "upcoming_events": [
+        {
+          "headline": "Q3 2025 Earnings Report",
+          "date": "2025-10-22",
+          "impact": "positive"
+        },
+        {
+          "headline": "Anticipated Robotaxi Service Launch",
+          "date": "2025-11-15",
+          "impact": "positive"
+        },
+        {
+          "headline": "Giga Berlin Production Milestone Announcement",
+          "date": "2025-12-01",
+          "impact": "positive"
+        }
+      ],
+      "recent_news": [
+        {
+          "headline": "Tesla's North American director of service leaves EV maker.",
+          "date": "2025-08-12",
+          "impact": "negative"
+        },
+        {
+          "headline": "Tesla seeks UK licence to supply electricity.",
+          "date": "2025-08-11",
+          "impact": "positive"
+        },
+        {
+          "headline": "Tesla CEO Elon Musk confirms Robotaxi is opening to the public.",
+          "date": "2025-08-11",
+          "impact": "positive"
+        },
+        {
+          "headline": "Tesla ordered to pay $200 million in punitive damages over fatal crash.",
+          "date": "2025-08-10",
+          "impact": "negative"
+        }
+      ]
+    },
+    "technical_analysis": {
+      "trend": "bullish",
+      "volume_analysis": {
+        "on_balance_volume": 18578000000,
+        "comment": "On-Balance Volume is in a rising trend, suggesting that volume is flowing into the stock and confirming the price uptrend.",
+        "volume_ratio": 1.13,
+        "volume_trend": "increasing"
+      },
+      "bollinger_bands": {
+        "upper": 349.99,
+        "comment": "The price is trading in the upper portion of the Bollinger Bands, which is a bullish sign. A break above the upper band could signal further upside.",
+        "lower": 312.93,
+        "middle": 331.46
+      },
+      "moving_averages": {
+        "sma_200": 315.86,
+        "comment": "Price is trading decisively above all key short, medium, and long-term moving averages, confirming a strong bullish trend across all timeframes.",
+        "sma_50": 318.57,
+        "sma_20": 331.46,
+        "ema_26": 324.74,
+        "ema_12": 332.9
+      },
+      "resistance_levels": [
+        349.99,
+        360
+      ],
+      "rsi": 64.38,
+      "macd": {
+        "signal": "buy",
+        "comment": "The MACD line is above the signal line and the histogram is positive, indicating bullish momentum is increasing.",
+        "value": 7.23,
+        "histogram": 0.73
+      },
+      "support_levels": [
+        333.24,
+        320.1
+      ],
+      "signals": [
+        {
+          "indicator": "Price Action",
+          "strength": "strong",
+          "type": "buy"
+        },
+        {
+          "indicator": "Moving Averages",
+          "strength": "strong",
+          "type": "buy"
+        },
+        {
+          "indicator": "MACD",
+          "strength": "medium",
+          "type": "hold"
+        },
+        {
+          "indicator": "RSI",
+          "strength": "weak",
+          "type": "hold"
+        }
+      ]
+    },
+    "overview": {
+      "current_price": 339.03,
+      "avg_volume": 104888272,
+      "market_cap": "1090.00B",
+      "change_percent": "+2.85%",
+      "pe_ratio": 195.97,
+      "volume": 91200320,
+      "52_week_low": 192.04,
+      "52_week_high": 488.54
+    }
+  },
+  "timestamp": 1754994900.949268,
+  "usage_metadata": {
+    "totalTokenCount": 26402,
+    "cachedContentTokenCount": 3842,
+    "candidatesTokenCount": 6716,
+    "thoughtsTokenCount": 2232,
+    "promptTokenCount": 17454,
+    "promptTokensDetails": [
+      {
+        "tokenCount": 17454,
+        "modality": "TEXT"
+      }
+    ],
+    "cacheTokensDetails": [
+      {
+        "tokenCount": 3842,
+        "modality": "TEXT"
+      }
+    ]
+  },
+  "response_type": "adk_structured"
+}

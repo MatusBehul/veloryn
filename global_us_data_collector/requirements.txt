@@ -1,0 +1,4 @@
+google-cloud-firestore==2.13.1
+functions-framework==3.4.0
+pydantic==2.11.7
+requests==2.32.4
