@@ -51,15 +51,21 @@ jobs:
 
     - name: Install ADK CLI
       run: |
-        echo "📦 Installing ADK CLI..."
-        pip install --upgrade pip
-        pip install adk-cli
+        echo "📦 Installing Google ADK CLI..."
+        
+        # Install ADK CLI using the official Google installer
+        curl -fsSL https://storage.googleapis.com/adk-cli/install.sh | bash
+        
+        # Add ADK to PATH
+        export PATH="$HOME/.adk/bin:$PATH"
+        echo "$HOME/.adk/bin" >> $GITHUB_PATH
+        
         echo "✅ ADK CLI installed successfully"
 
     - name: Verify ADK installation
       run: |
         echo "🔍 Verifying ADK installation..."
-        adk --version
+        adk version
         echo "✅ ADK CLI is ready"
 
     - name: Deploy with ADK
