@@ -1,3 +1,8 @@
-google-adk
+google-cloud-aiplatform
+google-generativeai
 google-cloud-logging
 google-cloud-firestore
+fastapi
+uvicorn[standard]
+pydantic
+requests

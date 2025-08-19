@@ -24,7 +24,7 @@ on:
 
 env:
   FUNCTION_NAME: global-us-data-collector
-  REGION: eu-west1
+  REGION: ${{ env.GOOGLE_CLOUD_LOCATION }}
   RUNTIME: python311
 
 jobs:

@@ -24,7 +24,7 @@ on:
 
 env:
   SERVICE_NAME: web-app
-  REGION: eu-west1
+  REGION: ${{ env.GOOGLE_CLOUD_LOCATION }}
 
 jobs:
   deploy:

@@ -24,7 +24,7 @@ on:
 
 env:
   FUNCTION_NAME: hourly-analysis-checker
-  REGION: eu-west1
+  REGION: ${{ env.GOOGLE_CLOUD_LOCATION }}
   RUNTIME: python311
 
 jobs:

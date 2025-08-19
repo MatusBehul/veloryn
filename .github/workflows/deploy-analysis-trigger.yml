@@ -24,7 +24,7 @@ on:
 
 env:
   FUNCTION_NAME: financial-analysis-trigger
-  REGION: eu-west1
+  REGION: ${{ env.GOOGLE_CLOUD_LOCATION }}
   RUNTIME: python311
 
 jobs:
@@ -57,10 +57,10 @@ jobs:
         cd analysis_trigger_cloud_function
         
         echo "🚀 Deploying Cloud Function..."
-        echo "Function name: ${{ env.FUNCTION_NAME }}-${{ env.ENV_SUFFIX }}"
+        echo "Function name: ${{ env.FUNCTION_NAME }}"
         echo "Project: ${{ env.PROJECT_ID }}"
         
-        gcloud functions deploy ${{ env.FUNCTION_NAME }}-${{ env.ENV_SUFFIX }} \
+        gcloud functions deploy ${{ env.FUNCTION_NAME }} \
           --gen2 \
           --runtime python311 \
           --region ${{ env.REGION }} \

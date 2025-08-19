@@ -19,7 +19,7 @@ on:
 
 env:
   SERVICE_NAME: llm-summary-agent
-  REGION: us-central1
+  REGION: ${{ env.GOOGLE_CLOUD_LOCATION }}
   GOOGLE_CLOUD_PROJECT: ${{ vars.GOOGLE_CLOUD_PROJECT || secrets.GOOGLE_CLOUD_PROJECT }}
 
 jobs:

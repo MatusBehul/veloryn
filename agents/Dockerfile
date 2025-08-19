@@ -26,19 +26,5 @@ ENV PORT=8080
 # Expose the port the app runs on
 EXPOSE 8080
 
-# Create a simple server script to run the ADK agent
-RUN echo '#!/usr/bin/env python3\n\
-import os\n\
-from google.adk.core import serve\n\
-from analysis_reporter.agent import root_agent\n\
-\n\
-if __name__ == "__main__":\n\
-    port = int(os.environ.get("PORT", 8080))\n\
-    serve(root_agent, port=port, host="0.0.0.0")\n\
-' > /app/main.py
-
-# Make the script executable
-RUN chmod +x /app/main.py
-
 # Run the application
 CMD ["python", "main.py"]
