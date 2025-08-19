@@ -16,11 +16,6 @@ on:
       environment:
         required: true
         type: string
-  push:
-    branches:
-      - main
-    paths:
-      - 'email_sending_cloud_function/**'
 
 env:
   FUNCTION_NAME: email-processor

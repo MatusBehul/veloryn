@@ -16,11 +16,6 @@ on:
       environment:
         required: true
         type: string
-  push:
-    branches:
-      - main
-    paths:
-      - 'global_us_data_collector/**'
 
 env:
   FUNCTION_NAME: global-us-data-collector
