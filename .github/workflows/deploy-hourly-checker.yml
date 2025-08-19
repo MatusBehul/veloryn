@@ -24,7 +24,6 @@ on:
 
 env:
   FUNCTION_NAME: hourly-analysis-checker
-  REGION: ${{ env.GOOGLE_CLOUD_LOCATION }}
   RUNTIME: python311
 
 jobs:
@@ -50,7 +49,7 @@ jobs:
     - name: Set up Cloud SDK
       uses: google-github-actions/setup-gcloud@v2
       with:
-        project_id: ${{ env.GOOGLE_CLOUD_PROJECT }}
+        project_id: ${{ vars.GOOGLE_CLOUD_PROJECT }}
 
     - name: Create Pub/Sub topics
       run: |
@@ -58,10 +57,10 @@ jobs:
         
         # Create hourly-checker-trigger topic
         echo "Creating hourly-checker-trigger topic..."
-        if gcloud pubsub topics describe hourly-checker-trigger --project=${{ env.GOOGLE_CLOUD_PROJECT }} &>/dev/null; then
+        if gcloud pubsub topics describe hourly-checker-trigger --project=${{ vars.GOOGLE_CLOUD_PROJECT }} &>/dev/null; then
           echo "✅ Topic hourly-checker-trigger already exists"
         else
-          gcloud pubsub topics create hourly-checker-trigger --project=${{ env.GOOGLE_CLOUD_PROJECT }} || {
+          gcloud pubsub topics create hourly-checker-trigger --project=${{ vars.GOOGLE_CLOUD_PROJECT }} || {
             echo "❌ Failed to create hourly-checker-trigger topic"
             exit 1
           }
@@ -74,17 +73,17 @@ jobs:
         
         echo "🚀 Deploying Hourly Analysis Checker..."
         echo "Function name: ${{ env.FUNCTION_NAME }}"
-        echo "Project: ${{ env.GOOGLE_CLOUD_PROJECT }}"
+        echo "Project: ${{ vars.GOOGLE_CLOUD_PROJECT }}"
         
         gcloud functions deploy ${{ env.FUNCTION_NAME }} \
           --gen2 \
           --runtime ${{ env.RUNTIME }} \
-          --region ${{ env.REGION }} \
+          --region ${{ vars.GOOGLE_CLOUD_LOCATION }} \
           --source . \
           --entry-point check_new_analyses \
           --trigger-topic hourly-checker-trigger \
           --memory 1GiB \
           --timeout 540s \
           --max-instances 1 \
-          --set-env-vars="GCP_PROJECT=${{ env.GOOGLE_CLOUD_PROJECT }},EMAIL_PUBSUB_TOPIC=hourly-checker-trigger,ANALYSIS_BATCH_SIZE=50,LOOKBACK_HOURS=1" \
+          --set-env-vars="GCP_PROJECT=${{ vars.GOOGLE_CLOUD_PROJECT }},EMAIL_PUBSUB_TOPIC=hourly-checker-trigger,ANALYSIS_BATCH_SIZE=50,LOOKBACK_HOURS=1" \
           --no-allow-unauthenticated

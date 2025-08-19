@@ -19,8 +19,6 @@ on:
 
 env:
   SERVICE_NAME: llm-summary-agent
-  REGION: ${{ env.GOOGLE_CLOUD_LOCATION }}
-  GOOGLE_CLOUD_PROJECT: ${{ vars.GOOGLE_CLOUD_PROJECT || secrets.GOOGLE_CLOUD_PROJECT }}
 
 jobs:
   deploy:
@@ -47,7 +45,7 @@ jobs:
     - name: Set up Cloud SDK
       uses: google-github-actions/setup-gcloud@v2
       with:
-        project_id: ${{ env.GOOGLE_CLOUD_PROJECT }}
+        project_id: ${{ vars.GOOGLE_CLOUD_PROJECT }}
 
     - name: Configure Docker for Google Cloud
       run: |
@@ -60,9 +58,9 @@ jobs:
         gcloud run deploy ${{ env.SERVICE_NAME }} \
           --source . \
           --platform managed \
-          --region ${{ env.REGION }} \
+          --region ${{ vars.GOOGLE_CLOUD_LOCATION }} \
           --allow-unauthenticated \
-          --project ${{ env.GOOGLE_CLOUD_PROJECT }} \
+          --project ${{ vars.GOOGLE_CLOUD_PROJECT }} \
           --memory=2Gi \
           --cpu=1 \
           --timeout=3600 \
@@ -74,7 +72,7 @@ jobs:
       run: |
         SERVICE_URL=$(gcloud run services describe llm-summary-agent \
           --platform managed \
-          --region ${{ env.REGION }} \
+          --region ${{ vars.GOOGLE_CLOUD_LOCATION }} \
           --format 'value(status.url)' 2>/dev/null || echo "")
         
         if [ -n "$SERVICE_URL" ]; then

@@ -24,7 +24,6 @@ on:
 
 env:
   FUNCTION_NAME: email-processor
-  REGION: ${{ env.GOOGLE_CLOUD_LOCATION }}
   RUNTIME: python311
 
 jobs:
@@ -50,7 +49,7 @@ jobs:
     - name: Set up Cloud SDK
       uses: google-github-actions/setup-gcloud@v2
       with:
-        project_id: ${{ env.GOOGLE_CLOUD_PROJECT }}
+        project_id: ${{ vars.GOOGLE_CLOUD_PROJECT }}
 
     - name: Create Pub/Sub topics
       run: |
@@ -58,10 +57,10 @@ jobs:
         
         # Create email-analysis-requests topic
         echo "Creating email-analysis-requests topic..."
-        if gcloud pubsub topics describe email-analysis-requests --project=${{ env.GOOGLE_CLOUD_PROJECT }} &>/dev/null; then
+        if gcloud pubsub topics describe email-analysis-requests --project=${{ vars.GOOGLE_CLOUD_PROJECT }} &>/dev/null; then
           echo "✅ Topic email-analysis-requests already exists"
         else
-          gcloud pubsub topics create email-analysis-requests --project=${{ env.GOOGLE_CLOUD_PROJECT }} || {
+          gcloud pubsub topics create email-analysis-requests --project=${{ vars.GOOGLE_CLOUD_PROJECT }} || {
             echo "❌ Failed to create email-analysis-requests topic"
             exit 1
           }
@@ -74,15 +73,15 @@ jobs:
         
         echo "🚀 Deploying Email Cloud Function..."
         echo "Function name: ${{ env.FUNCTION_NAME }}"
-        echo "Project: ${{ env.GOOGLE_CLOUD_PROJECT }}"
+        echo "Project: ${{ vars.GOOGLE_CLOUD_PROJECT }}"
         
         gcloud functions deploy ${{ env.FUNCTION_NAME }} \
           --gen2 \
           --runtime ${{ env.RUNTIME }} \
-          --region ${{ env.REGION }} \
+          --region ${{ vars.GOOGLE_CLOUD_LOCATION }} \
           --source . \
           --entry-point process_email_request \
           --trigger-topic email-analysis-requests \
           --memory 512MB \
           --timeout 540s \
-          --set-env-vars="GCP_PROJECT=${{ env.GOOGLE_CLOUD_PROJECT }},MAILGUN_API_KEY=${{ secrets.MAILGUN_API_KEY }},MAILGUN_DOMAIN=${{ env.MAILGUN_DOMAIN }}"
+          --set-env-vars="GCP_PROJECT=${{ vars.GOOGLE_CLOUD_PROJECT }},MAILGUN_API_KEY=${{ secrets.MAILGUN_API_KEY }},MAILGUN_DOMAIN=${{ env.MAILGUN_DOMAIN }}"

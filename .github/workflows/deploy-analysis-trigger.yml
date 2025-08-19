@@ -24,7 +24,6 @@ on:
 
 env:
   FUNCTION_NAME: financial-analysis-trigger
-  REGION: ${{ env.GOOGLE_CLOUD_LOCATION }}
   RUNTIME: python311
 
 jobs:
@@ -50,7 +49,7 @@ jobs:
     - name: Set up Cloud SDK
       uses: google-github-actions/setup-gcloud@v2
       with:
-        project_id: ${{ env.GOOGLE_CLOUD_PROJECT }}
+        project_id: ${{ vars.GOOGLE_CLOUD_PROJECT }}
 
     - name: Deploy Cloud Function
       run: |
@@ -63,7 +62,7 @@ jobs:
         gcloud functions deploy ${{ env.FUNCTION_NAME }} \
           --gen2 \
           --runtime python311 \
-          --region ${{ env.REGION }} \
+          --region ${{ vars.GOOGLE_CLOUD_LOCATION }} \
           --source . \
           --entry-point content_trigger_function \
           --trigger-http \
@@ -71,4 +70,4 @@ jobs:
           --memory 512MB \
           --timeout 540s \
           --max-instances 100 \
-          --set-env-vars="GCP_PROJECT=${{ env.GOOGLE_CLOUD_PROJECT }},ALPHAVANTAGE_API_KEY=${{ secrets.ALPHAVANTAGE_API_KEY }},CLOUD_RUN_URL=https://llm-summary-agent-377791692293.us-west1.run.app"
+          --set-env-vars="GCP_PROJECT=${{ vars.GOOGLE_CLOUD_PROJECT }},ALPHAVANTAGE_API_KEY=${{ secrets.ALPHAVANTAGE_API_KEY }},CLOUD_RUN_URL=https://llm-summary-agent-377791692293.us-west1.run.app"
