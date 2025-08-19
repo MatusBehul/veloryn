@@ -30,13 +30,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Determine deployment environment
-      id: env-setup
-      run: |
-        DEPLOY_ENV="${{ github.event.inputs.environment || inputs.environment || 'test' }}"
-        echo "deploy_env=$DEPLOY_ENV" >> $GITHUB_OUTPUT
-        echo "Deploying to environment: $DEPLOY_ENV"
-
     - name: Authenticate to Google Cloud
       uses: google-github-actions/auth@v2
       with:
@@ -47,30 +40,40 @@ jobs:
       with:
         project_id: ${{ vars.GOOGLE_CLOUD_PROJECT }}
 
-    - name: Configure Docker for Google Cloud
+    - name: Install ADK CLI
       run: |
-        gcloud auth configure-docker
+        echo "📦 Installing Google ADK..."
+        pip install --upgrade pip
+        pip install google-adk
+        echo "✅ Google ADK installed successfully"
 
-    - name: Deploy to Cloud Run
+    - name: Verify ADK installation
+      run: |
+        echo "🔍 Verifying ADK installation..."
+        pip show google-adk
+        adk --help
+        echo "✅ ADK CLI is ready"
+
+    - name: Deploy with ADK CLI
       run: |
         cd agents
-        echo "🚀 Deploying agents to Cloud Run..."
-        gcloud run deploy ${{ env.SERVICE_NAME }} \
-          --source . \
-          --platform managed \
-          --region ${{ vars.GOOGLE_CLOUD_LOCATION }} \
-          --allow-unauthenticated \
-          --project ${{ vars.GOOGLE_CLOUD_PROJECT }} \
-          --memory=2Gi \
-          --cpu=1 \
-          --timeout=3600 \
-          --max-instances=10 \
-          --port=8080
+        echo "🚀 Deploying agents with official ADK CLI..."
+        
+        # Set required environment variables for ADK
+        export GOOGLE_GENAI_USE_VERTEXAI=True
+        
+        # Deploy using the official ADK CLI command
+        adk deploy cloud_run \
+          --project=${{ vars.GOOGLE_CLOUD_PROJECT }} \
+          --region=${{ vars.GOOGLE_CLOUD_LOCATION }} \
+          --service_name=${{ env.SERVICE_NAME }} \
+          --with_ui \
+          analysis_reporter/
 
     - name: Get service URL
       id: get-url
       run: |
-        SERVICE_URL=$(gcloud run services describe llm-summary-agent \
+        SERVICE_URL=$(gcloud run services describe ${{ env.SERVICE_NAME }} \
           --platform managed \
           --region ${{ vars.GOOGLE_CLOUD_LOCATION }} \
           --format 'value(status.url)' 2>/dev/null || echo "")
