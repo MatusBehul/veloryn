@@ -16,15 +16,11 @@ on:
       environment:
         required: true
         type: string
-  push:
-    branches:
-      - main
-    paths:
-      - 'agents/**'
 
 env:
   SERVICE_NAME: llm-summary-agent
   REGION: us-central1
+  GOOGLE_CLOUD_PROJECT: ${{ vars.GOOGLE_CLOUD_PROJECT || secrets.GOOGLE_CLOUD_PROJECT }}
 
 jobs:
   deploy:
@@ -53,20 +49,20 @@ jobs:
       with:
         project_id: ${{ env.GOOGLE_CLOUD_PROJECT }}
 
-    - name: Check if ADK is available
-      id: check-adk
+    - name: Install ADK CLI
       run: |
-        cd agents
-        if command -v adk &> /dev/null; then
-          echo "adk_available=true" >> $GITHUB_OUTPUT
-          echo "✅ ADK CLI is available"
-        else
-          echo "adk_available=false" >> $GITHUB_OUTPUT
-          echo "⚠️ ADK CLI not found, will use gcloud directly"
-        fi
+        echo "📦 Installing ADK CLI..."
+        pip install --upgrade pip
+        pip install adk-cli
+        echo "✅ ADK CLI installed successfully"
 
-    - name: Deploy with ADK (if available)
-      if: steps.check-adk.outputs.adk_available == 'true'
+    - name: Verify ADK installation
+      run: |
+        echo "🔍 Verifying ADK installation..."
+        adk --version
+        echo "✅ ADK CLI is ready"
+
+    - name: Deploy with ADK
       run: |
         cd agents
         echo "🚀 Deploying with ADK..."
@@ -77,7 +73,7 @@ jobs:
       run: |
         SERVICE_URL=$(gcloud run services describe llm-summary-agent \
           --platform managed \
-          --region eu-west1 \
+          --region ${{ env.REGION }} \
           --format 'value(status.url)' 2>/dev/null || echo "")
         
         if [ -n "$SERVICE_URL" ]; then
