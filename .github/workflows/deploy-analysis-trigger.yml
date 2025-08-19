@@ -65,4 +65,4 @@ jobs:
           --memory 512MB \
           --timeout 540s \
           --max-instances 100 \
-          --set-env-vars="GCP_PROJECT=${{ vars.GOOGLE_CLOUD_PROJECT }},ALPHAVANTAGE_API_KEY=${{ secrets.ALPHAVANTAGE_API_KEY }},CLOUD_RUN_URL=https://llm-summary-agent-377791692293.us-west1.run.app"
+          --set-env-vars="GCP_PROJECT=${{ vars.GOOGLE_CLOUD_PROJECT }},ALPHAVANTAGE_API_KEY=${{ secrets.ALPHAVANTAGE_API_KEY }},CLOUD_RUN_URL=https://llm-summary-agent-377791692293.${{ vars.GOOGLE_CLOUD_LOCATION }}.run.app"
