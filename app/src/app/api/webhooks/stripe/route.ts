@@ -236,7 +236,6 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
     console.error(`❌ Failed to cancel subscription for user ${userId}:`, error);
     throw error;
   }
-  }, { merge: true });
 
   console.log(`Successfully canceled subscription for user ${userId}`);
 }
