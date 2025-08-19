@@ -21,9 +21,6 @@ on:
         type: string
         default: 'create-or-update'
 
-env:
-  REGION: us-central1
-
 jobs:
   deploy-schedulers:
     name: Deploy Cloud Scheduler Jobs
@@ -108,7 +105,6 @@ jobs:
         done
 
     - name: Create or update hourly analysis checker job
-      if: env.ACTION == 'create-or-update'
       run: |
         echo "📅 Creating/updating hourly analysis checker job..."
         
@@ -148,7 +144,6 @@ jobs:
         fi
 
     - name: Create or update global data collector job
-      if: env.ACTION == 'create-or-update'
       run: |
         echo "📅 Creating/updating global US data collector job..."
         
