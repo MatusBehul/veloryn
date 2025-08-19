@@ -46,15 +46,18 @@ jobs:
     - name: Create environment configuration
       run: |
         cd app
-        # Create .env.local for build time
-        cat > .env.local << EOF
-        NEXT_PUBLIC_FIREBASE_PROJECT_ID="${{ vars.GOOGLE_CLOUD_PROJECT }}"
-        NEXT_PUBLIC_FIREBASE_API_KEY="${{ secrets.FIREBASE_API_KEY }}"
-        NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN="${{ vars.GOOGLE_CLOUD_PROJECT }}.firebaseapp.com"
-        NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET="${{ vars.GOOGLE_CLOUD_PROJECT }}.firebasestorage.app"
-        NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID="${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}"
-        NEXT_PUBLIC_FIREBASE_APP_ID="${{ secrets.FIREBASE_APP_ID }}"
-        NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="${{ secrets.STRIPE_PUBLISHABLE_KEY }}"
+        # Remove any existing env files to prevent conflicts
+        rm -f .env.local .env.production
+        
+        # Create production environment file for build
+        cat > .env.production << EOF
+        NEXT_PUBLIC_FIREBASE_PROJECT_ID=${{ vars.GOOGLE_CLOUD_PROJECT }}
+        NEXT_PUBLIC_FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY }}
+        NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=${{ vars.GOOGLE_CLOUD_PROJECT }}.firebaseapp.com
+        NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=${{ vars.GOOGLE_CLOUD_PROJECT }}.firebasestorage.app
+        NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
+        NEXT_PUBLIC_FIREBASE_APP_ID=${{ secrets.FIREBASE_APP_ID }}
+        NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${{ secrets.STRIPE_PUBLISHABLE_KEY }}
         EOF
         
         # Create .env.yaml for Cloud Run runtime
@@ -76,7 +79,14 @@ jobs:
     - name: Build application
       run: |
         cd app
-        npm run build
+        echo "Building with production environment..."
+        echo "Firebase Project: ${{ vars.GOOGLE_CLOUD_PROJECT }}"
+        
+        # Verify the environment files exist
+        ls -la .env.production
+        
+        # Build with production environment
+        NODE_ENV=production npm run build
 
     - name: Authenticate to Google Cloud
       uses: google-github-actions/auth@v2
