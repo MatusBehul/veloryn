@@ -719,7 +719,7 @@ async def process_financial_analysis(ticker: str, day_input: str = None, user_id
             # Call Cloud Run service
             result = await analyzer.call_cloud_run_service(payload)
 
-            logger.info("Retrieved response from LLM Agent:", result)
+            print("Retrieved response from LLM Agent:", result)
 
             # Calculate total function execution time
             function_execution_time = time.time() - function_start_time
@@ -731,6 +731,9 @@ async def process_financial_analysis(ticker: str, day_input: str = None, user_id
             error_message = None
 
             logger.info(f"Validating analysis data for {ticker}: type={type(analysis_data)}, keys={list(analysis_data.keys()) if isinstance(analysis_data, dict) else 'N/A'}")
+
+            # DEBUG: Log the full analysis data structure for troubleshooting
+            logger.error(f"DEBUG - Full analysis_data for {ticker}: {json.dumps(analysis_data, indent=2, default=str)[:2000]}...")  # Truncate to avoid huge logs
 
             # Check for error in result
             if not result.get('success'):
@@ -751,6 +754,9 @@ async def process_financial_analysis(ticker: str, day_input: str = None, user_id
                         analysis_content = analysis_data.get('analysis', [])
                         logger.info(f"Analysis content for {ticker}: type={type(analysis_content)}, length={len(analysis_content) if isinstance(analysis_content, list) else 'N/A'}")
                         
+                        # DEBUG: Log the analysis content structure
+                        logger.error(f"DEBUG - Analysis content for {ticker}: {json.dumps(analysis_content, indent=2, default=str)[:1500]}...")  # Truncate to avoid huge logs
+                        
                         if isinstance(analysis_content, list):
                             if len(analysis_content) == 0:
                                 error_detected = True
@@ -760,6 +766,9 @@ async def process_financial_analysis(ticker: str, day_input: str = None, user_id
                                 first_analysis = analysis_content[0]
                                 logger.info(f"First analysis item for {ticker}: type={type(first_analysis)}, keys={list(first_analysis.keys()) if isinstance(first_analysis, dict) else 'N/A'}")
                                 
+                                # DEBUG: Log the first analysis item structure
+                                logger.error(f"DEBUG - First analysis item for {ticker}: {json.dumps(first_analysis, indent=2, default=str)[:1000]}...")  # Truncate to avoid huge logs
+                                
                                 if isinstance(first_analysis, dict):
                                     if 'error' in first_analysis:
                                         error_detected = True
@@ -767,6 +776,9 @@ async def process_financial_analysis(ticker: str, day_input: str = None, user_id
                                     else:
                                         # Validate that we have the expected structure
                                         expected_keys = ['overall_analysis', 'technical_analysis', 'fundamental_analysis']
+                                        found_keys = [key for key in expected_keys if key in first_analysis]
+                                        logger.error(f"DEBUG - Expected keys check for {ticker}: expected={expected_keys}, found={found_keys}, all_keys={list(first_analysis.keys())}")
+                                        
                                         if not any(key in first_analysis for key in expected_keys):
                                             error_detected = True
                                             error_message = 'Analysis missing required fields'
@@ -777,12 +789,17 @@ async def process_financial_analysis(ticker: str, day_input: str = None, user_id
                                     error_message = 'Analysis item is not a valid object'
                         elif isinstance(analysis_content, dict):
                             # Handle case where analysis_content is a dict (single analysis object)
+                            logger.error(f"DEBUG - Dict analysis content for {ticker}: {json.dumps(analysis_content, indent=2, default=str)[:1000]}...")  # Truncate to avoid huge logs
+                            
                             if 'error' in analysis_content:
                                 error_detected = True
                                 error_message = analysis_content.get('error')
                             else:
                                 # Validate that we have the expected structure
                                 expected_keys = ['overall_analysis', 'technical_analysis', 'fundamental_analysis']
+                                found_keys = [key for key in expected_keys if key in analysis_content]
+                                logger.error(f"DEBUG - Expected keys check for {ticker} (dict): expected={expected_keys}, found={found_keys}, all_keys={list(analysis_content.keys())}")
+                                
                                 if not any(key in analysis_content for key in expected_keys):
                                     error_detected = True
                                     error_message = 'Analysis missing required fields'
