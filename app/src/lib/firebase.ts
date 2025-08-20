@@ -18,23 +18,14 @@ const firebaseConfig = {
 
 // Debug logging
 console.log('Firebase config status:', {
-  apiKey: !!firebaseConfig.apiKey,
-  authDomain: !!firebaseConfig.authDomain,
-  projectId: !!firebaseConfig.projectId,
-  storageBucket: !!firebaseConfig.storageBucket,
-  messagingSenderId: !!firebaseConfig.messagingSenderId,
-  appId: !!firebaseConfig.appId,
+  env: process.env,
+  apiKey: firebaseConfig.apiKey,
+  authDomain: firebaseConfig.authDomain,
+  projectId: firebaseConfig.projectId,
+  storageBucket: firebaseConfig.storageBucket,
+  messagingSenderId: firebaseConfig.messagingSenderId,
+  appId: firebaseConfig.appId,
 });
-
-// Environment debug info (only in development)
-if (process.env.NODE_ENV === 'development' && typeof window !== 'undefined') {
-  console.log('Environment debug:', {
-    NODE_ENV: process.env.NODE_ENV,
-    apiKeyExists: !!process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-    projectIdExists: !!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-    authDomainExists: !!process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  });
-}
 
 // Check if we have the required config
 const hasFirebaseConfig = !!(firebaseConfig.apiKey && 
