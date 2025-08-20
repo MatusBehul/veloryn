@@ -29,8 +29,44 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // Use provided priceId or fall back to default PRICE_ID
-    const selectedPriceId = priceId || PRICE_ID;
+    // Fetch price mappings from Firestore
+    let priceMapping: { [key: string]: string } = {};
+    try {
+      const configDoc = await adminDb.collection('conf').doc('subscriptions').get();
+      if (configDoc.exists) {
+        const configData = configDoc.data();
+        console.log('Fetched price config from Firestore:', configData);
+        
+        // Build price mapping from Firestore data
+        if (configData) {
+          for (const [priceId, tier] of Object.entries(configData)) {
+            if (typeof tier === 'string' && priceId.startsWith('price_1')) {
+              priceMapping[`price_${tier}`] = priceId;
+            }
+          }
+        }
+      } else {
+        console.warn('Subscriptions config document not found in Firestore');
+      }
+    } catch (firestoreError) {
+      console.error('Error fetching price config from Firestore:', firestoreError);
+    }
+    
+    console.log('Final price mapping:', priceMapping);
+
+    // Use provided priceId with mapping, or fall back to standard price
+    let selectedPriceId: string;
+    if (priceId && priceMapping[priceId]) {
+      selectedPriceId = priceMapping[priceId];
+    } else if (priceId && priceId.startsWith('price_1')) {
+      // If it's already a real Stripe price ID, use it directly
+      selectedPriceId = priceId;
+    } else {
+      // Default to standard price
+      selectedPriceId = priceMapping['price_standard'];
+    }
+
+    console.log('Price mapping:', { originalPriceId: priceId, selectedPriceId, PRICE_ID });
 
     // Create or retrieve customer
     let customer;
@@ -55,11 +91,27 @@ export async function POST(request: NextRequest) {
       }, { merge: true });
     }
 
-    // Get the base URL for redirect URLs
-    const baseUrl = process.env.NEXTAUTH_URL || request.headers.get('origin') || 'https://test.veloryn.wadby.cloud';
+    // Get the base URL for redirect URLs with robust fallback
+    let baseUrl = process.env.NEXTAUTH_URL;
+    
+    if (!baseUrl) {
+      // Fallback to request origin or hardcoded URL
+      const origin = request.headers.get('origin');
+      const host = request.headers.get('host');
+      
+      if (origin) {
+        baseUrl = origin;
+      } else if (host) {
+        baseUrl = `https://${host}`;
+      } else {
+        baseUrl = 'https://test.veloryn.wadby.cloud';
+      }
+    }
     
     console.log('Creating checkout session with base URL:', baseUrl);
     console.log('Environment NEXTAUTH_URL:', process.env.NEXTAUTH_URL);
+    console.log('Request origin:', request.headers.get('origin'));
+    console.log('Request host:', request.headers.get('host'));
     
     // Ensure the base URL has the proper scheme
     const normalizedBaseUrl = baseUrl.startsWith('http') ? baseUrl : `https://${baseUrl}`;
