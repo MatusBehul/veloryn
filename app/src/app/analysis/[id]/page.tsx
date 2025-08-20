@@ -20,7 +20,7 @@ interface AnalysisData {
     analysis_data?: {
       fundamental_analysis?: string[];
       investment_narrative?: string[];
-      investment_recommendations?: string[];
+      investment_insights?: string[];
       overall_analysis?: string[];
       risk_analysis?: string[];
       sentiment_analysis?: string[];
@@ -1110,7 +1110,7 @@ Educational use only - Not financial advice
         )}
 
         {/* 11. Investment Insights - Last Section */}
-        {analysis.analysis_overview?.analysis_data?.investment_recommendations && (
+        {analysis.analysis_overview?.analysis_data?.investment_insights && (
           <Card className="mb-8">
             <CardHeader>
               <CardTitle className="flex items-center">
@@ -1121,7 +1121,7 @@ Educational use only - Not financial advice
             <CardContent>
               <div className="bg-purple-50 p-6 rounded-lg">
                 <div className="prose max-w-none">
-                  {renderAnalysisSection(analysis.analysis_overview.analysis_data.investment_recommendations)}
+                  {renderAnalysisSection(analysis.analysis_overview.analysis_data.investment_insights)}
                 </div>
               </div>
             </CardContent>

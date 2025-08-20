@@ -210,7 +210,7 @@ npm start
 
 ⚠️ **Educational Use Only**: This system provides AI-generated analysis for educational and informational purposes only. All output is:
 
-- **NOT financial advice** or investment recommendations
+- **NOT financial advice** or investment insights
 - **NOT offers to buy or sell** securities or financial instruments
 - **NOT guaranteed** for accuracy, completeness, or profitability
 - **FOR educational exploration** and research enhancement only

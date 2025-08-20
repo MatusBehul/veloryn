@@ -120,7 +120,7 @@ export const componentColors = {
   status: {
     premium: velorynColors.secondary[500],
     analysis: velorynColors.primary[500],
-    recommendations: '#8b5cf6', // Purple
+    insights: '#8b5cf6', // Purple
     charts: '#f59e0b', // Orange
   },
   

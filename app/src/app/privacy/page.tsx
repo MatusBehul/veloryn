@@ -418,7 +418,7 @@ export default function PrivacyPage() {
                 <h3 className="font-semibold text-red-900 mb-2">Financial Information Disclaimer</h3>
                 <p className="text-red-800 text-sm">
                   Veloryn provides AI-generated financial analysis for informational purposes only. 
-                  Our analyses are not financial advice, investment recommendations, or guarantees 
+                  Our analyses are not financial advice, investment insights, or guarantees 
                   of future performance. Always consult with qualified financial professionals 
                   before making investment decisions.
                 </p>

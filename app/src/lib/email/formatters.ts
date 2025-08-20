@@ -47,8 +47,8 @@ export function formatAnalysisForEmail(analysis: FinancialAnalysis): EmailConten
     .metric-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; text-align: center; }
     .metric-value { font-size: 24px; font-weight: bold; color: #1f2937; }
     .metric-label { font-size: 14px; color: #6b7280; margin-top: 4px; }
-    .recommendation { background: #f0f9ff; border: 1px solid #0ea5e9; border-radius: 8px; padding: 20px; margin: 16px 0; }
-    .recommendation-action { display: inline-block; padding: 8px 16px; border-radius: 20px; font-weight: 600; text-transform: uppercase; }
+    .insights { background: #f0f9ff; border: 1px solid #0ea5e9; border-radius: 8px; padding: 20px; margin: 16px 0; }
+    .insights-action { display: inline-block; padding: 8px 16px; border-radius: 20px; font-weight: 600; text-transform: uppercase; }
     .buy { background: #dcfce7; color: #166534; }
     .hold { background: #fef3c7; color: #92400e; }
     .sell { background: #fee2e2; color: #991b1b; }
@@ -103,34 +103,34 @@ export function formatAnalysisForEmail(analysis: FinancialAnalysis): EmailConten
       </div>
       ` : ''}
 
-      ${data.analysis?.recommendations ? `
+      ${data.analysis?.insights ? `
       <div class="section">
         <h2>🎯 Investment Recommendation</h2>
-        <div class="recommendation">
+        <div class="insights">
           <div style="text-align: center; margin-bottom: 16px;">
-            <span class="recommendation-action ${data.analysis.recommendations.action}">${data.analysis.recommendations.action}</span>
+            <span class="insights-action ${data.analysis.insights.action}">${data.analysis.insights.action}</span>
           </div>
           <div class="metric-grid">
             <div class="metric-card">
-              <div class="metric-value">${formatCurrency(data.analysis.recommendations.target_price)}</div>
+              <div class="metric-value">${formatCurrency(data.analysis.insights.target_price)}</div>
               <div class="metric-label">Target Price</div>
             </div>
             <div class="metric-card">
-              <div class="metric-value">${Math.round(data.analysis.recommendations.confidence * 100)}%</div>
+              <div class="metric-value">${Math.round(data.analysis.insights.confidence * 100)}%</div>
               <div class="metric-label">Confidence Level</div>
             </div>
           </div>
-          ${data.analysis.recommendations.reasoning ? `
+          ${data.analysis.insights.reasoning ? `
           <div style="margin-top: 16px;">
             <strong>Key Reasoning:</strong>
             <ul>
-              ${data.analysis.recommendations.reasoning.map(reason => `<li>${reason}</li>`).join('')}
+              ${data.analysis.insights.reasoning.map(reason => `<li>${reason}</li>`).join('')}
             </ul>
           </div>
           ` : ''}
-          ${data.analysis.recommendations.stop_loss ? `
+          ${data.analysis.insights.stop_loss ? `
           <div style="background: #fee2e2; padding: 12px; border-radius: 6px; margin-top: 16px;">
-            <strong>Stop Loss:</strong> ${formatCurrency(data.analysis.recommendations.stop_loss)}
+            <strong>Stop Loss:</strong> ${formatCurrency(data.analysis.insights.stop_loss)}
           </div>
           ` : ''}
         </div>
@@ -234,16 +234,16 @@ P/E Ratio: ${data.analysis.overview.pe_ratio}
 52-Week Range: ${formatCurrency(data.analysis.overview['52_week_low'])} - ${formatCurrency(data.analysis.overview['52_week_high'])}
 ` : ''}
 
-${data.analysis?.recommendations ? `
+${data.analysis?.insights ? `
 INVESTMENT RECOMMENDATION
-Action: ${data.analysis.recommendations.action.toUpperCase()}
-Target Price: ${formatCurrency(data.analysis.recommendations.target_price)}
-Confidence: ${Math.round(data.analysis.recommendations.confidence * 100)}%
+Action: ${data.analysis.insights.action.toUpperCase()}
+Target Price: ${formatCurrency(data.analysis.insights.target_price)}
+Confidence: ${Math.round(data.analysis.insights.confidence * 100)}%
 
 Key Reasoning:
-${data.analysis.recommendations.reasoning?.map(reason => `• ${reason}`).join('\n') || 'No reasoning provided'}
+${data.analysis.insights.reasoning?.map(reason => `• ${reason}`).join('\n') || 'No reasoning provided'}
 
-${data.analysis.recommendations.stop_loss ? `Stop Loss: ${formatCurrency(data.analysis.recommendations.stop_loss)}` : ''}
+${data.analysis.insights.stop_loss ? `Stop Loss: ${formatCurrency(data.analysis.insights.stop_loss)}` : ''}
 ` : ''}
 
 ${data.analysis?.technical_analysis ? `

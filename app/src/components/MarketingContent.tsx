@@ -74,7 +74,7 @@ export function MarketingContent({ showLoading = true }: MarketingContentProps) 
       "AI-powered market analysis",
       "Real-time financial insights", 
       "Risk assessment tools",
-      "Personalized recommendations"
+      "Personalized insights"
     ],
     testimonial: {
       text: "Veloryn's AI analysis helped me identify market opportunities I would have missed.",

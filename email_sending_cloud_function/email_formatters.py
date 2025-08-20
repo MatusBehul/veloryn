@@ -48,8 +48,8 @@ def format_analysis_for_email(analysis: Dict[str, Any]) -> Dict[str, str]:
     .metric-card {{ background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; text-align: center; }}
     .metric-value {{ font-size: 24px; font-weight: bold; color: #1f2937; }}
     .metric-label {{ font-size: 14px; color: #6b7280; margin-top: 4px; }}
-    .recommendation {{ background: #f0f9ff; border: 1px solid #0ea5e9; border-radius: 8px; padding: 20px; margin: 16px 0; }}
-    .recommendation-action {{ display: inline-block; padding: 8px 16px; border-radius: 20px; font-weight: 600; text-transform: uppercase; }}
+    .insights {{ background: #f0f9ff; border: 1px solid #0ea5e9; border-radius: 8px; padding: 20px; margin: 16px 0; }}
+    .insights-action {{ display: inline-block; padding: 8px 16px; border-radius: 20px; font-weight: 600; text-transform: uppercase; }}
     .buy {{ background: #dcfce7; color: #166534; }}
     .hold {{ background: #fef3c7; color: #92400e; }}
     .sell {{ background: #fee2e2; color: #991b1b; }}
@@ -123,21 +123,21 @@ def format_analysis_for_email(analysis: Dict[str, Any]) -> Dict[str, str]:
       </div>
 """
 
-    # Add recommendation section
-    recommendations = data.get('recommendations', {})
-    if recommendations:
-        action = recommendations.get('action', 'hold').lower()
-        target_price = recommendations.get('target_price', 0)
-        confidence = recommendations.get('confidence', 0)
-        reasoning = recommendations.get('reasoning', [])
-        stop_loss = recommendations.get('stop_loss')
+    # Add insights section
+    insights = data.get('insights', {})
+    if insights:
+        action = insights.get('action', 'hold').lower()
+        target_price = insights.get('target_price', 0)
+        confidence = insights.get('confidence', 0)
+        reasoning = insights.get('reasoning', [])
+        stop_loss = insights.get('stop_loss')
         
         html += f"""
       <div class="section">
         <h2>🎯 Investment Recommendation</h2>
-        <div class="recommendation">
+        <div class="insights">
           <div style="text-align: center; margin-bottom: 16px;">
-            <span class="recommendation-action {action}">{action.upper()}</span>
+            <span class="insights-action {action}">{action.upper()}</span>
           </div>
           <div class="metric-grid">
             <div class="metric-card">
@@ -584,20 +584,20 @@ P/E Ratio: {overview.get('pe_ratio', 'N/A')}
 
 """
 
-    if recommendations:
+    if insights:
         text_content += f"""
 INVESTMENT RECOMMENDATION
-Action: {recommendations.get('action', 'HOLD').upper()}
-Target Price: {format_currency(recommendations.get('target_price', 0))}
-Confidence: {int(recommendations.get('confidence', 0) * 100)}%
+Action: {insights.get('action', 'HOLD').upper()}
+Target Price: {format_currency(insights.get('target_price', 0))}
+Confidence: {int(insights.get('confidence', 0) * 100)}%
 
 Key Reasoning:
 """
-        for reason in recommendations.get('reasoning', []):
+        for reason in insights.get('reasoning', []):
             text_content += f"• {reason}\n"
         
-        if recommendations.get('stop_loss'):
-            text_content += f"\nStop Loss: {format_currency(recommendations['stop_loss'])}\n"
+        if insights.get('stop_loss'):
+            text_content += f"\nStop Loss: {format_currency(insights['stop_loss'])}\n"
         text_content += "\n"
 
     if technical:

@@ -51,8 +51,8 @@ const mockAnalysisData = {
         "Analyst coverage shows **72% buy ratings** with average price target of $210.",
         "Social media sentiment trends **bullish** following recent product announcements."
       ],
-      investment_recommendations: [
-        "**BUY** recommendation with 12-month price target of $215.",
+      investment_insights: [
+        "**BUY** insights with 12-month price target of $215.",
         "Suitable for **long-term growth** and dividend income investors.",
         "Consider **dollar-cost averaging** for optimal entry positioning."
       ]

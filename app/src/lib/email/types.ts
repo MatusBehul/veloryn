@@ -10,7 +10,7 @@ export interface AnalysisData {
       '52_week_high': number;
       '52_week_low': number;
     };
-    recommendations?: {
+    insights?: {
       action: string;
       target_price: number;
       confidence: number;

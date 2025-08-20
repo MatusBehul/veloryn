@@ -434,7 +434,7 @@ class FinancialAnalysisTrigger:
                     analysis_item = data[0]  # Take the first analysis item
                     # Validate it has the expected structure
                     expected_keys = ['language', 'overall_analysis', 'technical_analysis', 'fundamental_analysis', 
-                                   'sentiment_analysis', 'risk_analysis', 'investment_recommendations', 'investment_narrative']
+                                   'sentiment_analysis', 'risk_analysis', 'investment_insights', 'investment_narrative']
                     if any(key in analysis_item for key in expected_keys):
                         return {"analysis": data}  # Wrap in analysis key for consistency
                 else:
@@ -444,7 +444,7 @@ class FinancialAnalysisTrigger:
             elif isinstance(data, dict):
                 # Check for legacy format keys
                 legacy_keys = ['overall_analysis', 'technical_analysis', 'fundamental_analysis', 
-                             'sentiment_analysis', 'risk_analysis', 'investment_recommendations', 'investment_narrative']
+                             'sentiment_analysis', 'risk_analysis', 'investment_insights', 'investment_narrative']
                 if any(key in data for key in legacy_keys):
                     # Convert legacy format to new array format
                     converted_data = [{

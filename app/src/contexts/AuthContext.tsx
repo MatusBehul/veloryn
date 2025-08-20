@@ -98,61 +98,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
             
             // Ensure user profile exists in integration platform
             await ensureIntegrationProfile(token, firebaseUser.email!);
-          } else if (response.status === 404) {
-            // User doesn't exist, create them
-            const createResponse = await fetch('/api/user', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-              },
-              body: JSON.stringify({
-                email: firebaseUser.email,
-                name: firebaseUser.displayName,
-              }),
-            });
-            
-            if (createResponse.ok) {
-              const userData = await createResponse.json();
-              setUser(userData);
-              
-              // Ensure user profile exists in integration platform
-              await ensureIntegrationProfile(token, firebaseUser.email!);
-            } else {
-              console.error('Error creating user document');
-              // Fallback user object
-              const newUser: User = {
-                id: firebaseUser.uid,
-                email: firebaseUser.email!,
-                name: firebaseUser.displayName || undefined,
-                subscriptionStatus: 'inactive',
-                subscriptionTier: 'free',
-              };
-              setUser(newUser);
-            }
           } else {
             console.error('Error fetching user data');
-            // Fallback user object
-            const newUser: User = {
-              id: firebaseUser.uid,
-              email: firebaseUser.email!,
-              name: firebaseUser.displayName || undefined,
-              subscriptionStatus: 'inactive',
-              subscriptionTier: 'free',
-            };
-            setUser(newUser);
+            setUser(null);
           }
         } catch (error) {
           console.error('Error fetching user data:', error);
-          // Fallback user object
-          const newUser: User = {
-            id: firebaseUser.uid,
-            email: firebaseUser.email!,
-            name: firebaseUser.displayName || undefined,
-            subscriptionStatus: 'inactive',
-            subscriptionTier: 'free',
-          };
-          setUser(newUser);
+          setUser(null);
         }
       } else {
         setUser(null);

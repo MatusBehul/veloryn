@@ -32,7 +32,7 @@ export default function TermsPage() {
                   Veloryn provides AI-generated financial analysis for EDUCATIONAL and INFORMATIONAL purposes ONLY.
                 </p>
                 <p className="text-red-700 text-sm">
-                  Our analyses are NOT financial advice, NOT investment recommendations, and NOT offers to buy or sell securities. 
+                  Our analyses are NOT financial advice, NOT investment insights, and NOT offers to buy or sell securities. 
                   Past performance does not guarantee future results. All investments carry risk of loss. 
                   You must consult qualified financial advisors before making any investment decisions.
                 </p>
@@ -93,7 +93,7 @@ export default function TermsPage() {
                 <h3 className="font-semibold text-gray-900 mb-2">What Veloryn Does NOT Provide</h3>
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                   <ul className="text-yellow-800 space-y-1 ml-4 text-sm">
-                    <li>• Financial advice, investment recommendations, or personalized investment strategies</li>
+                    <li>• Financial advice, investment insights, or personalized investment strategies</li>
                     <li>• Guaranteed returns, profit predictions, or investment performance warranties</li>
                     <li>• Licensed financial advisory, brokerage, or investment management services</li>
                     <li>• Direct investment execution, trading services, or portfolio management</li>

@@ -14,7 +14,7 @@ interface AnalysisData {
     analysis_data?: {
       fundamental_analysis?: string[];
       investment_narrative?: string[];
-      investment_recommendations?: string[];
+      investment_insights?: string[];
       overall_analysis?: string[];
       risk_analysis?: string[];
       sentiment_analysis?: string[];
@@ -555,11 +555,11 @@ export function formatAnalysisDataForEmail(analysis: AnalysisData): EmailContent
       </div>
       ` : ''}
 
-      ${analysis.analysis_overview?.analysis_data?.investment_recommendations ? `
+      ${analysis.analysis_overview?.analysis_data?.investment_insights ? `
       <div class="section">
         <h2><span class="section-icon">🎯</span>Investment Insights</h2>
         <div class="analysis-content blue">
-          ${renderAnalysisSection(analysis.analysis_overview.analysis_data.investment_recommendations)}
+          ${renderAnalysisSection(analysis.analysis_overview.analysis_data.investment_insights)}
         </div>
       </div>
       ` : ''}
@@ -694,11 +694,11 @@ ${Array.isArray(analysis.analysis_overview.analysis_data.sentiment_analysis)
   : analysis.analysis_overview.analysis_data.sentiment_analysis}
 ` : ''}
 
-${analysis.analysis_overview?.analysis_data?.investment_recommendations ? `
+${analysis.analysis_overview?.analysis_data?.investment_insights ? `
 INVESTMENT INSIGHTS
-${Array.isArray(analysis.analysis_overview.analysis_data.investment_recommendations) 
-  ? analysis.analysis_overview.analysis_data.investment_recommendations.join('\n\n')
-  : analysis.analysis_overview.analysis_data.investment_recommendations}
+${Array.isArray(analysis.analysis_overview.analysis_data.investment_insights) 
+  ? analysis.analysis_overview.analysis_data.investment_insights.join('\n\n')
+  : analysis.analysis_overview.analysis_data.investment_insights}
 ` : ''}
 
 IMPORTANT DISCLAIMER

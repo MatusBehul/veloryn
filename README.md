@@ -61,7 +61,7 @@ The system consists of **6 specialized agents** orchestrated by a central financ
 - **Multi-Dimensional Risk Assessment:** Company-specific and systematic risk evaluation
 - **Scenario Stress Testing:** Bull, bear, and black swan event analysis
 - **Risk-Tolerance Alignment:** Strategy compatibility with user risk profile
-- **Risk Mitigation Framework:** Hedging and position management recommendations
+- **Risk Mitigation Framework:** Hedging and position management insights
 
 ## 🔄 Analysis Workflow
 
@@ -170,7 +170,7 @@ from agents.financial_reporter import root_agent
 - **Risk Transparency:** Complete risk disclosure and assessment
 
 ### Actionable Intelligence
-- **Specific Recommendations:** Clear, implementable strategies
+- **Specific Insights:** Clear, implementable strategies
 - **Risk Management:** Detailed risk controls and monitoring
 - **Performance Benchmarks:** Measurable success criteria
 - **Dynamic Adaptation:** Framework for strategy evolution
@@ -179,7 +179,7 @@ from agents.financial_reporter import root_agent
 
 This system provides AI-generated analysis for **educational and informational purposes only**. All output is:
 
-- **NOT financial advice** or investment recommendations
+- **NOT financial advice** or investment insights
 - **NOT offers to buy or sell** securities or financial instruments  
 - **NOT guaranteed** for accuracy, completeness, or profitability
 - **FOR educational exploration** and research enhancement only

@@ -33,7 +33,19 @@ export async function GET(request: NextRequest) {
     const userDoc = await adminDb.collection('users').doc(uid).get();
     
     if (!userDoc.exists) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      // Auto-create user document for new users
+      const userData = {
+        id: uid,
+        email: null, // Will be populated when user updates profile
+        name: null,
+        subscriptionStatus: 'inactive',
+        favoriteTickers: [], // Initialize empty favorite tickers array
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      await adminDb.collection('users').doc(uid).set(userData);
+      return NextResponse.json(userData);
     }
 
     const userData = userDoc.data();

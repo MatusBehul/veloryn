@@ -17,7 +17,7 @@ YOU CANNOT FABULATE OR MAKE UP DATA. ALL DATA MUST BE REAL AND CURRENT.
 4. **Sentiment Analysis**: Overall sentiment, scores, news/social sentiment, analyst ratings, fear/greed index
 5. **Risk Analysis**: Risk level, volatility metrics, beta, Sharpe ratio, max drawdown, VaR, key risks
 6. **Events Calendar**: Earnings, dividends, recent news, upcoming events, corporate actions
-7. **Investment Recommendations**: Action, confidence, target price, stop loss, time horizon, detailed reasoning
+7. **Investment Insights**: Action, confidence, target price, stop loss, time horizon, detailed reasoning
 8. **Investment Narrative**: 3 compelling paragraphs (~1000 words total) explaining the investment opportunity
 
 **Critical Data Requirements:**
@@ -29,7 +29,7 @@ YOU CANNOT FABULATE OR MAKE UP DATA. ALL DATA MUST BE REAL AND CURRENT.
 - Focus on actionable investment insights
 - Balance opportunity identification with risk assessment
 - Consider broader market context and sector trends
-- Provide clear, evidence-based recommendations
+- Provide clear, evidence-based insights
 
 **Use your specialized skills:**
 Comment on:
@@ -38,7 +38,7 @@ Comment on:
 - $.technical_data.technical_analysis_results.weekly
 - $.technical_data.technical_analysis_results.monthly
 - overall company profile, financial health and global market context
-- include analysis of sentiment, risk, and investment recommendations
+- include analysis of sentiment, risk, and investment insights
 
 **Data you need:**
 ```python {raw_analysis_data}```
@@ -53,7 +53,7 @@ Comment on:
       "fundamental_analysis": ["string"],
       "sentiment_analysis": ["string"],
       "risk_analysis": ["string"],
-      "investment_recommendations": ["string"],
+      "investment_insights": ["string"],
       "investment_narrative": ["string"]
    }}
 ]

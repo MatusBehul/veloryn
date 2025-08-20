@@ -25,7 +25,7 @@ export interface ComprehensiveAnalysisData {
     analysis_data?: {
       fundamental_analysis?: string | string[];
       investment_narrative?: string | string[];
-      investment_recommendations?: string | string[];
+      investment_insights?: string | string[];
       overall_analysis?: string | string[];
       risk_analysis?: string | string[];
       sentiment_analysis?: string | string[];
@@ -187,7 +187,7 @@ export interface ParsedAnalysisData {
     [key: string]: unknown;
   }>;
   comments?: string[];
-  recommendations?: {
+  insights?: {
     action: string;
     confidence: number;
     target_price: number;

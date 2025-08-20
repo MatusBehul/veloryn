@@ -27,7 +27,7 @@ root_agent = LlmAgent(
     - $.technical_data.technical_analysis_results.weekly
     - $.technical_data.technical_analysis_results.monthly
     - overall company profile, financial health and global market context
-    - include analysis of sentiment, risk, and investment recommendations
+    - include analysis of sentiment, risk, and investment insights
 
     I want result to be structured in a JSON format with the following schema but,
     - limit yourself to only 3 string per array, each string will be representing paragraph of the analysis
@@ -43,7 +43,7 @@ root_agent = LlmAgent(
             "fundamental_analysis": ["string"],
             "sentiment_analysis": ["string"],
             "risk_analysis": ["string"],
-            "investment_recommendations": ["string"],
+            "investment_insights": ["string"],
             "investment_narrative": ["string"]
         }
     ]

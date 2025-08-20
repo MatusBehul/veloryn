@@ -21,7 +21,7 @@ analysis_overview
     "analysis_data": {
         "fundamental_analysis": [string],  // paragrapths of analysis
         "investment_narrative": [string],  // paragrapths of analysis
-        "investment_recommendations": [string],  // paragrapths of analysis
+        "investment_insights": [string],  // paragrapths of analysis
         "overall_analysis": [string],  // paragrapths of analysis
         "risk_analysis": [string],  // paragrapths of analysis
         "sentiment_analysis": [string],  // paragrapths of analysis

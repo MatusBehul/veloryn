@@ -93,7 +93,7 @@ def render_analysis_section(content):
         html_parts = []
         for item in content:
             if isinstance(item, dict):
-                # Handle dictionary objects (like investment recommendations)
+                # Handle dictionary objects (like investment insights)
                 html_parts.append('<div style="margin: 0 0 16px 0; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; background-color: #f9fafb;">')
                 for key, value in item.items():
                     html_parts.append(f'<div style="margin-bottom: 8px;"><strong>{key}:</strong> {format_text_with_bold(str(value))}</div>')
@@ -442,14 +442,14 @@ def format_analysis_for_email_comprehensive(analysis: Dict[str, Any]) -> Dict[st
         </div>
         """)
 
-    # Investment Recommendations
-    investment_recommendations = analysis.get('analysis_overview', {}).get('analysis_data', {}).get('investment_recommendations')
-    if investment_recommendations:
+    # Investment Insights
+    investment_insights = analysis.get('analysis_overview', {}).get('analysis_data', {}).get('investment_insights')
+    if investment_insights:
         html_sections.append(f"""
         <div class="section">
           <h2><span class="section-icon">🎯</span>Investment Insights</h2>
           <div class="analysis-content blue">
-            {render_analysis_section(investment_recommendations)}
+            {render_analysis_section(investment_insights)}
           </div>
         </div>
         """)
