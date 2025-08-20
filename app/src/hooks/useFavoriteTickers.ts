@@ -147,7 +147,7 @@ export function useFavoriteTickers() {
       setTierInfo({ currentTier: 'free', limit: 0, used: 0, remaining: 0 });
       setError(null);
     }
-  }, [firebaseUser, loadFavoriteTickers]);
+  }, [firebaseUser]); // Only depend on firebaseUser, not loadFavoriteTickers
 
   return {
     favoriteTickers,
