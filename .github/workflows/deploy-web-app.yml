@@ -116,5 +116,4 @@ jobs:
           --cpu 1 \
           --min-instances 0 \
           --max-instances ${{ env.DEPLOY_ENV == 'prod' && '50' || '5' }} \
-          --build-env-vars-file .env.build.yaml \
           --env-vars-file .env.yaml
