@@ -29,17 +29,24 @@ root_agent = LlmAgent(
     - overall company profile, financial health and global market context
     - include analysis of sentiment, risk, and investment recommendations
 
-    I want result to be structured in a JSON format with the following schema (do not limit yourself to only one string per array, each string will be representing paragraph of the analysis):
+    I want result to be structured in a JSON format with the following schema but,
+    - limit yourself to only 3 string per array, each string will be representing paragraph of the analysis
+    - limit paragraph to 300 characters per paragraph. Be concise and to the point
+    - you will be provided with a list of languages, you must provide the analysis in all of them. They can be found in $.languages
+    Schema:
     ```json 
-    {
-        "overall_analysis": ["string"],
-        "technical_analysis": ["string"],
-        "fundamental_analysis": ["string"],
-        "sentiment_analysis": ["string"],
-        "risk_analysis": ["string"],
-        "investment_recommendations": ["string"],
-        "investment_narrative": ["string"]
-    }
+    [
+        {
+            "language": "string",
+            "overall_analysis": ["string"],
+            "technical_analysis": ["string"],
+            "fundamental_analysis": ["string"],
+            "sentiment_analysis": ["string"],
+            "risk_analysis": ["string"],
+            "investment_recommendations": ["string"],
+            "investment_narrative": ["string"]
+        }
+    ]
     ```
     """,
     output_key="financial_advisory_output",
