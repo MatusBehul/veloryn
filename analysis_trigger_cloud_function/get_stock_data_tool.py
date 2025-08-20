@@ -588,7 +588,7 @@ class FinancialDataTool:
             
             # Structure the response
             comprehensive_data = ComprehensiveStockDataModel(
-                languages=[os.environ.get('LANGUAGES', 'en').split("#")],
+                languages=os.environ.get('LANGUAGES', 'en').split("#"),
                 symbol=symbol,
                 timestamp=datetime.now().isoformat(),
                 status='success',
