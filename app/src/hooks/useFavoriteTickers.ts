@@ -141,7 +141,9 @@ export function useFavoriteTickers() {
   // Load tickers when component mounts or user changes
   useEffect(() => {
     if (firebaseUser) {
-      loadFavoriteTickers();
+      // Temporarily disable automatic loading to debug the redirect issue
+      console.log('Firebase user available, but automatic loading disabled for debugging');
+      // loadFavoriteTickers();
     } else {
       setFavoriteTickers([]);
       setTierInfo({ currentTier: 'free', limit: 0, used: 0, remaining: 0 });
