@@ -28,11 +28,6 @@ function getTierLimit(tier: string): number {
 
 export async function GET(request: NextRequest) {
   try {
-    // Check if Firebase Admin is available
-    if (!adminDb || !adminAuth) {
-      return NextResponse.json({ error: 'Firebase Admin not available' }, { status: 500 });
-    }
-
     // Get the authorization header (try both cases for compatibility)
     const authHeader = request.headers.get('authorization') || request.headers.get('Authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -44,6 +39,11 @@ export async function GET(request: NextRequest) {
     // Verify the token and get user ID
     let uid: string;
     try {
+      if (!adminAuth) {
+        console.error('Firebase Admin Auth not available');
+        return NextResponse.json({ error: 'Firebase Admin not configured' }, { status: 500 });
+      }
+      
       const decodedToken = await adminAuth.verifyIdToken(token);
       uid = decodedToken.uid;
     } catch (error) {
@@ -51,27 +51,71 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
     }
 
-    // Get user document from Firestore
-    const userDoc = await adminDb.collection('users').doc(uid).get();
-    
-    if (!userDoc.exists) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
+    // Try to get user document from Firestore
+    if (adminDb) {
+      try {
+        const userDoc = await adminDb.collection('users').doc(uid).get();
+        
+        if (!userDoc.exists) {
+          // Return empty state for new users
+          return NextResponse.json({
+            favoriteTickers: [],
+            tierInfo: {
+              currentTier: 'free',
+              limit: TICKER_LIMITS.free,
+              used: 0,
+              remaining: TICKER_LIMITS.free
+            }
+          });
+        }
 
-    const userData = userDoc.data();
-    const favoriteTickers = userData?.favoriteTickers || [];
-    const userTier = userData?.subscriptionTier || 'free';
-    const maxTickers = getTierLimit(userTier);
+        const userData = userDoc.data();
+        const favoriteTickers = userData?.favoriteTickers || [];
+        const subscriptionTier = userData?.subscriptionTier || 'free';
+        
+        const limit = getTierLimit(subscriptionTier);
+        const used = favoriteTickers.length;
+        const remaining = Math.max(0, limit - used);
 
-    return NextResponse.json({ 
-      favoriteTickers,
-      tierInfo: {
-        currentTier: userTier,
-        limit: maxTickers,
-        used: favoriteTickers.length,
-        remaining: maxTickers - favoriteTickers.length
+        return NextResponse.json({
+          favoriteTickers,
+          tierInfo: {
+            currentTier: subscriptionTier,
+            limit,
+            used,
+            remaining
+          }
+        });
+      } catch (firestoreError) {
+        console.error('Firestore error:', firestoreError);
+        
+        // Fallback response when Firestore is not available
+        return NextResponse.json({
+          favoriteTickers: [],
+          tierInfo: {
+            currentTier: 'free',
+            limit: TICKER_LIMITS.free,
+            used: 0,
+            remaining: TICKER_LIMITS.free
+          },
+          isFirestoreAvailable: false
+        });
       }
-    });
+    } else {
+      console.error('Firebase Admin DB not available');
+      
+      // Fallback response when Firestore is not available
+      return NextResponse.json({
+        favoriteTickers: [],
+        tierInfo: {
+          currentTier: 'free',
+          limit: TICKER_LIMITS.free,
+          used: 0,
+          remaining: TICKER_LIMITS.free
+        },
+        isFirestoreAvailable: false
+      });
+    }
   } catch (error) {
     console.error('Error fetching favorite tickers:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
