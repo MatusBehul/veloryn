@@ -46,7 +46,7 @@ jobs:
         echo "📅 Creating/updating financial analysis scheduler jobs..."
         
         # Define the tickers array (matching your original script)
-        TICKERS=("AAPL" "GOOGL" "MSFT" "AMZN" "TSLA" "META" "NFLX" "NVDA" "BRK.A" "V")
+        TICKERS=("AAPL" "GOOGL" "MSFT" "AMZN" "TSLA" "META" "NFLX" "NVDA" "BRK-A" "V")
         
         # Function URL - adjust based on environment suffix
         FUNCTION_URL="https://${{ vars.GOOGLE_CLOUD_LOCATION }}-${{ vars.GOOGLE_CLOUD_PROJECT }}.cloudfunctions.net/financial-analysis-trigger"
