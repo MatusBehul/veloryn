@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
 
     console.log(`Found customer ID: ${userData.customerId}`);
 
-    const velorynSubscriptionsConfig = await adminDb.collection('config').doc('subscriptions').get();
+    const velorynSubscriptionsConfig = await adminDb.collection('conf').doc('subscriptions').get();
 
     // Get all subscriptions for this customer
     const subscriptions = await stripe.subscriptions.list({
@@ -76,6 +76,12 @@ export async function POST(request: NextRequest) {
     // Get the most recent subscription
     const latestSubscription = subscriptions.data[0];
     console.log(`Latest subscription: ${latestSubscription.id}, status: ${latestSubscription.status}`);
+    
+    console.log('📋 Sync-subscription config data:', velorynSubscriptionsConfig.data());
+    console.log('🎯 Price ID from sync subscription:', latestSubscription.items.data[0]?.price?.id);
+    
+    const syncedTier = velorynSubscriptionsConfig.data()?.[latestSubscription.items.data[0].price.id] || 'free';
+    console.log('🏷️ Sync mapped tier:', syncedTier);
 
     // Update user document with subscription info
     const subscriptionWithPeriod = latestSubscription as { current_period_end?: number };
@@ -85,7 +91,7 @@ export async function POST(request: NextRequest) {
     
     await adminDb.collection('users').doc(userId).set({
       subscriptionId: latestSubscription.id,
-      subscriptionTier: velorynSubscriptionsConfig.data()?.[latestSubscription.items.data[0].price.id] || 'free',
+      subscriptionTier: syncedTier,
       subscriptionStatus: latestSubscription.status,
       currentPeriodEnd: currentPeriodEnd,
       updatedAt: new Date(),
@@ -108,7 +114,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       message: 'Subscription data synced successfully',
       subscriptionId: latestSubscription.id,
-      subscriptionTier: velorynSubscriptionsConfig.data()?.[latestSubscription.items.data[0].price.id] || 'free',
+      subscriptionTier: syncedTier,
       subscriptionStatus: latestSubscription.status,
       currentPeriodEnd: currentPeriodEnd,
     });
