@@ -64,8 +64,10 @@ jobs:
     - name: Build Docker image
       run: |
         ls -la
+        cd app
+        ls -la
 
-        docker build app -t ${{ env.IMAGE_NAME }} -f Dockerfile .
+        docker build . -t ${{ env.IMAGE_NAME }} -f Dockerfile .
 
     - name: Push Docker image
       run: docker push ${{ env.IMAGE_NAME }}
