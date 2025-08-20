@@ -28,7 +28,9 @@ export function useFavoriteTickers() {
       setLoading(true);
       setError(null);
       
+      console.log('Getting Firebase token...');
       const token = await firebaseUser.getIdToken();
+      console.log('Token obtained, making API call to /api/user/tickers...');
       
       const response = await fetch('/api/user/tickers', {
         headers: {
@@ -36,11 +38,16 @@ export function useFavoriteTickers() {
         },
       });
 
+      console.log('API response status:', response.status);
+      console.log('API response headers:', [...response.headers.entries()]);
+
       if (response.ok) {
         const data = await response.json();
+        console.log('API response data:', data);
         setFavoriteTickers(data.favoriteTickers || []);
         setTierInfo(data.tierInfo || { currentTier: 'free', limit: 0, used: 0, remaining: 0 });
       } else {
+        console.error('API response not ok:', response.status, response.statusText);
         throw new Error('Failed to load favorite tickers');
       }
     } catch (err) {
@@ -141,10 +148,10 @@ export function useFavoriteTickers() {
   // Load tickers when component mounts or user changes
   useEffect(() => {
     if (firebaseUser) {
-      // Temporarily disable automatic loading to debug the redirect issue
-      console.log('Firebase user available, but automatic loading disabled for debugging');
-      // loadFavoriteTickers();
+      console.log('Firebase user available, loading tickers...');
+      loadFavoriteTickers();
     } else {
+      console.log('No Firebase user, resetting state...');
       setFavoriteTickers([]);
       setTierInfo({ currentTier: 'free', limit: 0, used: 0, remaining: 0 });
       setError(null);
