@@ -45,15 +45,18 @@ Comment on:
 
 **Output Format:**
 ```json 
-{{
-   "overall_analysis": ["string"],
-   "technical_analysis": ["string"],
-   "fundamental_analysis": ["string"],
-   "sentiment_analysis": ["string"],
-   "risk_analysis": ["string"],
-   "investment_recommendations": ["string"],
-   "investment_narrative": ["string"]
-}}
+[
+   {{
+      "language": "string",
+      "overall_analysis": ["string"],
+      "technical_analysis": ["string"],
+      "fundamental_analysis": ["string"],
+      "sentiment_analysis": ["string"],
+      "risk_analysis": ["string"],
+      "investment_recommendations": ["string"],
+      "investment_narrative": ["string"]
+   }}
+]
 ```
 
 Ensure the analysis is thorough, current, and provides clear investment guidance."""

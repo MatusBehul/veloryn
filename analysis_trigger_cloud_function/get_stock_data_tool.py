@@ -587,8 +587,8 @@ class FinancialDataTool:
             # results = await asyncio.gather(*tasks, return_exceptions=True)
             
             # Structure the response
-            # Structure the response
             comprehensive_data = ComprehensiveStockDataModel(
+                languages=[os.environ.get('LANGUAGES', 'en').split("#")],
                 symbol=symbol,
                 timestamp=datetime.now().isoformat(),
                 status='success',

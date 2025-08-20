@@ -294,11 +294,11 @@ class FinancialAnalysisTrigger:
             }
     
     def _extract_json_from_markdown(self, text: str) -> Dict[str, Any]:
-        """Extract JSON from markdown code blocks like ```json {...}```"""
+        """Extract JSON from markdown code blocks like ```json {...}``` or ```json [...]```"""
         import re
         
-        # Try to find JSON in markdown code blocks
-        json_pattern = r'```(?:json)?\s*(\{.*?\})\s*```'
+        # Try to find JSON in markdown code blocks (both objects and arrays)
+        json_pattern = r'```(?:json)?\s*(\[.*?\]|\{.*?\})\s*```'
         match = re.search(json_pattern, text, re.DOTALL | re.IGNORECASE)
         
         if match:
@@ -306,21 +306,38 @@ class FinancialAnalysisTrigger:
             # Attempt to fix common JSON syntax errors before parsing
             json_str = self._fix_common_json_errors(json_str)
             try:
-                return json.loads(json_str)
+                parsed_data = json.loads(json_str)
+                # Validate and fix the analysis structure
+                return self._validate_and_fix_analysis(parsed_data)
             except json.JSONDecodeError as e:
                 logger.error(f"Failed to parse extracted JSON: {e}")
                 logger.error(f"JSON string around error: {json_str[max(0, e.pos-100):e.pos+100]}")
                 # Try more aggressive fixes
                 fixed_json = self._aggressive_json_fix(json_str)
                 try:
-                    return json.loads(fixed_json)
+                    parsed_data = json.loads(fixed_json)
+                    return self._validate_and_fix_analysis(parsed_data)
                 except json.JSONDecodeError as e2:
                     logger.error(f"Even aggressive fix failed: {e2}")
                     return {"error": "Failed to parse JSON from markdown", "raw_content": text}
         
-        # If no markdown blocks found, try to find raw JSON
-        json_pattern = r'\{.*\}'
-        match = re.search(json_pattern, text, re.DOTALL)
+        # If no markdown blocks found, try to find raw JSON (arrays or objects)
+        # First try arrays
+        array_pattern = r'\[.*?\]'
+        match = re.search(array_pattern, text, re.DOTALL)
+        
+        if match:
+            json_str = match.group(0)
+            json_str = self._fix_common_json_errors(json_str)
+            try:
+                parsed_data = json.loads(json_str)
+                return self._validate_and_fix_analysis(parsed_data)
+            except json.JSONDecodeError:
+                pass  # Continue to try object pattern
+        
+        # Then try objects
+        object_pattern = r'\{.*\}'
+        match = re.search(object_pattern, text, re.DOTALL)
         
         if match:
             json_str = match.group(0)
@@ -328,7 +345,7 @@ class FinancialAnalysisTrigger:
             json_str = self._fix_common_json_errors(json_str)
             try:
                 parsed_data = json.loads(json_str)
-                # Validate with Pydantic if available
+                # Validate with our new structure
                 return self._validate_and_fix_analysis(parsed_data)
             except json.JSONDecodeError as e:
                 logger.error(f"Failed to parse raw JSON: {e}")
@@ -336,7 +353,8 @@ class FinancialAnalysisTrigger:
                 # Try more aggressive fixes
                 fixed_json = self._aggressive_json_fix(json_str)
                 try:
-                    return json.loads(fixed_json)
+                    parsed_data = json.loads(fixed_json)
+                    return self._validate_and_fix_analysis(parsed_data)
                 except json.JSONDecodeError as e2:
                     logger.error(f"Even aggressive fix failed: {e2}")
                     return {"error": "Failed to parse raw JSON", "raw_content": text}
@@ -348,6 +366,9 @@ class FinancialAnalysisTrigger:
     def _aggressive_json_fix(self, json_str: str) -> str:
         """More aggressive JSON fixing for complex cases"""
         import re
+        
+        # Handle both array and object JSON structures
+        is_array = json_str.strip().startswith('[')
         
         # Try to fix the specific error pattern from the log
         # "action": "Accumulate", {"datetime": "High", "price": "1350.00", "volume": "1180.00"}, "time_horizon": ...
@@ -388,25 +409,66 @@ class FinancialAnalysisTrigger:
         if open_brackets > close_brackets:
             json_str += ']' * (open_brackets - close_brackets)
         
+        # Pattern 5: Fix common array issues
+        if is_array:
+            # Ensure proper array structure for analysis data
+            # Fix cases where array items are missing commas
+            json_str = re.sub(r'}\s*{', r'}, {', json_str)
+            
+            # Fix cases where the array is not properly closed
+            if not json_str.strip().endswith(']'):
+                json_str = json_str.rstrip() + ']'
+        
         return json_str
     
     def _validate_and_fix_analysis(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """Validate and fix analysis data structure"""
         try:
-            # Basic validation - ensure we have required top-level keys
-            if not isinstance(data, dict):
-                return {"error": "Analysis data is not a dictionary", "raw_data": data}
+            # Basic validation - ensure we have data
+            if not isinstance(data, (dict, list)):
+                return {"error": "Analysis data is not a dictionary or list", "raw_data": data}
             
-            # If data looks valid, return as-is
-            if any(key in data for key in ['analysis_summary', 'technical_analysis', 'investment_recommendations', 'risk_assessment']):
-                return data
+            # Handle new array format: [{"language": "string", "overall_analysis": [...], ...}]
+            if isinstance(data, list):
+                if len(data) > 0 and isinstance(data[0], dict):
+                    analysis_item = data[0]  # Take the first analysis item
+                    # Validate it has the expected structure
+                    expected_keys = ['language', 'overall_analysis', 'technical_analysis', 'fundamental_analysis', 
+                                   'sentiment_analysis', 'risk_analysis', 'investment_recommendations', 'investment_narrative']
+                    if any(key in analysis_item for key in expected_keys):
+                        return {"analysis": data}  # Wrap in analysis key for consistency
+                else:
+                    return {"error": "Analysis array is empty or contains invalid items", "raw_data": data}
             
-            # If it's nested under 'analysis' key, extract it
-            if 'analysis' in data and isinstance(data['analysis'], dict):
-                return data['analysis']
+            # Handle legacy dictionary format: {"overall_analysis": [...], ...}
+            elif isinstance(data, dict):
+                # Check for legacy format keys
+                legacy_keys = ['overall_analysis', 'technical_analysis', 'fundamental_analysis', 
+                             'sentiment_analysis', 'risk_analysis', 'investment_recommendations', 'investment_narrative']
+                if any(key in data for key in legacy_keys):
+                    # Convert legacy format to new array format
+                    converted_data = [{
+                        "language": "en",  # Default language
+                        **data  # Spread the existing data
+                    }]
+                    return {"analysis": converted_data}
+                
+                # If data looks like it's already wrapped (e.g., {"analysis": [...]})
+                if 'analysis' in data:
+                    if isinstance(data['analysis'], list):
+                        return data  # Already in correct format
+                    elif isinstance(data['analysis'], dict):
+                        # Convert wrapped dict to array format
+                        converted_data = [{
+                            "language": "en",
+                            **data['analysis']
+                        }]
+                        return {"analysis": converted_data}
+                
+                # If it's some other dict structure, return as-is for debugging
+                return {"analysis": [{"language": "en", "error": "Unknown data structure", "raw_data": data}]}
             
-            # Return the data as-is if we can't validate structure
-            return data
+            return {"error": "Unexpected data type", "raw_data": data}
             
         except Exception as e:
             logger.error(f"Error validating analysis data: {e}")
@@ -415,6 +477,9 @@ class FinancialAnalysisTrigger:
     def _fix_common_json_errors(self, json_str: str) -> str:
         """Attempt to fix common JSON syntax errors"""
         import re
+        
+        # Detect if this is an array or object
+        is_array = json_str.strip().startswith('[')
         
         # Fix missing opening brace for object entries like: "datetime": "value", -> {"datetime": "value",
         # This pattern looks for lines that start with a quote but aren't preceded by an opening brace
@@ -442,6 +507,14 @@ class FinancialAnalysisTrigger:
         json_str = re.sub(r'("[\w_]+"):\s*"([^"]+)",\s*(\{[^}]+\})', 
                          r'\1: "\2", "additional_data": \3', json_str)
         
+        # Array-specific fixes
+        if is_array:
+            # Fix missing commas between array objects
+            json_str = re.sub(r'}\s*{', r'}, {', json_str)
+            
+            # Fix array items that are missing proper object structure
+            # Pattern: ["string", "string"] should be valid, but mixed types need fixing
+            
         # Fix missing quotes around property names
         json_str = re.sub(r'(\{|\,)\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*:', r'\1"\2":', json_str)
         
@@ -457,11 +530,15 @@ class FinancialAnalysisTrigger:
                            raw_analysis_data: ComprehensiveStockDataModel) -> str:
         """Save analysis result to Firestore"""
         analysis_id = f"{ticker}_{datetime.now(timezone.utc).strftime('%Y%m%d')}"
-        
+        analysis_text = result.get('data', {}).get('analysis', [])
+
         analysis_doc = {
             'ticker': ticker.upper(),
             'timestamp': datetime.now(timezone.utc),
-            'analysis_data': result.get('data', {}).get('analysis', {}),
+            'analysis_data': {
+                text.get("language", "n/a"): text
+                for text in analysis_text if isinstance(text, dict)
+            },
             'success': result.get('success', False),
             'error': result.get('error'),
             'day': self.day_input,
@@ -639,20 +716,52 @@ async def process_financial_analysis(ticker: str, day_input: str = None, user_id
             error_detected = False
             error_message = None
 
-            # Check for error in result or analysis_data
+            # Check for error in result
             if not result.get('success'):
                 error_detected = True
                 error_message = result.get('error', 'Unknown error')
-            elif not analysis_data or (isinstance(analysis_data, dict) and (
-                'error' in analysis_data or 'error' in analysis_data.get('analysis', {})
-            )):
+            elif not analysis_data:
                 error_detected = True
-                # Try to extract error message
-                error_message = analysis_data.get('error') if isinstance(analysis_data, dict) else None
-                if not error_message and isinstance(analysis_data, dict):
-                    error_message = analysis_data.get('analysis', {}).get('error')
-                if not error_message:
-                    error_message = 'Analysis missing or invalid.'
+                error_message = 'No analysis data returned'
+            else:
+                # Check for errors in the analysis data structure
+                if isinstance(analysis_data, dict):
+                    # Check for direct error in analysis_data
+                    if 'error' in analysis_data:
+                        error_detected = True
+                        error_message = analysis_data.get('error')
+                    else:
+                        # Check for analysis array structure
+                        analysis_content = analysis_data.get('analysis', [])
+                        if isinstance(analysis_content, list):
+                            if len(analysis_content) == 0:
+                                error_detected = True
+                                error_message = 'Analysis array is empty'
+                            else:
+                                # Check first analysis item for errors
+                                first_analysis = analysis_content[0]
+                                if isinstance(first_analysis, dict):
+                                    if 'error' in first_analysis:
+                                        error_detected = True
+                                        error_message = first_analysis.get('error')
+                                    else:
+                                        # Validate that we have the expected structure
+                                        expected_keys = ['overall_analysis', 'technical_analysis', 'fundamental_analysis']
+                                        if not any(key in first_analysis for key in expected_keys):
+                                            error_detected = True
+                                            error_message = 'Analysis missing required fields'
+                                else:
+                                    error_detected = True
+                                    error_message = 'Analysis item is not a valid object'
+                        elif isinstance(analysis_content, dict) and 'error' in analysis_content:
+                            error_detected = True
+                            error_message = analysis_content.get('error')
+                        else:
+                            # Some other structure, check if it looks like legacy format
+                            legacy_keys = ['overall_analysis', 'technical_analysis', 'fundamental_analysis']
+                            if not any(key in analysis_data for key in legacy_keys):
+                                error_detected = True
+                                error_message = 'Analysis data structure is invalid or incomplete'
 
             # Save analysis result with correct success/error
             result_to_save = dict(result)

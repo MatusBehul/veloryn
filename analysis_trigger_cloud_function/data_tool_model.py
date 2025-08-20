@@ -316,6 +316,7 @@ class ComprehensiveStockDataModel(BaseModel):
         income_statement_data: List[StockIncomeStatementDataModel] = []
         earnings_estimates: List[StockEarningsEstimateDataModel] = []
 
+    languages: List[str] = ["en"]
     symbol: str
     timestamp: str
     status: str
