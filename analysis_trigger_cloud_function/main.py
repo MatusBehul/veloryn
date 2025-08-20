@@ -532,13 +532,25 @@ class FinancialAnalysisTrigger:
         analysis_id = f"{ticker}_{datetime.now(timezone.utc).strftime('%Y%m%d')}"
         analysis_text = result.get('data', {}).get('analysis', [])
 
+        # Handle both array and dict formats for analysis data
+        if isinstance(analysis_text, list):
+            # Array format: [{"language": "en", "overall_analysis": [...], ...}]
+            analysis_data_dict = {
+                text.get("language", "n/a"): text
+                for text in analysis_text if isinstance(text, dict)
+            }
+        elif isinstance(analysis_text, dict):
+            # Dict format: {"language": "en", "overall_analysis": [...], ...}
+            language = analysis_text.get("language", "n/a")
+            analysis_data_dict = {language: analysis_text}
+        else:
+            # Fallback for unexpected formats
+            analysis_data_dict = {"unknown": analysis_text}
+
         analysis_doc = {
             'ticker': ticker.upper(),
             'timestamp': datetime.now(timezone.utc),
-            'analysis_data': {
-                text.get("language", "n/a"): text
-                for text in analysis_text if isinstance(text, dict)
-            },
+            'analysis_data': analysis_data_dict,
             'success': result.get('success', False),
             'error': result.get('error'),
             'day': self.day_input,
@@ -707,6 +719,8 @@ async def process_financial_analysis(ticker: str, day_input: str = None, user_id
             # Call Cloud Run service
             result = await analyzer.call_cloud_run_service(payload)
 
+            logger.info("Retrieved response from LLM Agent:", result)
+
             # Calculate total function execution time
             function_execution_time = time.time() - function_start_time
             result['function_execution_time'] = function_execution_time
@@ -761,12 +775,21 @@ async def process_financial_analysis(ticker: str, day_input: str = None, user_id
                                 else:
                                     error_detected = True
                                     error_message = 'Analysis item is not a valid object'
-                        elif isinstance(analysis_content, dict) and 'error' in analysis_content:
-                            error_detected = True
-                            error_message = analysis_content.get('error')
+                        elif isinstance(analysis_content, dict):
+                            # Handle case where analysis_content is a dict (single analysis object)
+                            if 'error' in analysis_content:
+                                error_detected = True
+                                error_message = analysis_content.get('error')
+                            else:
+                                # Validate that we have the expected structure
+                                expected_keys = ['overall_analysis', 'technical_analysis', 'fundamental_analysis']
+                                if not any(key in analysis_content for key in expected_keys):
+                                    error_detected = True
+                                    error_message = 'Analysis missing required fields'
+                                else:
+                                    logger.info(f"Analysis validation passed for {ticker} (dict format)")
                         else:
-                            # analysis_content is neither a list nor a dict with error
-                            # This means analysis_data.get('analysis') returned something unexpected
+                            # analysis_content is neither a list nor a dict
                             error_detected = True
                             error_message = f'Analysis content has unexpected type: {type(analysis_content)}'
                 else:
