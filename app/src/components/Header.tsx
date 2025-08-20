@@ -8,6 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useSubscription } from '@/hooks/useSubscription';
 import { Button } from '@/components/ui/Button';
 import { VelorynLogo } from '@/components/VelorynLogo';
+import { LanguageSelectorCompact } from '@/components/LanguageSelector';
 import { User, LogOut, CreditCard, Crown, Plus } from 'lucide-react';
 
 export function Header() {
@@ -118,6 +119,9 @@ export function Header() {
                     </Link>
                   )}
                   
+                  {/* Language Selector */}
+                  <LanguageSelectorCompact />
+                  
                   <div className="flex items-center space-x-2">
                     <div className="flex items-center space-x-1">
                       <User className="h-4 w-4 text-gray-400" />
@@ -150,6 +154,8 @@ export function Header() {
                   Contact
                 </Link>
                 <div className="flex items-center space-x-2 border-l border-gray-200 pl-4">
+                  {/* Language Selector for non-authenticated users */}
+                  <LanguageSelectorCompact />
                   <span className="text-sm text-gray-600">Starting at €2/month</span>
                   <Link href="/login">
                     <Button variant="outline" size="sm">
