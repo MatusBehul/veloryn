@@ -50,10 +50,25 @@ jobs:
         rm -f .env.local .env.development .env.production
         echo "Cleaned local environment files"
 
+    - name: Create build-time environment file
+      run: |
+        cd app
+        # Create .env.production for build time (NEXT_PUBLIC_ vars only)
+        cat > .env.production << EOF
+        NEXT_PUBLIC_FIREBASE_PROJECT_ID=${{ vars.GOOGLE_CLOUD_PROJECT }}
+        NEXT_PUBLIC_FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY }}
+        NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=${{ vars.GOOGLE_CLOUD_PROJECT }}.firebaseapp.com
+        NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=${{ vars.GOOGLE_CLOUD_PROJECT }}.firebasestorage.app
+        NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
+        NEXT_PUBLIC_FIREBASE_APP_ID=${{ secrets.FIREBASE_APP_ID }}
+        NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${{ secrets.STRIPE_PUBLISHABLE_KEY }}
+        NODE_ENV=production
+        EOF
+
     - name: Create runtime environment configuration
       run: |
         cd app
-        # Create .env.yaml for Cloud Run runtime only
+        # Create .env.yaml for Cloud Run runtime (all vars)
         cat > .env.yaml << EOF
         NEXT_PUBLIC_FIREBASE_PROJECT_ID: "${{ vars.GOOGLE_CLOUD_PROJECT }}"
         NEXT_PUBLIC_FIREBASE_API_KEY: "${{ secrets.FIREBASE_API_KEY }}"
@@ -84,13 +99,25 @@ jobs:
         echo "Building with production environment..."
         echo "Firebase Project: ${{ vars.GOOGLE_CLOUD_PROJECT }}"
         
-        # Show that environment variables are set for build
+        # Verify both env vars and file are available
         echo "Environment variables for build:"
         echo "NEXT_PUBLIC_FIREBASE_PROJECT_ID is set: $([[ -n "$NEXT_PUBLIC_FIREBASE_PROJECT_ID" ]] && echo "YES" || echo "NO")"
         echo "NEXT_PUBLIC_FIREBASE_API_KEY is set: $([[ -n "$NEXT_PUBLIC_FIREBASE_API_KEY" ]] && echo "YES" || echo "NO")"
         
+        echo "Checking .env.production file:"
+        if [ -f .env.production ]; then
+          echo ".env.production exists"
+          grep "NEXT_PUBLIC_FIREBASE_PROJECT_ID" .env.production || echo "NEXT_PUBLIC_FIREBASE_PROJECT_ID not in file"
+        else
+          echo ".env.production does not exist"
+        fi
+        
         # Build the application
         npm run build
+        
+        # Clean up build-time env file to prevent conflicts with runtime
+        rm -f .env.production
+        echo "Cleaned up build-time environment file"
 
     - name: Authenticate to Google Cloud
       uses: google-github-actions/auth@v2
