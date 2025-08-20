@@ -187,6 +187,7 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
     // Get current user data to check for tier changes
     const userDoc = await adminDb.collection('users').doc(userId).get();
     const currentUserData = userDoc.exists ? userDoc.data() : {};
+    console.log("Current user data: ", currentUserData)
     const oldTier = currentUserData?.subscriptionTier || 'free';
     const currentTickers = currentUserData?.favoriteTickers || [];
 
@@ -197,6 +198,7 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
       updatedTickers = await performTierHousekeeping(userId, oldTier, newTier, currentTickers);
     }
 
+    console.log("Now updating firestore document to match tier: ", newTier)
     // Use set with merge to avoid document not found errors
     await adminDb.collection('users').doc(userId).set({
       subscriptionId: subscription.id,
