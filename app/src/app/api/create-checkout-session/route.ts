@@ -7,6 +7,13 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   try {
+    // Debug environment variables
+    console.log('Environment variables check:');
+    console.log('NEXTAUTH_URL:', process.env.NEXTAUTH_URL);
+    console.log('NODE_ENV:', process.env.NODE_ENV);
+    console.log('Request origin:', request.headers.get('origin'));
+    console.log('Request host:', request.headers.get('host'));
+    
     // Check if Firebase Admin and Stripe are available
     if (!adminDb) {
       return NextResponse.json({ error: 'Firebase Admin not available' }, { status: 500 });
@@ -48,6 +55,15 @@ export async function POST(request: NextRequest) {
       }, { merge: true });
     }
 
+    // Get the base URL for redirect URLs
+    const baseUrl = process.env.NEXTAUTH_URL || request.headers.get('origin') || 'https://test.veloryn.wadby.cloud';
+    
+    console.log('Creating checkout session with base URL:', baseUrl);
+    console.log('Environment NEXTAUTH_URL:', process.env.NEXTAUTH_URL);
+    
+    // Ensure the base URL has the proper scheme
+    const normalizedBaseUrl = baseUrl.startsWith('http') ? baseUrl : `https://${baseUrl}`;
+    
     // Create checkout session
     const session = await stripe.checkout.sessions.create({
       customer: customer.id,
@@ -59,8 +75,8 @@ export async function POST(request: NextRequest) {
         },
       ],
       mode: 'subscription',
-      success_url: `${process.env.NEXTAUTH_URL}/analysis?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXTAUTH_URL}/pricing`,
+      success_url: `${normalizedBaseUrl}/analysis?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${normalizedBaseUrl}/pricing`,
       metadata: {
         userId: userId,
       },

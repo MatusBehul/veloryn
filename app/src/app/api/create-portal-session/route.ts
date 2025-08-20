@@ -17,9 +17,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing customer ID' }, { status: 400 });
     }
 
+    // Get the base URL for redirect URLs
+    const baseUrl = process.env.NEXTAUTH_URL || request.headers.get('origin') || 'https://test.veloryn.wadby.cloud';
+    
+    console.log('Creating portal session with base URL:', baseUrl);
+    console.log('Environment NEXTAUTH_URL:', process.env.NEXTAUTH_URL);
+    
+    // Ensure the base URL has the proper scheme
+    const normalizedBaseUrl = baseUrl.startsWith('http') ? baseUrl : `https://${baseUrl}`;
+
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: customerId,
-      return_url: `${process.env.NEXTAUTH_URL}/analysis`,
+      return_url: `${normalizedBaseUrl}/analysis`,
     });
 
     return NextResponse.json({ url: portalSession.url });
