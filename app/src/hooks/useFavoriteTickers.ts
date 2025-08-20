@@ -21,8 +21,12 @@ export function useFavoriteTickers() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const loadFavoriteTickers = useCallback(async () => {
-    if (!firebaseUser) return;
+  // Simple async function without useCallback to avoid dependency issues
+  const loadFavoriteTickers = async () => {
+    if (!firebaseUser) {
+      console.log('No firebaseUser available for loading tickers');
+      return;
+    }
 
     try {
       setLoading(true);
@@ -30,7 +34,7 @@ export function useFavoriteTickers() {
       
       console.log('Getting Firebase token...');
       const token = await firebaseUser.getIdToken();
-      console.log('Token obtained, making API call to /api/user/tickers...');
+      console.log('Token obtained, making direct API call to /api/user/tickers...');
       
       const response = await fetch('/api/user/tickers', {
         headers: {
@@ -39,7 +43,7 @@ export function useFavoriteTickers() {
       });
 
       console.log('API response status:', response.status);
-      console.log('API response headers:', [...response.headers.entries()]);
+      console.log('API response ok:', response.ok);
 
       if (response.ok) {
         const data = await response.json();
@@ -48,7 +52,9 @@ export function useFavoriteTickers() {
         setTierInfo(data.tierInfo || { currentTier: 'free', limit: 0, used: 0, remaining: 0 });
       } else {
         console.error('API response not ok:', response.status, response.statusText);
-        throw new Error('Failed to load favorite tickers');
+        const errorText = await response.text();
+        console.error('Error response body:', errorText);
+        throw new Error(`Failed to load favorite tickers: ${response.status}`);
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
@@ -57,9 +63,9 @@ export function useFavoriteTickers() {
     } finally {
       setLoading(false);
     }
-  }, [firebaseUser]);
+  };
 
-  const saveFavoriteTickers = useCallback(async (updatedTickers: FavoriteTicker[]) => {
+  const saveFavoriteTickers = async (updatedTickers: FavoriteTicker[]) => {
     if (!firebaseUser) {
       throw new Error('User must be authenticated');
     }
@@ -100,9 +106,9 @@ export function useFavoriteTickers() {
     } finally {
       setLoading(false);
     }
-  }, [firebaseUser]);
+  };
 
-  const addTicker = useCallback(async (symbol: string, name?: string, dailyUpdates: boolean = true) => {
+  const addTicker = async (symbol: string, name?: string, dailyUpdates: boolean = true) => {
     const tickerSymbol = symbol.trim().toUpperCase();
     
     // Check if ticker already exists
@@ -123,40 +129,42 @@ export function useFavoriteTickers() {
 
     const updatedTickers = [...favoriteTickers, newTicker];
     await saveFavoriteTickers(updatedTickers);
-  }, [favoriteTickers, tierInfo, saveFavoriteTickers]);
+  };
 
-  const removeTicker = useCallback(async (symbolToRemove: string) => {
+  const removeTicker = async (symbolToRemove: string) => {
     const updatedTickers = favoriteTickers.filter(ticker => ticker.symbol !== symbolToRemove);
     await saveFavoriteTickers(updatedTickers);
-  }, [favoriteTickers, saveFavoriteTickers]);
+  };
 
-  const updateTicker = useCallback(async (symbol: string, updates: Partial<FavoriteTicker>) => {
+  const updateTicker = async (symbol: string, updates: Partial<FavoriteTicker>) => {
     const updatedTickers = favoriteTickers.map(ticker =>
       ticker.symbol === symbol ? { ...ticker, ...updates } : ticker
     );
     await saveFavoriteTickers(updatedTickers);
-  }, [favoriteTickers, saveFavoriteTickers]);
+  };
 
-  const toggleDailyUpdates = useCallback(async (symbol: string, enabled: boolean) => {
+  const toggleDailyUpdates = async (symbol: string, enabled: boolean) => {
     await updateTicker(symbol, { dailyUpdates: enabled });
-  }, [updateTicker]);
+  };
 
-  const getTickersWithDailyUpdates = useCallback(() => {
+  const getTickersWithDailyUpdates = () => {
     return favoriteTickers.filter(ticker => ticker.dailyUpdates);
-  }, [favoriteTickers]);
+  };
 
   // Load tickers when component mounts or user changes
   useEffect(() => {
     if (firebaseUser) {
       console.log('Firebase user available, loading tickers...');
-      loadFavoriteTickers();
+      loadFavoriteTickers().catch(err => {
+        console.error('Failed to load tickers in useEffect:', err);
+      });
     } else {
       console.log('No Firebase user, resetting state...');
       setFavoriteTickers([]);
       setTierInfo({ currentTier: 'free', limit: 0, used: 0, remaining: 0 });
       setError(null);
     }
-  }, [firebaseUser]); // Only depend on firebaseUser, not loadFavoriteTickers
+  }, [firebaseUser?.uid]); // Use uid instead of the full user object
 
   return {
     favoriteTickers,
