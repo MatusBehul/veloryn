@@ -156,6 +156,12 @@ async function performTierHousekeeping(userId: string, oldTier: string, newTier:
 
 async function handleSubscriptionChange(subscription: Stripe.Subscription) {
   console.log('🔄 Processing subscription change:', subscription.id);
+  console.log('📊 Subscription details:', {
+    id: subscription.id,
+    status: subscription.status,
+    priceId: subscription.items.data[0]?.price?.id,
+    metadata: subscription.metadata
+  });
   
   const userId = subscription.metadata?.userId;
 
@@ -170,8 +176,12 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
 
   console.log(`🔄 Updating subscription for user ${userId}: status=${status}, periodEnd=${currentPeriodEnd}`);
 
-  const velorynSubscriptionsConfig = await adminDb.collection('config').doc('subscriptions').get();
+  const velorynSubscriptionsConfig = await adminDb.collection('conf').doc('subscriptions').get();
   const newTier = velorynSubscriptionsConfig.data()?.[subscription.items.data[0].price.id] || 'free';
+
+  console.log('📋 Subscription config data:', velorynSubscriptionsConfig.data());
+  console.log('🎯 Price ID from subscription:', subscription.items.data[0].price.id);
+  console.log('🏷️ Mapped tier:', newTier);
 
   try {
     // Get current user data to check for tier changes
