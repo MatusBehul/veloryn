@@ -263,8 +263,14 @@ class FinancialAnalysisTrigger:
                     elif 'text' in parts[0]:
                         # Fallback to text parsing for older responses
                         logger.info("Parsing text-based response from ADK")
-                        markdown_text = parts[0]['text']
-                        analysis_data = self._extract_json_from_markdown(markdown_text)
+                        text_content = parts[0]['text']
+                        logger.info(f"Text content length: {len(text_content)} characters")
+                        
+                        # Log first and last 200 chars to help debug truncation
+                        logger.info(f"Text starts with: {text_content[:200]}...")
+                        logger.info(f"Text ends with: ...{text_content[-200:]}")
+                        
+                        analysis_data = self._extract_json_from_markdown(text_content)
                     else:
                         logger.warning("No structured_data or text found in ADK response parts")
                         analysis_data = {"error": "No valid content in ADK response"}
@@ -280,13 +286,22 @@ class FinancialAnalysisTrigger:
                         'response_type': 'adk_structured' if 'structured_data' in parts[0] else 'adk_text'
                     }
                     
+                    # Log token usage for monitoring
+                    usage = adk_response.get('usageMetadata', {})
+                    if usage:
+                        logger.info(f"Token usage - Prompt: {usage.get('promptTokenCount', 0)}, "
+                                  f"Response: {usage.get('candidatesTokenCount', 0)}, "
+                                  f"Total: {usage.get('totalTokenCount', 0)}")
+                    
                     return result
             
             # If it's not the expected ADK structure, try to extract JSON directly
+            logger.info("No ADK structure found, attempting direct JSON extraction")
             return self._extract_json_from_markdown(json.dumps(adk_response))
             
         except Exception as e:
             logger.error(f"Error extracting analysis from ADK response: {e}")
+            logger.error(f"ADK response keys: {list(adk_response.keys()) if isinstance(adk_response, dict) else 'Not a dict'}")
             return {
                 'error': f'Failed to extract analysis: {str(e)}',
                 'raw_response': adk_response,
@@ -297,7 +312,7 @@ class FinancialAnalysisTrigger:
         """Extract JSON from markdown code blocks like ```json {...}``` or ```json [...]```"""
         import re
         
-        # Try to find JSON in markdown code blocks (both objects and arrays)
+        # First, try to find complete JSON in markdown code blocks
         json_pattern = r'```(?:json)?\s*(\[.*?\]|\{.*?\})\s*```'
         match = re.search(json_pattern, text, re.DOTALL | re.IGNORECASE)
         
@@ -310,58 +325,83 @@ class FinancialAnalysisTrigger:
                 # Validate and fix the analysis structure
                 return self._validate_and_fix_analysis(parsed_data)
             except json.JSONDecodeError as e:
-                logger.error(f"Failed to parse extracted JSON: {e}")
+                logger.error(f"Failed to parse extracted JSON from markdown: {e}")
                 logger.error(f"JSON string around error: {json_str[max(0, e.pos-100):e.pos+100]}")
-                # Try more aggressive fixes
-                fixed_json = self._aggressive_json_fix(json_str)
+        
+        # If no markdown blocks found, try to find the largest complete JSON structure
+        # Look for array patterns first
+        array_matches = list(re.finditer(r'\[', text))
+        for start_match in array_matches:
+            start_pos = start_match.start()
+            # Find the matching closing bracket
+            bracket_count = 0
+            end_pos = start_pos
+            
+            for i, char in enumerate(text[start_pos:], start_pos):
+                if char == '[':
+                    bracket_count += 1
+                elif char == ']':
+                    bracket_count -= 1
+                    if bracket_count == 0:
+                        end_pos = i + 1
+                        break
+            
+            if bracket_count == 0:  # Found complete array
+                json_str = text[start_pos:end_pos]
+                json_str = self._fix_common_json_errors(json_str)
                 try:
-                    parsed_data = json.loads(fixed_json)
+                    parsed_data = json.loads(json_str)
                     return self._validate_and_fix_analysis(parsed_data)
-                except json.JSONDecodeError as e2:
-                    logger.error(f"Even aggressive fix failed: {e2}")
-                    return {"error": "Failed to parse JSON from markdown", "raw_content": text}
+                except json.JSONDecodeError:
+                    continue  # Try next array match
         
-        # If no markdown blocks found, try to find raw JSON (arrays or objects)
-        # First try arrays
-        array_pattern = r'\[.*?\]'
-        match = re.search(array_pattern, text, re.DOTALL)
+        # If arrays didn't work, try objects
+        object_matches = list(re.finditer(r'\{', text))
+        for start_match in object_matches:
+            start_pos = start_match.start()
+            # Find the matching closing brace
+            brace_count = 0
+            end_pos = start_pos
+            
+            for i, char in enumerate(text[start_pos:], start_pos):
+                if char == '{':
+                    brace_count += 1
+                elif char == '}':
+                    brace_count -= 1
+                    if brace_count == 0:
+                        end_pos = i + 1
+                        break
+            
+            if brace_count == 0:  # Found complete object
+                json_str = text[start_pos:end_pos]
+                json_str = self._fix_common_json_errors(json_str)
+                try:
+                    parsed_data = json.loads(json_str)
+                    return self._validate_and_fix_analysis(parsed_data)
+                except json.JSONDecodeError:
+                    continue  # Try next object match
+        
+        # If all else fails, try to extract and parse just the first complete JSON structure
+        # by looking for common analysis fields
+        analysis_pattern = r'(\[[\s\S]*?"overall_analysis"[\s\S]*?\])'
+        match = re.search(analysis_pattern, text, re.IGNORECASE)
         
         if match:
-            json_str = match.group(0)
+            json_str = match.group(1)
             json_str = self._fix_common_json_errors(json_str)
             try:
                 parsed_data = json.loads(json_str)
-                return self._validate_and_fix_analysis(parsed_data)
-            except json.JSONDecodeError:
-                pass  # Continue to try object pattern
-        
-        # Then try objects
-        object_pattern = r'\{.*\}'
-        match = re.search(object_pattern, text, re.DOTALL)
-        
-        if match:
-            json_str = match.group(0)
-            # Attempt to fix common JSON syntax errors before parsing
-            json_str = self._fix_common_json_errors(json_str)
-            try:
-                parsed_data = json.loads(json_str)
-                # Validate with our new structure
                 return self._validate_and_fix_analysis(parsed_data)
             except json.JSONDecodeError as e:
-                logger.error(f"Failed to parse raw JSON: {e}")
-                logger.error(f"JSON string around error: {json_str[max(0, e.pos-100):e.pos+100]}")
-                # Try more aggressive fixes
-                fixed_json = self._aggressive_json_fix(json_str)
-                try:
-                    parsed_data = json.loads(fixed_json)
-                    return self._validate_and_fix_analysis(parsed_data)
-                except json.JSONDecodeError as e2:
-                    logger.error(f"Even aggressive fix failed: {e2}")
-                    return {"error": "Failed to parse raw JSON", "raw_content": text}
+                logger.error(f"Failed to parse analysis pattern JSON: {e}")
         
-        # If no JSON found, return the raw content
-        logger.warning(f"No JSON found in response, returning raw content")
-        return {"error": "No JSON found", "raw_content": text}
+        # Final fallback - return error with truncated content for debugging
+        logger.warning(f"No valid JSON found in response, returning truncated content for debugging")
+        return {
+            "error": "No valid JSON found", 
+            "raw_content": text[:2000] + "..." if len(text) > 2000 else text,
+            "content_length": len(text)
+        }
     
     def _aggressive_json_fix(self, json_str: str) -> str:
         """More aggressive JSON fixing for complex cases"""
@@ -369,6 +409,33 @@ class FinancialAnalysisTrigger:
         
         # Handle both array and object JSON structures
         is_array = json_str.strip().startswith('[')
+        
+        # First, handle truncation issues - if the JSON appears to be cut off
+        if not (json_str.strip().endswith(']') if is_array else json_str.strip().endswith('}')):
+            logger.warning("JSON appears truncated, attempting to close properly")
+            
+            # Count open/close brackets or braces to determine how many to add
+            if is_array:
+                open_count = json_str.count('[')
+                close_count = json_str.count(']')
+                missing_closes = open_count - close_count
+                
+                # Also check for unclosed objects within the array
+                open_braces = json_str.count('{')
+                close_braces = json_str.count('}')
+                missing_brace_closes = open_braces - close_braces
+                
+                # Close any unclosed objects first, then the array
+                if missing_brace_closes > 0:
+                    json_str += '}' * missing_brace_closes
+                if missing_closes > 0:
+                    json_str += ']' * missing_closes
+            else:
+                open_count = json_str.count('{')
+                close_count = json_str.count('}')
+                missing_closes = open_count - close_count
+                if missing_closes > 0:
+                    json_str += '}' * missing_closes
         
         # Try to fix the specific error pattern from the log
         # "action": "Accumulate", {"datetime": "High", "price": "1350.00", "volume": "1180.00"}, "time_horizon": ...
@@ -388,36 +455,49 @@ class FinancialAnalysisTrigger:
             json_str
         )
         
-        # Pattern 3: Fix incomplete strings at the end
-        # If we have an incomplete string at the end, try to close it
-        if json_str.rstrip().endswith('"'):
-            # Already ends with quote
-            pass
-        elif re.search(r'"[^"]*$', json_str):
-            # Incomplete string at end
-            json_str = re.sub(r'"([^"]*$)', r'"\1"', json_str)
+        # Pattern 3: Fix incomplete strings at the end due to truncation
+        # Look for incomplete strings that might have been cut off
+        incomplete_string_pattern = r'"([^"]*?)\.\.\.?"?\s*$'
+        if re.search(incomplete_string_pattern, json_str):
+            # Try to properly close the incomplete string
+            json_str = re.sub(incomplete_string_pattern, r'"\1"', json_str)
         
-        # Pattern 4: Ensure proper closing of objects/arrays
-        open_braces = json_str.count('{')
-        close_braces = json_str.count('}')
-        open_brackets = json_str.count('[')
-        close_brackets = json_str.count(']')
+        # Pattern 4: Fix unterminated strings that don't end with quotes
+        # Find strings that start with quote but don't end properly
+        unterminated_pattern = r'"([^"]*?)(?:\.\.\.|$)(?!["\]\}])'
+        json_str = re.sub(unterminated_pattern, r'"\1"', json_str)
         
-        # Add missing closing braces/brackets
-        if open_braces > close_braces:
-            json_str += '}' * (open_braces - close_braces)
-        if open_brackets > close_brackets:
-            json_str += ']' * (open_brackets - close_brackets)
-        
-        # Pattern 5: Fix common array issues
+        # Pattern 5: Remove any trailing content after valid JSON end
         if is_array:
-            # Ensure proper array structure for analysis data
-            # Fix cases where array items are missing commas
+            # Find the last valid ] and truncate after it
+            last_bracket = json_str.rfind(']')
+            if last_bracket != -1:
+                # Check if there's content after the bracket that's not whitespace
+                after_bracket = json_str[last_bracket + 1:].strip()
+                if after_bracket:
+                    logger.warning(f"Removing trailing content after JSON: {after_bracket[:100]}...")
+                    json_str = json_str[:last_bracket + 1]
+        else:
+            # Find the last valid } and truncate after it
+            last_brace = json_str.rfind('}')
+            if last_brace != -1:
+                after_brace = json_str[last_brace + 1:].strip()
+                if after_brace:
+                    logger.warning(f"Removing trailing content after JSON: {after_brace[:100]}...")
+                    json_str = json_str[:last_brace + 1]
+        
+        # Pattern 6: Fix missing commas between array objects
+        if is_array:
             json_str = re.sub(r'}\s*{', r'}, {', json_str)
-            
-            # Fix cases where the array is not properly closed
-            if not json_str.strip().endswith(']'):
-                json_str = json_str.rstrip() + ']'
+        
+        # Pattern 7: Fix missing quotes around property names
+        json_str = re.sub(r'(\{|\,)\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*:', r'\1"\2":', json_str)
+        
+        # Pattern 8: Fix trailing commas before closing braces/brackets
+        json_str = re.sub(r',(\s*[}\]])', r'\1', json_str)
+        
+        # Pattern 9: Fix double commas
+        json_str = re.sub(r',,+', ',', json_str)
         
         return json_str
     
@@ -430,22 +510,51 @@ class FinancialAnalysisTrigger:
             
             # Handle new array format: [{"language": "string", "overall_analysis": [...], ...}]
             if isinstance(data, list):
-                if len(data) > 0 and isinstance(data[0], dict):
-                    analysis_item = data[0]  # Take the first analysis item
-                    # Validate it has the expected structure
-                    expected_keys = ['language', 'overall_analysis', 'technical_analysis', 'fundamental_analysis', 
-                                   'sentiment_analysis', 'risk_analysis', 'investment_insights', 'investment_narrative']
-                    if any(key in analysis_item for key in expected_keys):
-                        return {"analysis": data}  # Wrap in analysis key for consistency
+                if len(data) > 0:
+                    # Filter out any non-dict items that might have crept in
+                    valid_items = [item for item in data if isinstance(item, dict)]
+                    
+                    if valid_items:
+                        analysis_item = valid_items[0]  # Take the first valid analysis item
+                        
+                        # Validate it has the expected structure
+                        expected_keys = ['language', 'overall_analysis', 'technical_analysis', 'fundamental_analysis', 
+                                       'sentiment_analysis', 'risk_analysis', 'investment_insights', 'investment_narrative']
+                        
+                        # Check if this looks like a valid analysis object
+                        analysis_keys_found = [key for key in expected_keys if key in analysis_item]
+                        
+                        if len(analysis_keys_found) >= 3:  # At least 3 expected keys found
+                            logger.info(f"Valid analysis structure found with keys: {analysis_keys_found}")
+                            return {"analysis": valid_items}  # Return all valid items
+                        else:
+                            logger.warning(f"Analysis item missing expected keys. Found: {list(analysis_item.keys())}, Expected some of: {expected_keys}")
+                            # Try to salvage what we can
+                            if any(key in analysis_item for key in ['overall_analysis', 'technical_analysis', 'fundamental_analysis']):
+                                logger.info("Found minimal required analysis keys, proceeding")
+                                return {"analysis": valid_items}
+                            else:
+                                return {"error": "Analysis missing critical fields", "found_keys": list(analysis_item.keys()), "raw_data": data}
+                    else:
+                        return {"error": "Analysis array contains no valid dictionary items", "raw_data": data}
                 else:
-                    return {"error": "Analysis array is empty or contains invalid items", "raw_data": data}
+                    return {"error": "Analysis array is empty", "raw_data": data}
             
             # Handle legacy dictionary format: {"overall_analysis": [...], ...}
             elif isinstance(data, dict):
+                # Check for direct error in the data
+                if 'error' in data:
+                    logger.warning(f"Found error in analysis data: {data.get('error')}")
+                    return data  # Return the error as-is
+                
                 # Check for legacy format keys
                 legacy_keys = ['overall_analysis', 'technical_analysis', 'fundamental_analysis', 
                              'sentiment_analysis', 'risk_analysis', 'investment_insights', 'investment_narrative']
-                if any(key in data for key in legacy_keys):
+                
+                found_legacy_keys = [key for key in legacy_keys if key in data]
+                
+                if found_legacy_keys:
+                    logger.info(f"Converting legacy format to new array format. Found keys: {found_legacy_keys}")
                     # Convert legacy format to new array format
                     converted_data = [{
                         "language": "en",  # Default language
@@ -456,17 +565,63 @@ class FinancialAnalysisTrigger:
                 # If data looks like it's already wrapped (e.g., {"analysis": [...]})
                 if 'analysis' in data:
                     if isinstance(data['analysis'], list):
-                        return data  # Already in correct format
+                        # Validate the nested array
+                        if len(data['analysis']) > 0:
+                            first_item = data['analysis'][0]
+                            if isinstance(first_item, dict):
+                                expected_keys = ['overall_analysis', 'technical_analysis', 'fundamental_analysis']
+                                if any(key in first_item for key in expected_keys):
+                                    logger.info("Found valid nested analysis array structure")
+                                    return data  # Already in correct format
+                        
+                        logger.warning("Nested analysis array appears invalid or empty")
+                        return {"error": "Invalid nested analysis array", "raw_data": data}
+                        
                     elif isinstance(data['analysis'], dict):
                         # Convert wrapped dict to array format
-                        converted_data = [{
-                            "language": "en",
-                            **data['analysis']
-                        }]
-                        return {"analysis": converted_data}
+                        analysis_dict = data['analysis']
+                        expected_keys = ['overall_analysis', 'technical_analysis', 'fundamental_analysis']
+                        
+                        if any(key in analysis_dict for key in expected_keys):
+                            converted_data = [{
+                                "language": "en",
+                                **analysis_dict
+                            }]
+                            return {"analysis": converted_data}
+                        else:
+                            return {"error": "Wrapped analysis dict missing expected fields", "raw_data": data}
                 
-                # If it's some other dict structure, return as-is for debugging
-                return {"analysis": [{"language": "en", "error": "Unknown data structure", "raw_data": data}]}
+                # If it's some other dict structure, check if it might be a partial response
+                if 'raw_content' in data and 'error' in data:
+                    # This looks like an error response, check if we can extract anything useful
+                    raw_content = data.get('raw_content', '')
+                    if isinstance(raw_content, str) and len(raw_content) > 100:
+                        # Try to parse the raw content one more time
+                        logger.info("Attempting to re-parse raw content from error response")
+                        try:
+                            # Look for JSON-like structures in the raw content
+                            import re
+                            
+                            # Try to find array patterns with analysis data
+                            analysis_pattern = r'\[\s*\{\s*"language":\s*"[^"]*"[\s\S]*?"overall_analysis"[\s\S]*?\]'
+                            match = re.search(analysis_pattern, raw_content, re.IGNORECASE)
+                            
+                            if match:
+                                potential_json = match.group(0)
+                                # Try basic fixes
+                                potential_json = self._fix_common_json_errors(potential_json)
+                                try:
+                                    reparsed_data = json.loads(potential_json)
+                                    if isinstance(reparsed_data, list) and len(reparsed_data) > 0:
+                                        logger.info("Successfully reparsed analysis from raw content")
+                                        return {"analysis": reparsed_data}
+                                except json.JSONDecodeError:
+                                    pass
+                        except Exception as e:
+                            logger.warning(f"Failed to reparse raw content: {e}")
+                
+                # Final fallback for unknown dict structure
+                return {"error": "Unknown dictionary structure", "found_keys": list(data.keys()), "raw_data": data}
             
             return {"error": "Unexpected data type", "raw_data": data}
             
