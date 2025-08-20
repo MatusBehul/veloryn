@@ -50,74 +50,42 @@ jobs:
         rm -f .env.local .env.development .env.production
         echo "Cleaned local environment files"
 
-    - name: Create build-time environment file
+    - name: Create build-time environment file (for Cloud Build)
       run: |
         cd app
-        # Create .env.production for build time (NEXT_PUBLIC_ vars only)
-        cat > .env.production << EOF
-        NEXT_PUBLIC_FIREBASE_PROJECT_ID=${{ vars.GOOGLE_CLOUD_PROJECT }}
-        NEXT_PUBLIC_FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY }}
-        NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=${{ vars.GOOGLE_CLOUD_PROJECT }}.firebaseapp.com
-        NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=${{ vars.GOOGLE_CLOUD_PROJECT }}.firebasestorage.app
-        NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
-        NEXT_PUBLIC_FIREBASE_APP_ID=${{ secrets.FIREBASE_APP_ID }}
-        NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${{ secrets.STRIPE_PUBLISHABLE_KEY }}
-        NODE_ENV=production
-        EOF
-
-    - name: Create runtime environment configuration
-      run: |
-        cd app
-        # Create .env.yaml for Cloud Run runtime (all vars)
-        cat > .env.yaml << EOF
+        # Only public values needed by Next.js at build time
+        cat > .env.build.yaml << EOF
         NEXT_PUBLIC_FIREBASE_PROJECT_ID: "${{ vars.GOOGLE_CLOUD_PROJECT }}"
         NEXT_PUBLIC_FIREBASE_API_KEY: "${{ secrets.FIREBASE_API_KEY }}"
         NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: "${{ vars.GOOGLE_CLOUD_PROJECT }}.firebaseapp.com"
         NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: "${{ vars.GOOGLE_CLOUD_PROJECT }}.firebasestorage.app"
         NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: "${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}"
         NEXT_PUBLIC_FIREBASE_APP_ID: "${{ secrets.FIREBASE_APP_ID }}"
-        FIREBASE_PROJECT_ID: "${{ vars.GOOGLE_CLOUD_PROJECT }}"
-        FIREBASE_CLIENT_EMAIL: "${{ secrets.FIREBASE_CLIENT_EMAIL }}"
-        FIREBASE_PRIVATE_KEY: "${{ secrets.FIREBASE_PRIVATE_KEY }}"
-        STRIPE_SECRET_KEY: "${{ secrets.STRIPE_SECRET_KEY }}"
-        STRIPE_WEBHOOK_SECRET: "${{ secrets.STRIPE_WEBHOOK_SECRET }}"
         NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: "${{ secrets.STRIPE_PUBLISHABLE_KEY }}"
         EOF
 
-    - name: Build application
-      env:
-        NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.GOOGLE_CLOUD_PROJECT }}
-        NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
-        NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ vars.GOOGLE_CLOUD_PROJECT }}.firebaseapp.com
-        NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{ vars.GOOGLE_CLOUD_PROJECT }}.firebasestorage.app
-        NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
-        NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
-        NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.STRIPE_PUBLISHABLE_KEY }}
-        NODE_ENV: production
+    - name: Create runtime environment configuration
       run: |
         cd app
-        echo "Building with production environment..."
-        echo "Firebase Project: ${{ vars.GOOGLE_CLOUD_PROJECT }}"
-        
-        # Verify both env vars and file are available
-        echo "Environment variables for build:"
-        echo "NEXT_PUBLIC_FIREBASE_PROJECT_ID is set: $([[ -n "$NEXT_PUBLIC_FIREBASE_PROJECT_ID" ]] && echo "YES" || echo "NO")"
-        echo "NEXT_PUBLIC_FIREBASE_API_KEY is set: $([[ -n "$NEXT_PUBLIC_FIREBASE_API_KEY" ]] && echo "YES" || echo "NO")"
-        
-        echo "Checking .env.production file:"
-        if [ -f .env.production ]; then
-          echo ".env.production exists"
-          grep "NEXT_PUBLIC_FIREBASE_PROJECT_ID" .env.production || echo "NEXT_PUBLIC_FIREBASE_PROJECT_ID not in file"
-        else
-          echo ".env.production does not exist"
-        fi
-        
-        # Build the application
-        npm run build
-        
-        # Clean up build-time env file to prevent conflicts with runtime
-        rm -f .env.production
-        echo "Cleaned up build-time environment file"
+        cat > .env.yaml << 'EOF'
+        NEXT_PUBLIC_FIREBASE_PROJECT_ID: "${{ vars.GOOGLE_CLOUD_PROJECT }}"
+        NEXT_PUBLIC_FIREBASE_API_KEY: "${{ secrets.FIREBASE_API_KEY }}"
+        NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: "${{ vars.GOOGLE_CLOUD_PROJECT }}.firebaseapp.com"
+        NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: "${{ vars.GOOGLE_CLOUD_PROJECT }}.firebasestorage.app"
+        NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: "${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}"
+        NEXT_PUBLIC_FIREBASE_APP_ID: "${{ secrets.FIREBASE_APP_ID }}"
+        NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: "${{ secrets.STRIPE_PUBLISHABLE_KEY }}"
+
+        # Backend (server/runtime) vars
+        GOOGLE_CLOUD_PROJECT: "${{ vars.GOOGLE_CLOUD_PROJECT }}"
+        FIREBASE_PROJECT_ID: "${{ vars.GOOGLE_CLOUD_PROJECT }}"
+        FIREBASE_CLIENT_EMAIL: "${{ secrets.FIREBASE_CLIENT_EMAIL }}"
+        # Use block scalar to preserve newlines in the private key
+        FIREBASE_PRIVATE_KEY: |-
+          ${{ secrets.FIREBASE_PRIVATE_KEY }}
+        STRIPE_SECRET_KEY: "${{ secrets.STRIPE_SECRET_KEY }}"
+        STRIPE_WEBHOOK_SECRET: "${{ secrets.STRIPE_WEBHOOK_SECRET }}"
+        EOF
 
     - name: Authenticate to Google Cloud
       uses: google-github-actions/auth@v2
@@ -132,11 +100,11 @@ jobs:
     - name: Deploy to Cloud Run
       run: |
         cd app
-        
+
         echo "🚀 Deploying Web Application..."
         echo "Service name: ${{ env.SERVICE_NAME }}"
         echo "Project: ${{ vars.GOOGLE_CLOUD_PROJECT }}"
-        
+
         gcloud run deploy ${{ env.SERVICE_NAME }} \
           --source . \
           --platform managed \
@@ -147,4 +115,5 @@ jobs:
           --cpu 1 \
           --min-instances 0 \
           --max-instances ${{ env.DEPLOY_ENV == 'prod' && '50' || '5' }} \
+          --build-env-vars-file .env.build.yaml \
           --env-vars-file .env.yaml
