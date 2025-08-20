@@ -47,22 +47,24 @@ jobs:
       run: |
         cd app
         # Remove any local environment files that might interfere
-        rm -f .env.local .env.development .env.production
+        rm -f .env.local .env.development
+        # DO NOT remove .env.production later; we'll create it and keep it for Cloud Build
         echo "Cleaned local environment files"
 
-    - name: Create build-time environment file (for Cloud Build)
+    - name: Create build-time .env.production for Next.js
       run: |
         cd app
-        # Only public values needed by Next.js at build time
-        cat > .env.build.yaml << EOF
-        NEXT_PUBLIC_FIREBASE_PROJECT_ID: "${{ vars.GOOGLE_CLOUD_PROJECT }}"
-        NEXT_PUBLIC_FIREBASE_API_KEY: "${{ secrets.FIREBASE_API_KEY }}"
-        NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: "${{ vars.GOOGLE_CLOUD_PROJECT }}.firebaseapp.com"
-        NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: "${{ vars.GOOGLE_CLOUD_PROJECT }}.firebasestorage.app"
-        NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: "${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}"
-        NEXT_PUBLIC_FIREBASE_APP_ID: "${{ secrets.FIREBASE_APP_ID }}"
-        NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: "${{ secrets.STRIPE_PUBLISHABLE_KEY }}"
+        cat > .env.production << EOF
+        NEXT_PUBLIC_FIREBASE_PROJECT_ID=${{ vars.GOOGLE_CLOUD_PROJECT }}
+        NEXT_PUBLIC_FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY }}
+        NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=${{ vars.GOOGLE_CLOUD_PROJECT }}.firebaseapp.com
+        NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=${{ vars.GOOGLE_CLOUD_PROJECT }}.firebasestorage.app
+        NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
+        NEXT_PUBLIC_FIREBASE_APP_ID=${{ secrets.FIREBASE_APP_ID }}
+        NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${{ secrets.STRIPE_PUBLISHABLE_KEY }}
+        NODE_ENV=production
         EOF
+        echo "Wrote app/.env.production for build"
 
     - name: Create runtime environment configuration
       run: |
@@ -80,7 +82,6 @@ jobs:
         GOOGLE_CLOUD_PROJECT: "${{ vars.GOOGLE_CLOUD_PROJECT }}"
         FIREBASE_PROJECT_ID: "${{ vars.GOOGLE_CLOUD_PROJECT }}"
         FIREBASE_CLIENT_EMAIL: "${{ secrets.FIREBASE_CLIENT_EMAIL }}"
-        # Use block scalar to preserve newlines in the private key
         FIREBASE_PRIVATE_KEY: |-
           ${{ secrets.FIREBASE_PRIVATE_KEY }}
         STRIPE_SECRET_KEY: "${{ secrets.STRIPE_SECRET_KEY }}"
