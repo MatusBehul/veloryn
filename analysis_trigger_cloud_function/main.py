@@ -530,7 +530,13 @@ class FinancialAnalysisTrigger:
                            raw_analysis_data: ComprehensiveStockDataModel) -> str:
         """Save analysis result to Firestore"""
         analysis_id = f"{ticker}_{datetime.now(timezone.utc).strftime('%Y%m%d')}"
-        analysis_text = result.get('data', {}).get('analysis', [])
+        analysis_data = result.get('data', {}).get('analysis', {})
+        
+        # Handle nested structure: {"analysis": [{"language": "en", ...}]}
+        if isinstance(analysis_data, dict) and 'analysis' in analysis_data:
+            analysis_text = analysis_data['analysis']
+        else:
+            analysis_text = analysis_data
 
         # Handle both array and dict formats for analysis data
         if isinstance(analysis_text, list):
@@ -788,23 +794,53 @@ async def process_financial_analysis(ticker: str, day_input: str = None, user_id
                                     error_detected = True
                                     error_message = 'Analysis item is not a valid object'
                         elif isinstance(analysis_content, dict):
-                            # Handle case where analysis_content is a dict (single analysis object)
+                            # Handle case where analysis_content is a dict
                             logger.error(f"DEBUG - Dict analysis content for {ticker}: {json.dumps(analysis_content, indent=2, default=str)[:1000]}...")  # Truncate to avoid huge logs
                             
                             if 'error' in analysis_content:
                                 error_detected = True
                                 error_message = analysis_content.get('error')
                             else:
-                                # Validate that we have the expected structure
-                                expected_keys = ['overall_analysis', 'technical_analysis', 'fundamental_analysis']
-                                found_keys = [key for key in expected_keys if key in analysis_content]
-                                logger.error(f"DEBUG - Expected keys check for {ticker} (dict): expected={expected_keys}, found={found_keys}, all_keys={list(analysis_content.keys())}")
-                                
-                                if not any(key in analysis_content for key in expected_keys):
-                                    error_detected = True
-                                    error_message = 'Analysis missing required fields'
+                                # Check if this dict has a nested 'analysis' key with an array
+                                if 'analysis' in analysis_content and isinstance(analysis_content['analysis'], list):
+                                    # Handle nested structure: {"analysis": [{"language": "en", "overall_analysis": [...], ...}]}
+                                    nested_analysis_array = analysis_content['analysis']
+                                    if len(nested_analysis_array) == 0:
+                                        error_detected = True
+                                        error_message = 'Nested analysis array is empty'
+                                    else:
+                                        first_nested_analysis = nested_analysis_array[0]
+                                        logger.error(f"DEBUG - First nested analysis item for {ticker}: {json.dumps(first_nested_analysis, indent=2, default=str)[:1000]}...")
+                                        
+                                        if isinstance(first_nested_analysis, dict):
+                                            if 'error' in first_nested_analysis:
+                                                error_detected = True
+                                                error_message = first_nested_analysis.get('error')
+                                            else:
+                                                # Validate that we have the expected structure
+                                                expected_keys = ['overall_analysis', 'technical_analysis', 'fundamental_analysis']
+                                                found_keys = [key for key in expected_keys if key in first_nested_analysis]
+                                                logger.error(f"DEBUG - Expected keys check for {ticker} (nested dict): expected={expected_keys}, found={found_keys}, all_keys={list(first_nested_analysis.keys())}")
+                                                
+                                                if not any(key in first_nested_analysis for key in expected_keys):
+                                                    error_detected = True
+                                                    error_message = 'Nested analysis missing required fields'
+                                                else:
+                                                    logger.info(f"Analysis validation passed for {ticker} (nested dict format)")
+                                        else:
+                                            error_detected = True
+                                            error_message = 'Nested analysis item is not a valid object'
                                 else:
-                                    logger.info(f"Analysis validation passed for {ticker} (dict format)")
+                                    # Check if this is a direct analysis object (legacy format)
+                                    expected_keys = ['overall_analysis', 'technical_analysis', 'fundamental_analysis']
+                                    found_keys = [key for key in expected_keys if key in analysis_content]
+                                    logger.error(f"DEBUG - Expected keys check for {ticker} (direct dict): expected={expected_keys}, found={found_keys}, all_keys={list(analysis_content.keys())}")
+                                    
+                                    if not any(key in analysis_content for key in expected_keys):
+                                        error_detected = True
+                                        error_message = 'Analysis missing required fields'
+                                    else:
+                                        logger.info(f"Analysis validation passed for {ticker} (direct dict format)")
                         else:
                             # analysis_content is neither a list nor a dict
                             error_detected = True
