@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 
 export interface FavoriteTicker {
@@ -21,7 +21,7 @@ export function useFavoriteTickers() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const loadFavoriteTickers = async () => {
+  const loadFavoriteTickers = useCallback(async () => {
     if (!firebaseUser) return;
 
     try {
@@ -50,9 +50,9 @@ export function useFavoriteTickers() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [firebaseUser]);
 
-  const saveFavoriteTickers = async (updatedTickers: FavoriteTicker[]) => {
+  const saveFavoriteTickers = useCallback(async (updatedTickers: FavoriteTicker[]) => {
     if (!firebaseUser) {
       throw new Error('User must be authenticated');
     }
@@ -93,9 +93,9 @@ export function useFavoriteTickers() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [firebaseUser]);
 
-  const addTicker = async (symbol: string, name?: string, dailyUpdates: boolean = true) => {
+  const addTicker = useCallback(async (symbol: string, name?: string, dailyUpdates: boolean = true) => {
     const tickerSymbol = symbol.trim().toUpperCase();
     
     // Check if ticker already exists
@@ -116,27 +116,27 @@ export function useFavoriteTickers() {
 
     const updatedTickers = [...favoriteTickers, newTicker];
     await saveFavoriteTickers(updatedTickers);
-  };
+  }, [favoriteTickers, tierInfo, saveFavoriteTickers]);
 
-  const removeTicker = async (symbolToRemove: string) => {
+  const removeTicker = useCallback(async (symbolToRemove: string) => {
     const updatedTickers = favoriteTickers.filter(ticker => ticker.symbol !== symbolToRemove);
     await saveFavoriteTickers(updatedTickers);
-  };
+  }, [favoriteTickers, saveFavoriteTickers]);
 
-  const updateTicker = async (symbol: string, updates: Partial<FavoriteTicker>) => {
+  const updateTicker = useCallback(async (symbol: string, updates: Partial<FavoriteTicker>) => {
     const updatedTickers = favoriteTickers.map(ticker =>
       ticker.symbol === symbol ? { ...ticker, ...updates } : ticker
     );
     await saveFavoriteTickers(updatedTickers);
-  };
+  }, [favoriteTickers, saveFavoriteTickers]);
 
-  const toggleDailyUpdates = async (symbol: string, enabled: boolean) => {
+  const toggleDailyUpdates = useCallback(async (symbol: string, enabled: boolean) => {
     await updateTicker(symbol, { dailyUpdates: enabled });
-  };
+  }, [updateTicker]);
 
-  const getTickersWithDailyUpdates = () => {
+  const getTickersWithDailyUpdates = useCallback(() => {
     return favoriteTickers.filter(ticker => ticker.dailyUpdates);
-  };
+  }, [favoriteTickers]);
 
   // Load tickers when component mounts or user changes
   useEffect(() => {
@@ -147,7 +147,7 @@ export function useFavoriteTickers() {
       setTierInfo({ currentTier: 'free', limit: 0, used: 0, remaining: 0 });
       setError(null);
     }
-  }, [firebaseUser]);
+  }, [firebaseUser, loadFavoriteTickers]);
 
   return {
     favoriteTickers,
