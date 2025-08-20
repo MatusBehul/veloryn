@@ -716,6 +716,8 @@ async def process_financial_analysis(ticker: str, day_input: str = None, user_id
             error_detected = False
             error_message = None
 
+            logger.info(f"Validating analysis data for {ticker}: type={type(analysis_data)}, keys={list(analysis_data.keys()) if isinstance(analysis_data, dict) else 'N/A'}")
+
             # Check for error in result
             if not result.get('success'):
                 error_detected = True
@@ -733,6 +735,8 @@ async def process_financial_analysis(ticker: str, day_input: str = None, user_id
                     else:
                         # Check for analysis array structure
                         analysis_content = analysis_data.get('analysis', [])
+                        logger.info(f"Analysis content for {ticker}: type={type(analysis_content)}, length={len(analysis_content) if isinstance(analysis_content, list) else 'N/A'}")
+                        
                         if isinstance(analysis_content, list):
                             if len(analysis_content) == 0:
                                 error_detected = True
@@ -740,6 +744,8 @@ async def process_financial_analysis(ticker: str, day_input: str = None, user_id
                             else:
                                 # Check first analysis item for errors
                                 first_analysis = analysis_content[0]
+                                logger.info(f"First analysis item for {ticker}: type={type(first_analysis)}, keys={list(first_analysis.keys()) if isinstance(first_analysis, dict) else 'N/A'}")
+                                
                                 if isinstance(first_analysis, dict):
                                     if 'error' in first_analysis:
                                         error_detected = True
@@ -750,6 +756,8 @@ async def process_financial_analysis(ticker: str, day_input: str = None, user_id
                                         if not any(key in first_analysis for key in expected_keys):
                                             error_detected = True
                                             error_message = 'Analysis missing required fields'
+                                        else:
+                                            logger.info(f"Analysis validation passed for {ticker}")
                                 else:
                                     error_detected = True
                                     error_message = 'Analysis item is not a valid object'
@@ -757,11 +765,13 @@ async def process_financial_analysis(ticker: str, day_input: str = None, user_id
                             error_detected = True
                             error_message = analysis_content.get('error')
                         else:
-                            # Some other structure, check if it looks like legacy format
-                            legacy_keys = ['overall_analysis', 'technical_analysis', 'fundamental_analysis']
-                            if not any(key in analysis_data for key in legacy_keys):
-                                error_detected = True
-                                error_message = 'Analysis data structure is invalid or incomplete'
+                            # analysis_content is neither a list nor a dict with error
+                            # This means analysis_data.get('analysis') returned something unexpected
+                            error_detected = True
+                            error_message = f'Analysis content has unexpected type: {type(analysis_content)}'
+                else:
+                    error_detected = True
+                    error_message = f'Analysis data is not a dictionary: {type(analysis_data)}'
 
             # Save analysis result with correct success/error
             result_to_save = dict(result)
