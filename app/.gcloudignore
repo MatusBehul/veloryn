@@ -9,14 +9,6 @@
 # Node.js dependencies:
 node_modules/
 
-# Explicitly include .env.dev (don't ignore it)
-!.env.dev
-
-# But ignore other .env files
-.env.local
-.env.production
-.env
-
 # Build outputs
 .next/
 
