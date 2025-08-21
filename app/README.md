@@ -83,7 +83,6 @@ STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
 STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret
 
 # Subscription Configuration
-STRIPE_PRICE_ID=price_your_subscription_price_id
 ```
 
 ## Setup Instructions

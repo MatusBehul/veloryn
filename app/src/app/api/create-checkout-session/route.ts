@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { stripe, PRICE_ID } from '@/lib/stripe-server';
+import { stripe } from '@/lib/stripe-server';
 import { adminDb } from '@/lib/firebase-admin';
 
 // Prevent static generation during build
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
       selectedPriceId = priceMapping['price_standard'];
     }
 
-    console.log('Price mapping:', { originalPriceId: priceId, selectedPriceId, PRICE_ID });
+    console.log('Price mapping:', { originalPriceId: priceId, selectedPriceId });
 
     // Create or retrieve customer
     let customer;

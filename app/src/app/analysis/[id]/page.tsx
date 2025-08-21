@@ -3,10 +3,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSubscription } from '@/hooks/useSubscription';
-import { useAnalysisLanguage } from '@/hooks/useLanguage';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { LanguageSelector } from '@/components/LanguageSelector';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { ArrowLeft, Calendar, TrendingUp, AlertCircle, Download, Share, Mail, DollarSign, BarChart3, Activity, Target, Shield, Info, Building, Zap, Brain, PieChart } from 'lucide-react';
@@ -57,9 +55,6 @@ export default function AnalysisDetailPage() {
   const [priceChartData, setPriceChartData] = useState<any[]>([]);
   const [monthlyChartData, setMonthlyChartData] = useState<any[]>([]);
   const [financialChartData, setFinancialChartData] = useState<any[]>([]);
-
-  // Multi-language support
-  const { currentAnalysis, hasMultipleLanguages } = useAnalysisLanguage(analysis?.analysis_overview?.analysis_data);
 
   const formatDate = (dateString: any) => {
     if (!dateString) return 'Date not available';
@@ -405,14 +400,24 @@ Educational use only - Not financial advice
                   )}
                 </div>
               </div>
-              <div className="mt-4 md:mt-0">
-                {/* Language Selector */}
-                {hasMultipleLanguages && (
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm text-gray-600">Language:</span>
-                    <LanguageSelector variant="pills" showText={false} />
-                  </div>
-                )}
+              <div className="mt-4 md:mt-0 flex space-x-2">
+                <Button variant="outline" size="sm" onClick={handleShare}>
+                  <Share className="h-4 w-4 mr-2" />
+                  Share
+                </Button>
+                <Button variant="outline" size="sm" onClick={handleDownload}>
+                  <Download className="h-4 w-4 mr-2" />
+                  Download
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleEmailSend}
+                  disabled={emailLoading}
+                >
+                  <Mail className="h-4 w-4 mr-2" />
+                  {emailLoading ? 'Sending...' : 'Email'}
+                </Button>
               </div>
             </div>
           </CardContent>

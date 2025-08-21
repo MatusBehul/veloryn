@@ -14,56 +14,44 @@ export interface TierInfo {
   remaining: number;
 }
 
+// Tier-based limits for favorite tickers (keep in sync with backend)
+const TICKER_LIMITS = {
+  free: 0,
+  standard: 5,
+  premium: 20,
+  vip: 50,
+  ultimate: 100
+} as const;
+
+type SubscriptionTier = keyof typeof TICKER_LIMITS;
+
+function getTierLimit(tier: string): number {
+  const normalizedTier = tier.toLowerCase() as SubscriptionTier;
+  return TICKER_LIMITS[normalizedTier] || TICKER_LIMITS.free;
+}
+
+function calculateTierInfo(favoriteTickers: FavoriteTicker[], subscriptionTier: string): TierInfo {
+  const limit = getTierLimit(subscriptionTier);
+  const used = favoriteTickers.length;
+  const remaining = Math.max(0, limit - used);
+  
+  return {
+    currentTier: subscriptionTier,
+    limit,
+    used,
+    remaining
+  };
+}
+
 export function useFavoriteTickers() {
-  const { firebaseUser } = useAuth();
-  const [favoriteTickers, setFavoriteTickers] = useState<FavoriteTicker[]>([]);
-  const [tierInfo, setTierInfo] = useState<TierInfo>({ currentTier: 'free', limit: 0, used: 0, remaining: 0 });
+  const { user, firebaseUser } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Simple async function without useCallback to avoid dependency issues
-  const loadFavoriteTickers = async () => {
-    if (!firebaseUser) {
-      console.log('No firebaseUser available for loading tickers');
-      return;
-    }
-
-    try {
-      setLoading(true);
-      setError(null);
-      
-      console.log('Getting Firebase token...');
-      const token = await firebaseUser.getIdToken();
-      console.log('Token obtained, making direct API call to /api/user/tickers...');
-      
-      const response = await fetch('/api/user/tickers', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      console.log('API response status:', response.status);
-      console.log('API response ok:', response.ok);
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log('API response data:', data);
-        setFavoriteTickers(data.favoriteTickers || []);
-        setTierInfo(data.tierInfo || { currentTier: 'free', limit: 0, used: 0, remaining: 0 });
-      } else {
-        console.error('API response not ok:', response.status, response.statusText);
-        const errorText = await response.text();
-        console.error('Error response body:', errorText);
-        throw new Error(`Failed to load favorite tickers: ${response.status}`);
-      }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
-      setError(errorMessage);
-      console.error('Error loading favorite tickers:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Extract favorite tickers and tier info from user data (already fetched by AuthContext)
+  const favoriteTickers = user?.favoriteTickers || [];
+  const subscriptionTier = user?.subscriptionTier || 'free';
+  const tierInfo = calculateTierInfo(favoriteTickers, subscriptionTier);
 
   const saveFavoriteTickers = async (updatedTickers: FavoriteTicker[]) => {
     if (!firebaseUser) {
@@ -86,9 +74,9 @@ export function useFavoriteTickers() {
       });
 
       if (response.ok) {
-        const data = await response.json();
-        setFavoriteTickers(updatedTickers);
-        setTierInfo(data.tierInfo || { currentTier: 'free', limit: 0, used: 0, remaining: 0 });
+        // The backend has been updated successfully.
+        // For now, we'll trust the update worked. The user data will be 
+        // refreshed on next page load or when the AuthContext refetches.
         return true;
       } else {
         const errorData = await response.json();
@@ -151,21 +139,6 @@ export function useFavoriteTickers() {
     return favoriteTickers.filter(ticker => ticker.dailyUpdates);
   };
 
-  // Load tickers when component mounts or user changes
-  useEffect(() => {
-    if (firebaseUser) {
-      console.log('Firebase user available, loading tickers...');
-      loadFavoriteTickers().catch(err => {
-        console.error('Failed to load tickers in useEffect:', err);
-      });
-    } else {
-      console.log('No Firebase user, resetting state...');
-      setFavoriteTickers([]);
-      setTierInfo({ currentTier: 'free', limit: 0, used: 0, remaining: 0 });
-      setError(null);
-    }
-  }, [firebaseUser?.uid]); // Use uid instead of the full user object
-
   return {
     favoriteTickers,
     tierInfo,
@@ -176,6 +149,5 @@ export function useFavoriteTickers() {
     updateTicker,
     toggleDailyUpdates,
     getTickersWithDailyUpdates,
-    loadFavoriteTickers,
   };
 }

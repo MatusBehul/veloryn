@@ -53,33 +53,7 @@ export const SUPPORTED_LANGUAGES: Language[] = [
   }
 ];
 
-// Easy extension: just add new languages here
-export const ADDITIONAL_LANGUAGES: Language[] = [
-  // Example of how to add more languages:
-  // {
-  //   code: 'fr',
-  //   name: 'French',
-  //   nativeName: 'Français',
-  //   flag: '🇫🇷',
-  //   direction: 'ltr'
-  // },
-  // {
-  //   code: 'ja',
-  //   name: 'Japanese',
-  //   nativeName: '日本語',
-  //   flag: '🇯🇵',
-  //   direction: 'ltr'
-  // },
-  // {
-  //   code: 'zh',
-  //   name: 'Chinese',
-  //   nativeName: '中文',
-  //   flag: '🇨🇳',
-  //   direction: 'ltr'
-  // }
-];
-
-export const ALL_LANGUAGES = [...SUPPORTED_LANGUAGES, ...ADDITIONAL_LANGUAGES];
+export const ALL_LANGUAGES = [...SUPPORTED_LANGUAGES];
 
 export const DEFAULT_LANGUAGE = 'en';
 
