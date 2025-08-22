@@ -1,0 +1,81 @@
+name: Deploy Instagram Reels Manager
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'test'
+        type: choice
+        options:
+        - test
+        - prod
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+
+env:
+  FUNCTION_NAME: ig-reels-manager
+  RUNTIME: python311
+jobs:
+  deploy:
+    name: Deploy Instagram Reels Manager
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || inputs.environment || 'test' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ vars.GOOGLE_CLOUD_PROJECT }}
+
+      - name: Create Pub/Sub topics
+        run: |
+          echo "📋 Creating Pub/Sub topics..."
+          
+          # Create make-ig-reel topic
+          echo "Creating make-ig-reel topic..."
+          if gcloud pubsub topics describe make-ig-reel --project=${{ vars.GOOGLE_CLOUD_PROJECT }} &>/dev/null; then
+            echo "✅ Topic make-ig-reel already exists"
+          else
+            gcloud pubsub topics create make-ig-reel --project=${{ vars.GOOGLE_CLOUD_PROJECT }} || {
+              echo "❌ Failed to create make-ig-reel topic"
+              exit 1
+            }
+            echo "✅ Created topic: make-ig-reel"
+          fi
+
+      - name: Deploy Function (Gen2, custom container)
+        run: |
+          cd ig_reels_manager
+          
+          echo "🚀 Deploying Instagram Reels Manager..."
+          echo "Function name: ${{ env.FUNCTION_NAME }}"
+          echo "Project: ${{ vars.GOOGLE_CLOUD_PROJECT }}"
+
+          gcloud functions deploy ${{ env.FUNCTION_NAME }} \
+            --gen2 \
+            --runtime=python311 \
+            --region=${{ vars.GOOGLE_CLOUD_LOCATION }} \
+            --source=. \
+            --entry-point=entrypoint \
+            --trigger-topic=make-ig-reel \
+            --memory=2Gi \
+            --project="${{ vars.GOOGLE_CLOUD_PROJECT }}" \
+            --set-env-vars=GCS_BUCKET=${{ vars.GOOGLE_CLOUD_STAGE_BUCKET }},ELEVENLABS_API_KEY=${{ secrets.ELEVENLABS_API_KEY }}
