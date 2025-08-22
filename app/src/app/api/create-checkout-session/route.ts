@@ -116,8 +116,8 @@ export async function POST(request: NextRequest) {
     // Ensure the base URL has the proper scheme
     const normalizedBaseUrl = baseUrl.startsWith('http') ? baseUrl : `https://${baseUrl}`;
     
-    // Create checkout session
-    const session = await stripe.checkout.sessions.create({
+    // Prepare checkout session configuration
+    const sessionConfig: any = {
       customer: customer.id,
       payment_method_types: ['card'],
       line_items: [
@@ -129,6 +129,7 @@ export async function POST(request: NextRequest) {
       mode: 'subscription',
       success_url: `${normalizedBaseUrl}/analysis?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${normalizedBaseUrl}/pricing`,
+      allow_promotion_codes: true, // Allow customers to enter promotion codes during checkout
       metadata: {
         userId: userId,
       },
@@ -137,7 +138,10 @@ export async function POST(request: NextRequest) {
           userId: userId,
         },
       },
-    });
+    };
+    
+    // Create checkout session
+    const session = await stripe.checkout.sessions.create(sessionConfig);
 
     return NextResponse.json({ sessionId: session.id });
   } catch (error) {
