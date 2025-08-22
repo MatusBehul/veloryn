@@ -46,7 +46,7 @@ def make_video(text, audio_path, out_path):
 
 
 def upload_and_sign(local_path):
-    bucket_name = os.environ["GCS_BUCKET"]
+    bucket_name = os.environ["GCS_BUCKET"].replace("gs://", "").split("/", 1)[0]  
     client = storage.Client()
     bucket = client.bucket(bucket_name)
     blob_name = f"reels/{datetime.now(timezone.utc).strftime('%Y%m%d')}-{uuid.uuid4().hex}.mp4"
