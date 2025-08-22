@@ -4,9 +4,12 @@ import React from 'react';
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { useTranslation } from '@/hooks/useTranslation';
 import { ArrowLeft, TrendingUp, Brain, Shield, Users, Globe, Zap } from 'lucide-react';
 
 export default function AboutPage() {
+  const { t } = useTranslation();
+  
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -14,11 +17,11 @@ export default function AboutPage() {
         <div className="mb-8">
           <Link href="/" className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-4">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Home
+            {t('back_to_home')}
           </Link>
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">About Veloryn</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">{t('about_veloryn')}</h1>
           <p className="text-xl text-gray-600">
-            Advanced Financial Intelligence - Democratizing institutional-quality financial analysis through AI
+            {t('advanced_financial_intelligence')}
           </p>
         </div>
 
@@ -27,11 +30,9 @@ export default function AboutPage() {
           <CardContent className="py-8">
             <div className="text-center mb-8">
               <TrendingUp className="h-16 w-16 text-blue-600 mx-auto mb-4" />
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Our Mission</h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">{t('our_mission')}</h2>
               <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-                To make sophisticated financial analysis accessible to everyone by leveraging cutting-edge AI technology. 
-                We believe that quality financial insights shouldn't be limited to large institutions - they should be 
-                available to individual investors, small businesses, and anyone seeking to make informed financial decisions.
+                {t('mission_description')}
               </p>
             </div>
           </CardContent>
@@ -39,15 +40,14 @@ export default function AboutPage() {
 
         {/* What We Do */}
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">What We Do</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">{t('what_we_do')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <Card>
               <CardContent className="p-6">
                 <Brain className="h-8 w-8 text-purple-600 mb-4" />
-                <h3 className="font-semibold text-gray-900 mb-2">AI-Powered Analysis</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">{t('ai_powered_analysis')}</h3>
                 <p className="text-gray-600 text-sm">
-                  Our multi-agent AI system processes vast amounts of financial data to provide comprehensive analysis 
-                  that rivals traditional institutional research.
+                  {t('ai_analysis_description')}
                 </p>
               </CardContent>
             </Card>
@@ -55,10 +55,9 @@ export default function AboutPage() {
             <Card>
               <CardContent className="p-6">
                 <TrendingUp className="h-8 w-8 text-green-600 mb-4" />
-                <h3 className="font-semibold text-gray-900 mb-2">Market Intelligence</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">{t('market_intelligence')}</h3>
                 <p className="text-gray-600 text-sm">
-                  Real-time market data, technical analysis, sentiment tracking, and risk assessment combined 
-                  into actionable insights for better decision-making.
+                  {t('market_intelligence_description')}
                 </p>
               </CardContent>
             </Card>
@@ -66,10 +65,9 @@ export default function AboutPage() {
             <Card>
               <CardContent className="p-6">
                 <Shield className="h-8 w-8 text-red-600 mb-4" />
-                <h3 className="font-semibold text-gray-900 mb-2">Risk Management</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">{t('risk_management')}</h3>
                 <p className="text-gray-600 text-sm">
-                  Advanced risk assessment tools and portfolio optimization strategies to help you understand 
-                  and manage investment risks effectively.
+                  {t('risk_management_description')}
                 </p>
               </CardContent>
             </Card>
@@ -79,39 +77,39 @@ export default function AboutPage() {
         {/* Our Technology */}
         <Card className="mb-8">
           <CardContent className="py-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Our Technology</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">{t('our_technology')}</h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Multi-Agent AI System</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('multi_agent_ai_system')}</h3>
                 <ul className="space-y-3 text-gray-600">
                   <li className="flex items-start">
                     <Zap className="h-5 w-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
-                    <span>Specialized AI agents for data analysis, technical analysis, sentiment analysis, and risk assessment</span>
+                    <span>{t('ai_agent_specialized')}</span>
                   </li>
                   <li className="flex items-start">
                     <Zap className="h-5 w-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
-                    <span>Real-time data processing from multiple financial data sources</span>
+                    <span>{t('ai_agent_realtime')}</span>
                   </li>
                   <li className="flex items-start">
                     <Zap className="h-5 w-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
-                    <span>Machine learning models trained on institutional-grade datasets</span>
+                    <span>{t('ai_agent_ml')}</span>
                   </li>
                 </ul>
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Data Sources & Security</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('data_sources_security')}</h3>
                 <ul className="space-y-3 text-gray-600">
                   <li className="flex items-start">
                     <Shield className="h-5 w-5 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
-                    <span>Enterprise-grade security with encrypted data transmission and storage</span>
+                    <span>{t('security_enterprise')}</span>
                   </li>
                   <li className="flex items-start">
                     <Shield className="h-5 w-5 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
-                    <span>GDPR and data privacy compliance with transparent data handling</span>
+                    <span>{t('security_gdpr')}</span>
                   </li>
                   <li className="flex items-start">
                     <Shield className="h-5 w-5 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
-                    <span>Integration with trusted financial data providers and market feeds</span>
+                    <span>{t('security_integration')}</span>
                   </li>
                 </ul>
               </div>
@@ -122,27 +120,27 @@ export default function AboutPage() {
         {/* Our Values */}
         <Card className="mb-8">
           <CardContent className="py-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Our Values</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">{t('our_values')}</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="text-center">
                 <Users className="h-12 w-12 text-blue-600 mx-auto mb-4" />
-                <h3 className="font-semibold text-gray-900 mb-2">Accessibility</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">{t('accessibility')}</h3>
                 <p className="text-gray-600 text-sm">
-                  Making institutional-quality financial analysis available to everyone, regardless of their background or resources.
+                  {t('accessibility_description')}
                 </p>
               </div>
               <div className="text-center">
                 <Shield className="h-12 w-12 text-green-600 mx-auto mb-4" />
-                <h3 className="font-semibold text-gray-900 mb-2">Transparency</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">{t('transparency')}</h3>
                 <p className="text-gray-600 text-sm">
-                  Clear communication about our methodologies, limitations, and the educational nature of our analysis.
+                  {t('transparency_description')}
                 </p>
               </div>
               <div className="text-center">
                 <Globe className="h-12 w-12 text-purple-600 mx-auto mb-4" />
-                <h3 className="font-semibold text-gray-900 mb-2">Innovation</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">{t('innovation')}</h3>
                 <p className="text-gray-600 text-sm">
-                  Continuously advancing our AI capabilities to provide better insights and more comprehensive analysis.
+                  {t('innovation_description')}
                 </p>
               </div>
             </div>
@@ -151,19 +149,19 @@ export default function AboutPage() {
 
         {/* Contact */}
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Get Started</h2>
-          <p className="text-gray-600 mb-6">
-            Ready to experience AI-powered financial analysis? Join thousands of users who trust Veloryn for their market insights.
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('get_started')}</h2>
+          <p className="text-lg text-gray-600 mb-6 max-w-2xl mx-auto">
+            {t('get_started_description')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/">
-              <Button size="lg">
-                Explore Features
+            <Link href="/pricing">
+              <Button size="lg" className="text-lg px-8 py-3">
+                {t('explore_features')}
               </Button>
             </Link>
             <Link href="/contact">
-              <Button variant="outline" size="lg">
-                Contact Us
+              <Button variant="outline" size="lg" className="text-lg px-8 py-3">
+                {t('contact_us')}
               </Button>
             </Link>
           </div>

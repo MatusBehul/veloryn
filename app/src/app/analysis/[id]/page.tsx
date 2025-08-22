@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSubscription } from '@/hooks/useSubscription';
+import { useTranslation } from '@/hooks/useTranslation';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
@@ -17,7 +18,7 @@ interface AnalysisData {
   createdAt?: string;
   // Data collection documents
   analysis_overview?: {
-    analysis_data?: {
+    analysis_data?: Record<string, {
       fundamental_analysis?: string[];
       investment_narrative?: string[];
       investment_insights?: string[];
@@ -25,7 +26,7 @@ interface AnalysisData {
       risk_analysis?: string[];
       sentiment_analysis?: string[];
       technical_analysis?: string[];
-    };
+    }>;
   };
   balance_sheet_data?: any;
   company_overview?: any;
@@ -47,6 +48,7 @@ export default function AnalysisDetailPage() {
   const { id } = useParams();
   const { user, firebaseUser, loading: authLoading } = useAuth();
   const { hasActiveSubscription } = useSubscription();
+  const { t } = useTranslation();
   const [analysis, setAnalysis] = useState<AnalysisData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -103,7 +105,7 @@ export default function AnalysisDetailPage() {
 
   const formatLargeNumber = (value: number | string) => {
     const numValue = typeof value === 'string' ? parseFloat(value) : value;
-    if (isNaN(numValue)) return 'N/A';
+    if (isNaN(numValue)) return t('analysisNotAvailable');
     if (numValue >= 1e12) return `$${(numValue / 1e12).toFixed(2)}T`;
     if (numValue >= 1e9) return `$${(numValue / 1e9).toFixed(2)}B`;
     if (numValue >= 1e6) return `$${(numValue / 1e6).toFixed(2)}M`;
@@ -113,7 +115,7 @@ export default function AnalysisDetailPage() {
 
   const formatPercent = (value: number | string) => {
     const numValue = typeof value === 'string' ? parseFloat(value) : value;
-    if (isNaN(numValue)) return 'N/A';
+    if (isNaN(numValue)) return t('analysisNotAvailable');
     return `${numValue.toFixed(2)}%`;
   };
 
@@ -233,7 +235,6 @@ Educational use only - Not financial advice
           analysisId: id,
           ticker: analysis.ticker,
           recipientEmail: user?.email || firebaseUser.email || '',
-          analysisData: analysis // Send the full analysis data
         })
       });
 
@@ -353,12 +354,12 @@ Educational use only - Not financial advice
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-xl font-semibold text-gray-900 mb-2">Analysis Not Found</h1>
-          <p className="text-gray-600 mb-4">The requested analysis could not be found.</p>
+          <h1 className="text-xl font-semibold text-gray-900 mb-2">{t('analysisDetailNotFound')}</h1>
+          <p className="text-gray-600 mb-4">{t('analysisDetailNotFoundDescription')}</p>
           <Link href="/analysis">
             <Button variant="outline">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Analysis List
+              {t('analysisDetailBackToList')}
             </Button>
           </Link>
         </div>
@@ -374,7 +375,7 @@ Educational use only - Not financial advice
           <Link href="/analysis">
             <Button variant="outline" size="sm" className="mb-6">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Analysis List
+              {t('analysisDetailBackToList')}
             </Button>
           </Link>
         </div>
@@ -385,7 +386,7 @@ Educational use only - Not financial advice
             <div className="flex flex-col md:flex-row md:items-center md:justify-between">
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                  {analysis.ticker} Financial Analysis
+                  {analysis.ticker} {t('analysisDetailFinancialAnalysis')}
                 </h1>
                 <div className="flex items-center text-gray-600 space-x-4">
                   <div className="flex items-center">
@@ -403,11 +404,11 @@ Educational use only - Not financial advice
               <div className="mt-4 md:mt-0 flex space-x-2">
                 <Button variant="outline" size="sm" onClick={handleShare}>
                   <Share className="h-4 w-4 mr-2" />
-                  Share
+                  {t('analysisDetailShare')}
                 </Button>
                 <Button variant="outline" size="sm" onClick={handleDownload}>
                   <Download className="h-4 w-4 mr-2" />
-                  Download
+                  {t('analysisDetailDownload')}
                 </Button>
                 <Button 
                   variant="outline" 
@@ -416,7 +417,7 @@ Educational use only - Not financial advice
                   disabled={emailLoading}
                 >
                   <Mail className="h-4 w-4 mr-2" />
-                  {emailLoading ? 'Sending...' : 'Email'}
+                  {emailLoading ? t('analysisDetailSending') : t('analysisDetailEmail')}
                 </Button>
               </div>
             </div>
@@ -434,7 +435,7 @@ Educational use only - Not financial advice
               </div>
               <div className="ml-3">
                 <p className="text-green-800">
-                  Analysis sent to your email successfully!
+                  {t('analysisDetailEmailSuccess')}
                 </p>
               </div>
             </div>
@@ -442,17 +443,17 @@ Educational use only - Not financial advice
         )}
 
         {/* 1. Overall Analysis - First Section */}
-        {analysis.analysis_overview?.analysis_data?.overall_analysis && (
+        {analysis?.analysis_overview?.analysis_data?.[user?.preferredLanguage || 'en'].overall_analysis && (
           <Card className="mb-8">
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Brain className="h-5 w-5 mr-2" />
-                Overall Analysis
+                {t('analysisDetailOverallAnalysis')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="prose max-w-none">
-                {renderAnalysisSection(analysis.analysis_overview.analysis_data.overall_analysis)}
+                {renderAnalysisSection(analysis.analysis_overview.analysis_data[user?.preferredLanguage || 'en'].overall_analysis)}
               </div>
             </CardContent>
           </Card>
@@ -464,7 +465,7 @@ Educational use only - Not financial advice
             <CardHeader>
               <CardTitle className="flex items-center">
                 <TrendingUp className="h-5 w-5 mr-2" />
-                Price Performance
+                {t('analysisDetailPricePerformance')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -473,7 +474,7 @@ Educational use only - Not financial advice
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                   {/* Short Horizon */}
                   <div>
-                    <h4 className="font-medium text-gray-900 mb-4">Short-Term Performance (Daily Data)</h4>
+                    <h4 className="font-medium text-gray-900 mb-4">{t('analysisDetailShortTermPerformance')}</h4>
                     <div className="h-80">
                       <ResponsiveContainer width="100%" height="100%">
                         <LineChart data={priceChartData}>
@@ -495,7 +496,7 @@ Educational use only - Not financial advice
                   
                   {/* Long Horizon */}
                   <div>
-                    <h4 className="font-medium text-gray-900 mb-4">Long-Term Performance (Monthly Data)</h4>
+                    <h4 className="font-medium text-gray-900 mb-4">{t('analysisDetailLongTermPerformance')}</h4>
                     {monthlyChartData.length > 0 ? (
                       <div className="h-80">
                         <ResponsiveContainer width="100%" height="100%">
@@ -520,13 +521,13 @@ Educational use only - Not financial advice
                           <>
                             <div className="grid grid-cols-2 gap-4">
                               <div className="bg-blue-50 p-4 rounded-lg">
-                                <h5 className="font-medium text-gray-900 mb-2">52W High</h5>
+                                <h5 className="font-medium text-gray-900 mb-2">{t('analysisDetail52WeekHigh')}</h5>
                                 <p className="text-xl font-bold text-blue-600">
                                   {formatCurrency(analysis.company_overview.data[0]._52WeekHigh)}
                                 </p>
                               </div>
                               <div className="bg-red-50 p-4 rounded-lg">
-                                <h5 className="font-medium text-gray-900 mb-2">52W Low</h5>
+                                <h5 className="font-medium text-gray-900 mb-2">{t('analysisDetail52WeekLow')}</h5>
                                 <p className="text-xl font-bold text-red-600">
                                   {formatCurrency(analysis.company_overview.data[0]._52WeekLow)}
                                 </p>
@@ -534,13 +535,13 @@ Educational use only - Not financial advice
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                               <div className="bg-green-50 p-4 rounded-lg">
-                                <h5 className="font-medium text-gray-900 mb-2">50-Day MA</h5>
+                                <h5 className="font-medium text-gray-900 mb-2">{t('analysisDetail50DayMA')}</h5>
                                 <p className="text-xl font-bold text-green-600">
                                   {formatCurrency(analysis.company_overview.data[0]._50DayMovingAverage)}
                                 </p>
                               </div>
                               <div className="bg-purple-50 p-4 rounded-lg">
-                                <h5 className="font-medium text-gray-900 mb-2">200-Day MA</h5>
+                                <h5 className="font-medium text-gray-900 mb-2">{t('analysisDetail200DayMA')}</h5>
                                 <p className="text-xl font-bold text-purple-600">
                                   {formatCurrency(analysis.company_overview.data[0]._200DayMovingAverage)}
                                 </p>
@@ -558,18 +559,18 @@ Educational use only - Not financial advice
         )}
 
         {/* 3. Investment Narrative */}
-        {analysis.analysis_overview?.analysis_data?.investment_narrative && (
+        {analysis?.analysis_overview?.analysis_data?.[user?.preferredLanguage || 'en']?.investment_narrative && (
           <Card className="mb-8">
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Info className="h-5 w-5 mr-2" />
-                Investment Narrative
+                {t('analysisDetailInvestmentNarrative')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="bg-blue-50 p-6 rounded-lg">
                 <div className="prose max-w-none">
-                  {renderAnalysisSection(analysis.analysis_overview.analysis_data.investment_narrative)}
+                  {renderAnalysisSection(analysis.analysis_overview.analysis_data[user?.preferredLanguage || 'en'].investment_narrative)}
                 </div>
               </div>
             </CardContent>
@@ -577,17 +578,17 @@ Educational use only - Not financial advice
         )}
 
         {/* 4. Technical Analysis Text */}
-        {analysis.analysis_overview?.analysis_data?.technical_analysis && (
+        {analysis?.analysis_overview?.analysis_data?.[user?.preferredLanguage || 'en']?.technical_analysis && (
           <Card className="mb-8">
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Zap className="h-5 w-5 mr-2" />
-                Technical Analysis
+                {t('analysisDetailTechnicalAnalysis')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="prose max-w-none">
-                {renderAnalysisSection(analysis.analysis_overview.analysis_data.technical_analysis)}
+                {renderAnalysisSection(analysis.analysis_overview.analysis_data[user?.preferredLanguage || 'en'].technical_analysis)}
               </div>
             </CardContent>
           </Card>
@@ -599,17 +600,17 @@ Educational use only - Not financial advice
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Activity className="h-5 w-5 mr-2" />
-                Technical Indicators Comparison
+                {t('analysisDetailTechnicalIndicators')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               {/* Helper function to get trend indicator */}
               {(() => {
                 const timeframes = [
-                  { key: 'hourly', label: 'Hourly', bgColor: 'bg-blue-50', textColor: 'text-blue-600' },
-                  { key: 'daily', label: 'Daily', bgColor: 'bg-green-50', textColor: 'text-green-600' },
-                  { key: 'weekly', label: 'Weekly', bgColor: 'bg-purple-50', textColor: 'text-purple-600' },
-                  { key: 'monthly', label: 'Monthly', bgColor: 'bg-orange-50', textColor: 'text-orange-600' }
+                  { key: 'hourly', label: t('analysisDetailHourly'), bgColor: 'bg-blue-50', textColor: 'text-blue-600' },
+                  { key: 'daily', label: t('analysisDetailDaily'), bgColor: 'bg-green-50', textColor: 'text-green-600' },
+                  { key: 'weekly', label: t('analysisDetailWeekly'), bgColor: 'bg-purple-50', textColor: 'text-purple-600' },
+                  { key: 'monthly', label: t('analysisDetailMonthly'), bgColor: 'bg-orange-50', textColor: 'text-orange-600' }
                 ];
 
                 const indicators = [
@@ -625,13 +626,13 @@ Educational use only - Not financial advice
                   <div className="space-y-8">
                     {/* Key Indicators Comparison Table */}
                     <div>
-                      <h4 className="font-medium text-gray-900 mb-4">Key Technical Indicators Across Timeframes</h4>
+                      <h4 className="font-medium text-gray-900 mb-4">{t('analysisDetailKeyIndicators')}</h4>
                       <div className="overflow-x-auto">
                         <table className="min-w-full bg-white border border-gray-200 rounded-lg">
                           <thead className="bg-gray-50">
                             <tr>
                               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r">
-                                Indicator
+                                {t('analysisDetailIndicator')}
                               </th>
                               {timeframes.map(timeframe => (
                                 <th key={timeframe.key} className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-r">
@@ -672,13 +673,13 @@ Educational use only - Not financial advice
                       analysis.technical_analysis_results.weekly?.moving_averages || 
                       analysis.technical_analysis_results.monthly?.moving_averages) && (
                       <div>
-                        <h4 className="font-medium text-gray-900 mb-4">Moving Averages Comparison</h4>
+                        <h4 className="font-medium text-gray-900 mb-4">{t('analysisDetailMovingAverages')}</h4>
                         <div className="overflow-x-auto">
                           <table className="min-w-full bg-white border border-gray-200 rounded-lg">
                             <thead className="bg-gray-50">
                               <tr>
                                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r">
-                                  Moving Average
+                                  {t('analysisDetailMovingAverage')}
                                 </th>
                                 {timeframes.map(timeframe => (
                                   <th key={timeframe.key} className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-r">
@@ -717,13 +718,13 @@ Educational use only - Not financial advice
                       analysis.technical_analysis_results.weekly?.bollinger_bands || 
                       analysis.technical_analysis_results.monthly?.bollinger_bands) && (
                       <div>
-                        <h4 className="font-medium text-gray-900 mb-4">Bollinger Bands Comparison</h4>
+                        <h4 className="font-medium text-gray-900 mb-4">{t('analysisDetailBollingerBands')}</h4>
                         <div className="overflow-x-auto">
                           <table className="min-w-full bg-white border border-gray-200 rounded-lg">
                             <thead className="bg-gray-50">
                               <tr>
                                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r">
-                                  Band
+                                  {t('analysisDetailBand')}
                                 </th>
                                 {timeframes.map(timeframe => (
                                   <th key={timeframe.key} className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-r">
@@ -731,7 +732,7 @@ Educational use only - Not financial advice
                                   </th>
                                 ))}
                                 <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                  Band Width
+                                  {t('analysisDetailBandWidth')}
                                 </th>
                               </tr>
                             </thead>
@@ -739,7 +740,9 @@ Educational use only - Not financial advice
                               {['upper', 'middle', 'lower'].map(band => (
                                 <tr key={band} className="hover:bg-gray-50">
                                   <td className="px-4 py-3 text-sm font-medium text-gray-900 border-r">
-                                    {band.charAt(0).toUpperCase() + band.slice(1)} Band
+                                    {band === 'upper' ? t('analysisDetailUpperBand') : 
+                                     band === 'middle' ? t('analysisDetailMiddleBand') : 
+                                     t('analysisDetailLowerBand')}
                                   </td>
                                   {timeframes.map(timeframe => {
                                     const data = analysis.technical_analysis_results[timeframe.key]?.bollinger_bands;
@@ -772,7 +775,7 @@ Educational use only - Not financial advice
 
                     {/* Summary Cards for Quick Overview */}
                     <div>
-                      <h4 className="font-medium text-gray-900 mb-4">Technical Analysis Summary</h4>
+                      <h4 className="font-medium text-gray-900 mb-4">{t('analysisDetailTechnicalSummary')}</h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         {timeframes.map(timeframe => {
                           const data = analysis.technical_analysis_results[timeframe.key];
@@ -784,7 +787,7 @@ Educational use only - Not financial advice
                           
                           return (
                             <div key={timeframe.key} className={`${timeframe.bgColor} p-4 rounded-lg border`}>
-                              <h5 className={`font-medium ${timeframe.textColor} mb-3`}>{timeframe.label} Signals</h5>
+                              <h5 className={`font-medium ${timeframe.textColor} mb-3`}>{timeframe.label} {t('analysisDetailSignals')}</h5>
                               <div className="space-y-2 text-sm">
                                 <div className="flex justify-between">
                                   <span className="text-gray-600">RSI:</span>
@@ -845,17 +848,17 @@ Educational use only - Not financial advice
         )}
 
         {/* 6. Fundamental Analysis Text */}
-        {analysis.analysis_overview?.analysis_data?.fundamental_analysis && (
+        {analysis?.analysis_overview?.analysis_data?.[user?.preferredLanguage || 'en']?.fundamental_analysis && (
           <Card className="mb-8">
             <CardHeader>
               <CardTitle className="flex items-center">
                 <BarChart3 className="h-5 w-5 mr-2" />
-                Fundamental Analysis
+                {t('analysisDetailFundamentalAnalysis')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="prose max-w-none">
-                {renderAnalysisSection(analysis.analysis_overview.analysis_data.fundamental_analysis)}
+                {renderAnalysisSection(analysis.analysis_overview.analysis_data[user?.preferredLanguage || 'en'].fundamental_analysis)}
               </div>
             </CardContent>
           </Card>
@@ -867,14 +870,14 @@ Educational use only - Not financial advice
             <CardHeader>
               <CardTitle className="flex items-center">
                 <PieChart className="h-5 w-5 mr-2" />
-                Financial Data & Charts
+                {t('analysisDetailFinancialDataCharts')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               {/* Company Overview Metrics */}
               {analysis.company_overview?.data?.[0] && (
                 <div className="mb-8">
-                  <h4 className="font-medium text-gray-900 mb-4">Key Financial Metrics</h4>
+                  <h4 className="font-medium text-gray-900 mb-4">{t('analysisDetailKeyFinancialMetrics')}</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <div className="bg-blue-50 p-4 rounded-lg">
                       <h5 className="font-medium text-gray-900 mb-2">Market Cap</h5>
@@ -907,7 +910,7 @@ Educational use only - Not financial advice
               {/* Financial Performance Chart */}
               {financialChartData.length > 0 && (
                 <div className="mb-8">
-                  <h4 className="font-medium text-gray-900 mb-4">Financial Performance Trends</h4>
+                  <h4 className="font-medium text-gray-900 mb-4">{t('analysisDetailFinancialPerformanceTrends')}</h4>
                   <div className="h-80">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={financialChartData}>
@@ -926,28 +929,28 @@ Educational use only - Not financial advice
               {/* Latest Quarter Financials */}
               {analysis.income_statement_data?.data?.[0] && (
                 <div className="mb-6">
-                  <h4 className="font-medium text-gray-900 mb-4">Latest Quarter Financials</h4>
+                  <h4 className="font-medium text-gray-900 mb-4">{t('analysisDetailLatestQuarterFinancials')}</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <div className="bg-blue-50 p-4 rounded-lg">
-                      <h5 className="font-medium text-gray-900 mb-2">Total Revenue</h5>
+                      <h5 className="font-medium text-gray-900 mb-2">{t('analysisDetailTotalRevenue')}</h5>
                       <p className="text-2xl font-bold text-blue-600">
                         {formatLargeNumber(analysis.income_statement_data.data[0].totalRevenue)}
                       </p>
                     </div>
                     <div className="bg-green-50 p-4 rounded-lg">
-                      <h5 className="font-medium text-gray-900 mb-2">Net Income</h5>
+                      <h5 className="font-medium text-gray-900 mb-2">{t('analysisDetailNetIncome')}</h5>
                       <p className="text-2xl font-bold text-green-600">
                         {formatLargeNumber(analysis.income_statement_data.data[0].netIncome)}
                       </p>
                     </div>
                     <div className="bg-purple-50 p-4 rounded-lg">
-                      <h5 className="font-medium text-gray-900 mb-2">Gross Profit</h5>
+                      <h5 className="font-medium text-gray-900 mb-2">{t('analysisDetailGrossProfit')}</h5>
                       <p className="text-2xl font-bold text-purple-600">
                         {formatLargeNumber(analysis.income_statement_data.data[0].grossProfit)}
                       </p>
                     </div>
                     <div className="bg-orange-50 p-4 rounded-lg">
-                      <h5 className="font-medium text-gray-900 mb-2">Operating Income</h5>
+                      <h5 className="font-medium text-gray-900 mb-2">{t('analysisDetailOperatingIncome')}</h5>
                       <p className="text-2xl font-bold text-orange-600">
                         {formatLargeNumber(analysis.income_statement_data.data[0].operatingIncome)}
                       </p>
@@ -959,28 +962,28 @@ Educational use only - Not financial advice
               {/* Balance Sheet Highlights */}
               {analysis.balance_sheet_data?.data?.[0] && (
                 <div>
-                  <h4 className="font-medium text-gray-900 mb-4">Balance Sheet Highlights</h4>
+                  <h4 className="font-medium text-gray-900 mb-4">{t('analysisDetailBalanceSheetHighlights')}</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <div className="bg-blue-50 p-4 rounded-lg">
-                      <h5 className="font-medium text-gray-900 mb-2">Total Assets</h5>
+                      <h5 className="font-medium text-gray-900 mb-2">{t('analysisDetailTotalAssets')}</h5>
                       <p className="text-2xl font-bold text-blue-600">
                         {formatLargeNumber(analysis.balance_sheet_data.data[0].totalAssets)}
                       </p>
                     </div>
                     <div className="bg-red-50 p-4 rounded-lg">
-                      <h5 className="font-medium text-gray-900 mb-2">Total Liabilities</h5>
+                      <h5 className="font-medium text-gray-900 mb-2">{t('analysisDetailTotalLiabilities')}</h5>
                       <p className="text-2xl font-bold text-red-600">
                         {formatLargeNumber(analysis.balance_sheet_data.data[0].totalLiabilities)}
                       </p>
                     </div>
                     <div className="bg-green-50 p-4 rounded-lg">
-                      <h5 className="font-medium text-gray-900 mb-2">Shareholder Equity</h5>
+                      <h5 className="font-medium text-gray-900 mb-2">{t('analysisDetailShareholderEquity')}</h5>
                       <p className="text-2xl font-bold text-green-600">
                         {formatLargeNumber(analysis.balance_sheet_data.data[0].totalShareholderEquity)}
                       </p>
                     </div>
                     <div className="bg-purple-50 p-4 rounded-lg">
-                      <h5 className="font-medium text-gray-900 mb-2">Cash & Equivalents</h5>
+                      <h5 className="font-medium text-gray-900 mb-2">{t('analysisDetailCashAndEquivalents')}</h5>
                       <p className="text-2xl font-bold text-purple-600">
                         {formatLargeNumber(analysis.balance_sheet_data.data[0].cashAndCashEquivalentsAtCarryingValue)}
                       </p>
@@ -993,18 +996,18 @@ Educational use only - Not financial advice
         )}
 
         {/* 8. Risk Analysis */}
-        {analysis.analysis_overview?.analysis_data?.risk_analysis && (
+        {analysis?.analysis_overview?.analysis_data?.[user?.preferredLanguage || 'en']?.risk_analysis && (
           <Card className="mb-8">
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Shield className="h-5 w-5 mr-2" />
-                Risk Analysis
+                {t('analysisDetailRiskAnalysis')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="bg-red-50 p-6 rounded-lg">
                 <div className="prose max-w-none">
-                  {renderAnalysisSection(analysis.analysis_overview.analysis_data.risk_analysis)}
+                  {renderAnalysisSection(analysis.analysis_overview.analysis_data[user?.preferredLanguage || 'en'].risk_analysis)}
                 </div>
               </div>
             </CardContent>
@@ -1017,7 +1020,7 @@ Educational use only - Not financial advice
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Target className="h-5 w-5 mr-2" />
-                Earnings Estimates
+                {t('analysisDetailEarningsEstimates')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -1026,16 +1029,16 @@ Educational use only - Not financial advice
                   <thead className="bg-gray-50">
                     <tr>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Period
+                        {t('analysisDetailEarningsPeriod')}
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        EPS Estimate
+                        {t('analysisDetailEpsEstimate')}
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        High/Low
+                        {t('analysisDetailEpsHighLow')}
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Revenue Estimate
+                        {t('analysisDetailRevenueEstimate')}
                       </th>
                     </tr>
                   </thead>
@@ -1069,14 +1072,14 @@ Educational use only - Not financial advice
             <CardHeader>
               <CardTitle className="flex items-center">
                 <DollarSign className="h-5 w-5 mr-2" />
-                Dividend Information
+                {t('analysisDetailDividendInformation')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {analysis.dividend_data.data.slice(0, 4).map((dividend: any, index: number) => (
                   <div key={index} className="bg-gray-50 p-4 rounded-lg">
-                    <h5 className="font-medium text-gray-900 mb-2">Ex-Dividend Date</h5>
+                    <h5 className="font-medium text-gray-900 mb-2">{t('analysisDetailExDividendDate')}</h5>
                     <p className="text-sm text-gray-600 mb-1">
                       {dividend.ex_dividend_date ? new Date(dividend.ex_dividend_date).toLocaleDateString() : 'N/A'}
                     </p>
@@ -1091,18 +1094,18 @@ Educational use only - Not financial advice
         )}
 
         {/* 10. Sentiment Analysis */}
-        {analysis.analysis_overview?.analysis_data?.sentiment_analysis && (
+        {analysis?.analysis_overview?.analysis_data?.[user?.preferredLanguage || 'en']?.sentiment_analysis && (
           <Card className="mb-8">
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Activity className="h-5 w-5 mr-2" />
-                Sentiment Analysis
+                {t('analysisDetailSentimentAnalysis')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="bg-yellow-50 p-6 rounded-lg">
                 <div className="prose max-w-none">
-                  {renderAnalysisSection(analysis.analysis_overview.analysis_data.sentiment_analysis)}
+                  {renderAnalysisSection(analysis.analysis_overview.analysis_data[user?.preferredLanguage || 'en'].sentiment_analysis)}
                 </div>
               </div>
             </CardContent>
@@ -1110,18 +1113,18 @@ Educational use only - Not financial advice
         )}
 
         {/* 11. Investment Insights - Last Section */}
-        {analysis.analysis_overview?.analysis_data?.investment_insights && (
+        {analysis?.analysis_overview?.analysis_data?.[user?.preferredLanguage || 'en']?.investment_insights && (
           <Card className="mb-8">
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Target className="h-5 w-5 mr-2" />
-                Investment Insights
+                {t('analysisDetailInvestmentInsights')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="bg-purple-50 p-6 rounded-lg">
                 <div className="prose max-w-none">
-                  {renderAnalysisSection(analysis.analysis_overview.analysis_data.investment_insights)}
+                  {renderAnalysisSection(analysis.analysis_overview.analysis_data[user?.preferredLanguage || 'en'].investment_insights)}
                 </div>
               </div>
             </CardContent>
@@ -1131,12 +1134,11 @@ Educational use only - Not financial advice
         {/* Disclaimer */}
         <div className="bg-red-50 border border-red-200 rounded-lg p-6">
           <div className="flex items-start">
-            <AlertCircle className="h-5 w-5 text-red-400 mt-0.5 mr-3 flex-shrink-0" />
+            {/* <AlertCircle className="h-5 w-5 text-red-400 mt-0.5 mr-3 flex-shrink-0" /> */}
             <div>
-              <h3 className="text-sm font-medium text-red-800">Important Disclaimer</h3>
+              <h3 className="text-sm font-medium text-red-800">{t('shared_red_page_disclaimer_title')}</h3>
               <p className="mt-1 text-sm text-red-700">
-                This analysis is generated by AI and is for educational purposes only. It should not be considered as financial advice. 
-                Always consult with a qualified financial advisor before making investment decisions. Past performance does not guarantee future results.
+                {t('shared_red_page_disclaimer_text')}
               </p>
             </div>
           </div>

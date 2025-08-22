@@ -80,5 +80,5 @@ jobs:
           --memory 1GiB \
           --timeout 540s \
           --max-instances 1 \
-          --set-env-vars="GCP_PROJECT=${{ vars.GOOGLE_CLOUD_PROJECT }},EMAIL_PUBSUB_TOPIC=hourly-checker-trigger,ANALYSIS_BATCH_SIZE=50,LOOKBACK_HOURS=1" \
+          --set-env-vars="LANGUAGES=${{ vars.LANGUAGES }},GCP_PROJECT=${{ vars.GOOGLE_CLOUD_PROJECT }},EMAIL_PUBSUB_TOPIC=hourly-checker-trigger,ANALYSIS_BATCH_SIZE=50,LOOKBACK_HOURS=1" \
           --no-allow-unauthenticated

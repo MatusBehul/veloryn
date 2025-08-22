@@ -26,6 +26,7 @@ PROJECT_ID = os.environ.get('GCP_PROJECT', 'lab-quoriant-dev')
 EMAIL_TOPIC = os.environ.get('EMAIL_PUBSUB_TOPIC', 'email-analysis-requests')
 ANALYSIS_BATCH_SIZE = int(os.environ.get('ANALYSIS_BATCH_SIZE', '50'))  # Process analyses in batches
 LOOKBACK_HOURS = int(os.environ.get('LOOKBACK_HOURS', '1'))  # How far back to look for new analyses
+SUPPORTED_LANGUAGES = os.environ.get('LANGUAGES', 'en').split('#')
 
 # Initialize clients
 db = firestore.Client(project=PROJECT_ID)
@@ -158,28 +159,27 @@ def process_analysis_batch(analyses: List[Dict]) -> int:
             
         try:
             # Get users who have this ticker as favorite
-            interested_users = users_by_ticker.get(ticker, [])
-            
-            if not interested_users:
-                logger.info(f"No users interested in {ticker}")
-                continue
-            
-            # Send email notification
-            success = send_email_notification(analysis, interested_users)
-            
-            if success:
-                processed_count += 1
-                logger.info(f"✅ Triggered email for {ticker} to {len(interested_users)} users")
-            else:
-                logger.error(f"❌ Failed to trigger email for {ticker}")
+            for lang, interested_users in users_by_ticker.get(ticker, {}).items():
+                if not interested_users:
+                    logger.info(f"No users interested in {ticker} [{lang}]")
+                    continue
+
+                # Send email notification
+                success = send_email_notification(analysis, interested_users, lang)
                 
+                if success:
+                    processed_count += 1
+                    logger.info(f"✅ Triggered email for {ticker} [{lang}] to {len(interested_users)} users")
+                else:
+                    logger.error(f"❌ Failed to trigger email for {ticker} [{lang}]")
+
         except Exception as e:
             logger.error(f"Error processing analysis {analysis.get('id')}: {str(e)}")
     
     return processed_count
 
 
-def get_users_by_tickers(tickers: Set[str]) -> Dict[str, List[str]]:
+def get_users_by_tickers(tickers: Set[str]) -> Dict[str, Dict[str, List[str]]]:
     """
     Efficiently retrieve all users who have any of the specified tickers as favorites.
     
@@ -189,8 +189,8 @@ def get_users_by_tickers(tickers: Set[str]) -> Dict[str, List[str]]:
     Returns:
         Dictionary mapping ticker -> list of user emails
     """
-    users_by_ticker = {ticker: [] for ticker in tickers}
-    
+    users_by_ticker = {ticker: {lang: [] for lang in SUPPORTED_LANGUAGES} for ticker in tickers}
+
     try:
         # Get all users (we need to scan all users since Firestore doesn't support 
         # complex queries on array elements)
@@ -216,6 +216,7 @@ def get_users_by_tickers(tickers: Set[str]) -> Dict[str, List[str]]:
                 user_data = doc.to_dict()
                 user_email = user_data.get('email')
                 favorite_tickers = user_data.get('favoriteTickers', [])
+                user_language = user_data.get('preferredLanguage', 'en')
                 
                 if not user_email or not favorite_tickers:
                     continue
@@ -226,8 +227,8 @@ def get_users_by_tickers(tickers: Set[str]) -> Dict[str, List[str]]:
                     daily_updates = fav_ticker.get('dailyUpdates', False)
                     
                     if ticker_symbol in tickers and daily_updates:
-                        users_by_ticker[ticker_symbol].append(user_email)
-            
+                        users_by_ticker[ticker_symbol][user_language].append(user_email)
+
             total_users_processed += len(docs)
             last_doc = docs[-1]
             
@@ -238,9 +239,10 @@ def get_users_by_tickers(tickers: Set[str]) -> Dict[str, List[str]]:
         logger.info(f"Processed {total_users_processed} total users")
         
         # Log summary
-        for ticker, emails in users_by_ticker.items():
-            logger.info(f"Ticker {ticker}: {len(emails)} interested users")
-            
+        for ticker, ticker_data in users_by_ticker.items():
+            for lang, emails in ticker_data.items():
+                logger.info(f"Ticker {ticker} [{lang}]: {len(emails)} interested users")
+
         return users_by_ticker
         
     except Exception as e:
@@ -248,7 +250,7 @@ def get_users_by_tickers(tickers: Set[str]) -> Dict[str, List[str]]:
         return {ticker: [] for ticker in tickers}
 
 
-def send_email_notification(analysis: Dict, user_emails: List[str]) -> bool:
+def send_email_notification(analysis: Dict, user_emails: List[str], language: str) -> bool:
     """
     Send email notification by publishing to Pub/Sub topic.
     
@@ -266,7 +268,8 @@ def send_email_notification(analysis: Dict, user_emails: List[str]) -> bool:
             'ticker': analysis['ticker'],
             'recipients': user_emails,
             'type': 'bulk',  # Use bulk mode with specific recipients
-            'timestamp': datetime.utcnow().isoformat()
+            'timestamp': datetime.utcnow().isoformat(),
+            'language': language
         }
         
         # Publish to Pub/Sub topic

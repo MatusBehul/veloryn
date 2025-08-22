@@ -1,8 +1,13 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import { VelorynLogo } from '@/components/VelorynLogo';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export function Footer() {
+  const { t } = useTranslation();
+  
   return (
     <footer className="bg-slate-900 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -13,40 +18,37 @@ export function Footer() {
               <VelorynLogo variant="light" size="lg" />
             </div>
             <p className="text-slate-300 mb-4">
-              Advanced financial intelligence powered by AI. 
-              Educational and research purposes only.
+              {t('advanced_financial_intelligence_ai')}
             </p>
             <div className="bg-slate-800 p-4 rounded-lg">
               <p className="text-sm text-slate-400">
-                <strong>⚠️ Important Disclaimer:</strong> This system provides AI-generated analysis for 
-                educational and informational purposes only. All output is NOT financial advice, 
-                NOT offers to buy or sell securities, and NOT guaranteed for accuracy or profitability.
+                <strong>{t('important_disclaimer_footer')}</strong> {t('disclaimer_full_text')}
               </p>
             </div>
           </div>
 
           {/* Company */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Company</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('company_section')}</h3>
             <ul className="space-y-2">
               <li>
                 <Link href="/about" className="text-slate-300 hover:text-white">
-                  About
+                  {t('about')}
                 </Link>
               </li>
               <li>
                 <Link href="/contact" className="text-slate-300 hover:text-white">
-                  Contact
+                  {t('contact')}
                 </Link>
               </li>
               <li>
                 <Link href="/privacy" className="text-slate-300 hover:text-white">
-                  Privacy Policy
+                  {t('privacy_policy')}
                 </Link>
               </li>
               <li>
                 <Link href="/terms" className="text-slate-300 hover:text-white">
-                  Terms of Service
+                  {t('terms_of_service')}
                 </Link>
               </li>
             </ul>
@@ -56,10 +58,10 @@ export function Footer() {
         <div className="border-t border-gray-800 pt-8 mt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-400 text-sm">
-              © 2025 Financial Advisory Intelligence System. All rights reserved.
+              {t('copyright_text')}
             </p>
             <p className="text-gray-400 text-sm mt-2 md:mt-0">
-              Built with institutional standards for educational purposes.
+              {t('built_with_standards')}
             </p>
           </div>
         </div>

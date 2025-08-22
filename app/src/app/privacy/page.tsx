@@ -276,7 +276,7 @@ export default function PrivacyPage() {
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                   <p className="text-blue-800 font-medium mb-2">Contact Our Data Protection Officer</p>
                   <div className="text-blue-700 space-y-1">
-                    <p>Email: <strong>privacy@veloryn.com</strong></p>
+                    <p>Email: <strong>info@wadby.me</strong></p>
                     <p>Response Time: Within 30 days</p>
                     <p>Identity Verification: Required for security</p>
                   </div>
@@ -354,7 +354,7 @@ export default function PrivacyPage() {
                   Veloryn is not intended for children. We do not knowingly 
                   collect personal information from children under 18. If you are a parent or 
                   guardian and believe your child has provided us with personal information, 
-                  please contact us immediately at privacy@veloryn.com.
+                  please contact us immediately at info@wadby.me.
                 </p>
               </div>
               
@@ -458,9 +458,7 @@ export default function PrivacyPage() {
               <div>
                 <h3 className="font-semibold text-green-900 mb-2">Privacy Questions and Requests</h3>
                 <div className="text-green-800 space-y-2">
-                  <p><strong>Data Protection Officer:</strong> privacy@veloryn.com</p>
-                  <p><strong>General Support:</strong> support@veloryn.com</p>
-                  <p><strong>Business Inquiries:</strong> contact@veloryn.com</p>
+                  <p><strong>Support:</strong> info@wadby.me</p>
                   <p><strong>Response Time:</strong> Within 48 hours for privacy matters</p>
                 </div>
               </div>
@@ -468,7 +466,7 @@ export default function PrivacyPage() {
               <div className="pt-2 border-t border-green-200">
                 <p className="text-green-700 text-sm">
                   For urgent privacy matters or suspected security incidents, please contact 
-                  privacy@veloryn.com immediately with "URGENT" in the subject line.
+                  info@wadby.me immediately with "URGENT" in the subject line.
                 </p>
               </div>
             </div>

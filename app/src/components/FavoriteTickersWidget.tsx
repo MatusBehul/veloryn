@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useFavoriteTickers } from '@/hooks/useFavoriteTickers';
+import { useTranslation } from '@/hooks/useTranslation';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
@@ -9,6 +10,7 @@ import { Star, Bell, Plus, Settings } from 'lucide-react';
 
 export function FavoriteTickersWidget() {
   const { favoriteTickers, loading, getTickersWithDailyUpdates } = useFavoriteTickers();
+  const { t } = useTranslation();
   const dailyUpdateTickers = getTickersWithDailyUpdates();
 
   if (loading) {
@@ -17,12 +19,12 @@ export function FavoriteTickersWidget() {
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <Star className="h-5 w-5 text-yellow-500" />
-            <span>Favorite Tickers</span>
+            <span>{t('favoriteTickers')}</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center py-4">
-            <p className="text-gray-500">Loading...</p>
+            <p className="text-gray-500">{t('widgetLoading')}</p>
           </div>
         </CardContent>
       </Card>
@@ -35,12 +37,12 @@ export function FavoriteTickersWidget() {
         <CardTitle className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Star className="h-5 w-5 text-yellow-500" />
-            <span>Favorite Tickers</span>
+            <span>{t('favoriteTickers')}</span>
           </div>
           <Link href="/settings">
             <Button variant="outline" size="sm">
               <Settings className="h-4 w-4 mr-1" />
-              Manage
+              {t('manage')}
             </Button>
           </Link>
         </CardTitle>
@@ -49,11 +51,11 @@ export function FavoriteTickersWidget() {
         {favoriteTickers.length === 0 ? (
           <div className="text-center py-6">
             <Star className="h-8 w-8 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500 mb-3">No favorite tickers yet</p>
+            <p className="text-gray-500 mb-3">{t('noFavoriteTickersYet')}</p>
             <Link href="/settings">
               <Button size="sm">
                 <Plus className="h-4 w-4 mr-1" />
-                Add Tickers
+                {t('addTickers')}
               </Button>
             </Link>
           </div>
@@ -61,10 +63,10 @@ export function FavoriteTickersWidget() {
           <div className="space-y-3">
             {/* Summary */}
             <div className="flex items-center justify-between text-sm text-gray-600 pb-2 border-b">
-              <span>{favoriteTickers.length} ticker{favoriteTickers.length !== 1 ? 's' : ''} total</span>
+              <span>{favoriteTickers.length} {favoriteTickers.length === 1 ? 'ticker' : t('tickers')} {t('tickersTotal')}</span>
               <div className="flex items-center space-x-1">
                 <Bell className="h-4 w-4 text-green-500" />
-                <span>{dailyUpdateTickers.length} with daily updates</span>
+                <span>{dailyUpdateTickers.length} {t('withDailyUpdates')}</span>
               </div>
             </div>
 
@@ -92,7 +94,7 @@ export function FavoriteTickersWidget() {
                 <div className="text-center pt-2">
                   <Link href="/settings">
                     <Button variant="ghost" size="sm" className="text-xs">
-                      View all {favoriteTickers.length} tickers
+                      {t('viewAllTickers')} {favoriteTickers.length} {t('tickers')}
                     </Button>
                   </Link>
                 </div>
@@ -104,7 +106,7 @@ export function FavoriteTickersWidget() {
               <Link href="/settings">
                 <Button variant="outline" size="sm" className="w-full">
                   <Settings className="h-4 w-4 mr-1" />
-                  Manage Tickers & Updates
+                  {t('manageTickersUpdates')}
                 </Button>
               </Link>
             </div>

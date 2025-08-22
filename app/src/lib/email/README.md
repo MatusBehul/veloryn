@@ -50,7 +50,7 @@ Set these environment variables for the Cloud Function:
 GCP_PROJECT=your-google-cloud-project-id
 MAILGUN_API_KEY=your-mailgun-api-key
 MAILGUN_DOMAIN=your-mailgun-domain
-FROM_EMAIL=noreply@veloryn.com
+FROM_EMAIL=info@wadby.me
 ```
 
 ### Deployment Steps

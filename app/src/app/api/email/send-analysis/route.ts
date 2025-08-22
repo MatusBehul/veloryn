@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     const userId = decodedToken.uid;
 
     const body = await request.json();
-    const { analysisId, ticker, recipientEmail, analysisData } = body;
+    const { analysisId, ticker, recipientEmail } = body;
 
     if (!analysisId || !ticker || !recipientEmail) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
       ticker,
       recipients: [recipientEmail],
       requestedAt: new Date().toISOString(),
-      analysisData: analysisData, // Include the full analysis data
+      // analysisData: analysisData, // Include the full analysis data
     };
 
     console.log("emailRequest", emailRequest)

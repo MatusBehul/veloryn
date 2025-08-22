@@ -511,7 +511,7 @@ export default function TermsPage() {
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                   <p className="text-blue-800 text-sm font-medium mb-2">We encourage resolving disputes through these steps:</p>
                   <ol className="text-blue-700 text-sm space-y-1 ml-4 list-decimal">
-                    <li><strong>Direct Communication:</strong> Contact our support team at legal@veloryn.com</li>
+                    <li><strong>Direct Communication:</strong> Contact our support team at info@wadby.me</li>
                     <li><strong>Informal Resolution:</strong> We'll work with you to resolve issues within 30 days</li>
                     <li><strong>Mediation:</strong> If needed, we may agree to mediation through a neutral third party</li>
                     <li><strong>Arbitration/Courts:</strong> As a last resort, disputes may proceed to binding arbitration or courts</li>
@@ -591,9 +591,7 @@ export default function TermsPage() {
               <div>
                 <h3 className="font-semibold text-green-900 mb-2">Legal and Terms Questions</h3>
                 <div className="text-green-800 space-y-2">
-                  <p><strong>Legal Team:</strong> legal@veloryn.com</p>
-                  <p><strong>Terms Clarification:</strong> terms@veloryn.com</p>
-                  <p><strong>Billing Support:</strong> billing@veloryn.com</p>
+                  <p><strong>Support:</strong> info@wadby.me</p>
                   <p><strong>Response Time:</strong> Within 48 hours for terms-related inquiries</p>
                 </div>
               </div>
@@ -601,15 +599,13 @@ export default function TermsPage() {
               <div>
                 <h3 className="font-semibold text-green-900 mb-2">General Support</h3>
                 <div className="text-green-800 space-y-1">
-                  <p><strong>General Support:</strong> support@veloryn.com</p>
-                  <p><strong>Technical Issues:</strong> <Link href="/contact" className="text-green-600 underline">Contact Form</Link></p>
-                  <p><strong>Business Inquiries:</strong> contact@veloryn.com</p>
+                  <p><strong>Support:</strong> info@wadby.me</p>
                 </div>
               </div>
               
               <div className="pt-2 border-t border-green-200">
                 <p className="text-green-700 text-sm">
-                  For urgent legal matters or compliance issues, please email legal@veloryn.com 
+                  For urgent legal matters or compliance issues, please email info@wadby.me 
                   with "URGENT" in the subject line.
                 </p>
               </div>
@@ -642,7 +638,7 @@ export default function TermsPage() {
         {/* Footer */}
         <div className="text-center py-8 border-t border-gray-200 mt-8">
           <p className="text-gray-500 text-sm">
-            These Terms of Service are effective as of {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })} and apply to all users of Veloryn.
+            These Terms of Service are effective as of August 22, 2025 and apply to all users of Veloryn.
           </p>
           <p className="text-gray-500 text-sm mt-2">
             © {new Date().getFullYear()} Veloryn. All rights reserved.

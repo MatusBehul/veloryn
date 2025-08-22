@@ -44,6 +44,7 @@ def process_email_request(cloud_event):
             analysis_id = email_request.get('analysisId')
             ticker = email_request.get('ticker')
             recipients = email_request.get('recipients', [])
+            language = email_request.get('language', 'en')
             email_type = email_request.get('type', 'bulk')  # 'bulk' or 'ticker'
             
             if not all([analysis_id, ticker]):
@@ -68,14 +69,9 @@ def process_email_request(cloud_event):
             for doc in data_docs:
                 if doc.exists:
                     analysis_data[doc.id] = doc.to_dict()
-            
-            # Use analysisData if provided in the request (from frontend)
-            if 'analysisData' in email_request:
-                analysis_data = email_request['analysisData']
-                analysis_data['id'] = analysis_id
 
             # Format the analysis for email
-            analysis_formatted = format_analysis_for_email_comprehensive(analysis_data)
+            analysis_formatted = format_analysis_for_email_comprehensive(analysis_data, language)
 
             if len(recipients) == 0:
                 logger.warning("No recipients provided for bulk email")

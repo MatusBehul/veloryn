@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSubscription } from '@/hooks/useSubscription';
+import { useTranslation } from '@/hooks/useTranslation';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { MarketingContent } from '@/components/MarketingContent';
@@ -21,6 +22,7 @@ import {
 export default function HomePage() {
   const { user } = useAuth();
   const { hasActiveSubscription, createCheckoutSession } = useSubscription();
+  const { t } = useTranslation();
 
   return (
     <div className="bg-white">
@@ -29,18 +31,16 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold text-slate-900 mb-6">
-              Veloryn
-              <span className="text-blue-500"> Financial Intelligence</span>
+              Veloryn - <span className="text-blue-500">{t('heroTitle')}</span>
             </h1>
             <p className="text-xl md:text-2xl text-slate-600 mb-8 max-w-3xl mx-auto">
-              Advanced AI-powered financial analysis and market intelligence. 
-              Get institutional-quality insights with our multi-agent AI system.
+              {t('heroSubtitle')}
             </p>            
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               {user ? (
                 <Link href="/analysis">
                   <Button size="lg" className="text-lg px-8 py-3">
-                    View Analysis
+                    {t('viewAnalysis')}
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
@@ -48,13 +48,13 @@ export default function HomePage() {
                 <>
                   <Link href="/login">
                     <Button size="lg" className="text-lg px-8 py-3">
-                      Get Started - €5/month
+                      {t('get_started')} - €5/month
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Button>
                   </Link>
                   <Link href="/login">
                     <Button variant="outline" size="lg" className="text-lg px-8 py-3">
-                      Sign In
+                      {t('login')}
                     </Button>
                   </Link>
                 </>
@@ -69,10 +69,10 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
-              Powered by AI Agents
+              {t('poweredByAI')}
             </h2>
             <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-              Our multi-agent system combines specialized AI models to deliver comprehensive financial analysis
+              {t('multiAgentDescription')}
             </p>
           </div>
 
@@ -82,11 +82,11 @@ export default function HomePage() {
                 <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
                   <TrendingUp className="h-6 w-6 text-blue-500" />
                 </div>
-                <CardTitle>Market Data Analysis</CardTitle>
+                <CardTitle>{t('realTimeTitle')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-slate-600">
-                  Real-time market data processing with advanced technical analysis and pattern recognition.
+                  {t('realTimeDescription')}
                 </p>
               </CardContent>
             </Card>
@@ -96,11 +96,11 @@ export default function HomePage() {
                 <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center mb-4">
                   <BarChart3 className="h-6 w-6 text-emerald-600" />
                 </div>
-                <CardTitle>SEC Filing Analysis</CardTitle>
+                <CardTitle>{t('aiAnalysisTitle')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600">
-                  Automated analysis of SEC filings, earnings reports, and corporate announcements.
+                  {t('aiAnalysisDescription')}
                 </p>
               </CardContent>
             </Card>
@@ -110,11 +110,11 @@ export default function HomePage() {
                 <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
                   <Brain className="h-6 w-6 text-purple-600" />
                 </div>
-                <CardTitle>Sentiment Analysis</CardTitle>
+                <CardTitle>{t('portfolioTitle')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600">
-                  AI-powered sentiment analysis of news, social media, and market commentary.
+                  {t('portfolioDescription')}
                 </p>
               </CardContent>
             </Card>
@@ -124,11 +124,11 @@ export default function HomePage() {
                 <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mb-4">
                   <Shield className="h-6 w-6 text-red-600" />
                 </div>
-                <CardTitle>Risk Assessment</CardTitle>
+                <CardTitle>{t('dataAccessTitle')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600">
-                  Comprehensive risk analysis with portfolio optimization and stress testing.
+                  {t('dataAccessDescription')}
                 </p>
               </CardContent>
             </Card>
@@ -138,11 +138,11 @@ export default function HomePage() {
                 <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mb-4">
                   <Zap className="h-6 w-6 text-yellow-600" />
                 </div>
-                <CardTitle>Trading Strategies</CardTitle>
+                <CardTitle>{t('aiAnalysisTitle')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600">
-                  AI-generated trading strategies with backtesting and execution planning.
+                  {t('aiAnalysisDescription')}
                 </p>
               </CardContent>
             </Card>
@@ -152,11 +152,11 @@ export default function HomePage() {
                 <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
                   <Users className="h-6 w-6 text-indigo-600" />
                 </div>
-                <CardTitle>Multi-Agent Collaboration</CardTitle>
+                <CardTitle>{t('intelligentTitle')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600">
-                  Specialized AI agents work together to provide holistic financial insights.
+                  {t('intelligentDescription')}
                 </p>
               </CardContent>
             </Card>
@@ -173,10 +173,10 @@ export default function HomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-                Why Choose Our Platform?
+                {t('featuresTitle')}
               </h2>
               <p className="text-lg text-gray-600 mb-8">
-                Get institutional-quality analysis at a fraction of the cost, powered by cutting-edge AI technology.
+                {t('institutionalQuality')}
               </p>
               
               <div className="space-y-4">
@@ -191,16 +191,16 @@ export default function HomePage() {
                 <div className="flex items-start">
                   <CheckCircle className="h-6 w-6 text-green-500 mt-1 mr-3 flex-shrink-0" />
                   <div>
-                    <h3 className="font-semibold text-gray-900">Multi-dimensional Insights</h3>
-                    <p className="text-gray-600">Combine technical, fundamental, and sentiment analysis</p>
+                    <h3 className="font-semibold text-gray-900">{t('intelligentTitle')}</h3>
+                    <p className="text-gray-600">{t('intelligentDescription')}</p>
                   </div>
                 </div>
                 
                 <div className="flex items-start">
                   <CheckCircle className="h-6 w-6 text-green-500 mt-1 mr-3 flex-shrink-0" />
                   <div>
-                    <h3 className="font-semibold text-gray-900">Risk Management</h3>
-                    <p className="text-gray-600">Advanced risk assessment and portfolio optimization</p>
+                    <h3 className="font-semibold text-gray-900">{t('riskManagementTitle')}</h3>
+                    <p className="text-gray-600">{t('riskManagementDescription')}</p>
                   </div>
                 </div>
                 
@@ -221,14 +221,14 @@ export default function HomePage() {
                     // Active subscriber
                     <>
                       <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                        Welcome Back, Member!
+                        {t('memberWelcomeTitle')}
                       </h3>
                       <p className="text-gray-600 mb-6">
-                        You have full access to AI-driven financial analysis. Start exploring the markets!
+                        {t('memberWelcomeDescription')}
                       </p>
                       <Link href="/analysis">
                         <Button size="lg" className="w-full">
-                          View Analysis
+                          {t('viewAnalysis')}
                         </Button>
                       </Link>
                     </>
@@ -236,17 +236,17 @@ export default function HomePage() {
                     // Signed in but no subscription
                     <>
                       <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                        Upgrade to Premium
+                        {t('upgradeTitle')}
                       </h3>
                       <p className="text-gray-600 mb-6">
-                        Get unlimited access to AI-driven financial analysis for just €5/month
+                        {t('upgradeDescription')}
                       </p>
                       <Button 
                         size="lg" 
                         className="w-full"
-                        onClick={createCheckoutSession}
+                        onClick={() => createCheckoutSession()}
                       >
-                        Upgrade Now
+                        {t('upgradeNow')}
                       </Button>
                     </>
                   )
@@ -254,14 +254,14 @@ export default function HomePage() {
                   // Not signed in
                   <>
                     <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                      Join Veloryn
+                      {t('joinTitle')}
                     </h3>
                     <p className="text-gray-600 mb-6">
-                      Get unlimited access to AI-driven financial analysis for just €5/month
+                      {t('joinDescription')}
                     </p>
                     <Link href="/login">
                       <Button size="lg" className="w-full">
-                        Sign Up Now
+                        {t('signUpNow')}
                       </Button>
                     </Link>
                   </>
@@ -276,13 +276,9 @@ export default function HomePage() {
       <section className="py-12 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-red-800 mb-2">⚠️ Important Disclaimer</h3>
+            <h3 className="text-lg font-semibold text-red-800 mb-2">{t('disclaimerTitle')}</h3>
             <p className="text-sm text-red-700">
-              This system provides AI-generated analysis for educational and informational purposes only. 
-              All output is NOT financial advice, NOT offers to buy or sell securities, and NOT guaranteed 
-              for accuracy, completeness, or profitability. Users must conduct independent research and 
-              consult qualified financial advisors before making investment decisions. Past performance 
-              does not guarantee future results.
+              {t('disclaimerText')}
             </p>
           </div>
         </div>

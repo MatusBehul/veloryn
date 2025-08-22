@@ -5,6 +5,7 @@ from typing import Dict, Any, List
 from datetime import datetime
 import os
 import re
+from languages.manager import get_translation
 
 ISPROD = os.environ.get('ISPROD', 'false').lower() == 'true'
 
@@ -111,12 +112,13 @@ def render_analysis_section(content):
     else:
         return f'<p style="margin: 0 0 16px 0; line-height: 1.6; color: #374151;">{format_text_with_bold(str(content))}</p>'
 
-def format_analysis_for_email_comprehensive(analysis: Dict[str, Any]) -> Dict[str, str]:
+def format_analysis_for_email_comprehensive(analysis: Dict[str, Any], language: str = 'en') -> Dict[str, str]:
     """
     Format the comprehensive financial analysis data for email delivery
     """
+    # Validate language, default to English if not supported    
     ticker = analysis.get('ticker', 'Unknown')
-    subject = f"{'[TEST] ' if not ISPROD else ''}Financial Analysis: {ticker} - {format_date(analysis.get('date') or analysis.get('timestamp') or analysis.get('created_at') or analysis.get('createdAt'))}"
+    subject = f"{'[TEST] ' if not ISPROD else ''}{get_translation('financial_analysis', language)}: {ticker} - {format_date(analysis.get('date') or analysis.get('timestamp') or analysis.get('created_at') or analysis.get('createdAt'))}"
     
     company_name = ''
     if analysis.get('company_overview', {}).get('data'):
@@ -128,19 +130,19 @@ def format_analysis_for_email_comprehensive(analysis: Dict[str, Any]) -> Dict[st
     # Header
     html_sections.append(f"""
     <div class="header">
-      <h1>{ticker} Financial Analysis</h1>
-      <p>AI-Generated Market Intelligence Report</p>
-      <p>Generated on {format_date(analysis.get('date') or analysis.get('timestamp') or analysis.get('created_at') or analysis.get('createdAt'))}</p>
-      {f'<p>{company_name}</p>' if company_name else ''}
+      <h1>{ticker} {get_translation('financial_analysis', language)}</h1>
+      <p>{get_translation('ai_generated_report', language)}</p>
+      <p>{get_translation('generated_on', language)} {format_date(analysis.get('date') or analysis.get('timestamp') or analysis.get('created_at') or analysis.get('createdAt'))}</p>
+      {f'<p>{get_translation("company", language)}: {company_name}</p>' if company_name else ''}
     </div>
     """)
 
     # Overall Analysis
-    overall_analysis = analysis.get('analysis_overview', {}).get('analysis_data', {}).get('overall_analysis')
+    overall_analysis = analysis.get('analysis_overview', {}).get('analysis_data', {}).get(language, {}).get('overall_analysis')
     if overall_analysis:
         html_sections.append(f"""
         <div class="section">
-          <h2><span class="section-icon">🧠</span>Overall Analysis</h2>
+          <h2><span class="section-icon">🧠</span>{get_translation('overall_analysis', language)}</h2>
           <div class="analysis-content">
             {render_analysis_section(overall_analysis)}
           </div>
@@ -152,52 +154,52 @@ def format_analysis_for_email_comprehensive(analysis: Dict[str, Any]) -> Dict[st
     if company_data:
         html_sections.append(f"""
         <div class="section">
-          <h2><span class="section-icon">📊</span>Key Financial Metrics</h2>
+          <h2><span class="section-icon">📊</span>{get_translation('key_financial_metrics', language)}</h2>
           <div class="metric-grid-4">
             <div class="metric-card blue">
               <div class="metric-value blue">{format_large_number(company_data.get('MarketCapitalization'))}</div>
-              <div class="metric-label">Market Cap</div>
+              <div class="metric-label">{get_translation('market_cap', language)}</div>
             </div>
             <div class="metric-card blue">
               <div class="metric-value blue">{company_data.get('PERatio', 'N/A')}</div>
-              <div class="metric-label">P/E Ratio</div>
+              <div class="metric-label">{get_translation('pe_ratio', language)}</div>
             </div>
             <div class="metric-card blue">
               <div class="metric-value blue">{format_currency(company_data.get('EPS'))}</div>
-              <div class="metric-label">EPS</div>
+              <div class="metric-label">{get_translation('eps', language)}</div>
             </div>
             <div class="metric-card gray">
               <div class="metric-value gray">{format_percent((company_data.get('DividendYield', 0) or 0) * 100)}</div>
-              <div class="metric-label">Dividend Yield</div>
+              <div class="metric-label">{get_translation('dividend_yield', language)}</div>
             </div>
           </div>
           <div class="metric-grid-4">
             <div class="metric-card blue">
               <div class="metric-value blue">{format_currency(company_data.get('_52WeekHigh'))}</div>
-              <div class="metric-label">52W High</div>
+              <div class="metric-label">{get_translation('52w_high', language)}</div>
             </div>
             <div class="metric-card gray">
               <div class="metric-value gray">{format_currency(company_data.get('_52WeekLow'))}</div>
-              <div class="metric-label">52W Low</div>
+              <div class="metric-label">{get_translation('52w_low', language)}</div>
             </div>
             <div class="metric-card blue">
               <div class="metric-value blue">{format_currency(company_data.get('_50DayMovingAverage'))}</div>
-              <div class="metric-label">50-Day MA</div>
+              <div class="metric-label">{get_translation('50_day_ma', language)}</div>
             </div>
             <div class="metric-card gray">
               <div class="metric-value gray">{format_currency(company_data.get('_200DayMovingAverage'))}</div>
-              <div class="metric-label">200-Day MA</div>
+              <div class="metric-label">{get_translation('200_day_ma', language)}</div>
             </div>
           </div>
         </div>
         """)
 
     # Investment Narrative
-    investment_narrative = analysis.get('analysis_overview', {}).get('analysis_data', {}).get('investment_narrative')
+    investment_narrative = analysis.get('analysis_overview', {}).get('analysis_data', {}).get(language, {}).get('investment_narrative')
     if investment_narrative:
         html_sections.append(f"""
         <div class="section">
-          <h2><span class="section-icon">💡</span>Investment Narrative</h2>
+          <h2><span class="section-icon">💡</span>{get_translation('investment_narrative', language)}</h2>
           <div class="analysis-content blue">
             {render_analysis_section(investment_narrative)}
           </div>
@@ -205,11 +207,11 @@ def format_analysis_for_email_comprehensive(analysis: Dict[str, Any]) -> Dict[st
         """)
 
     # Technical Analysis Text
-    technical_analysis = analysis.get('analysis_overview', {}).get('analysis_data', {}).get('technical_analysis')
+    technical_analysis = analysis.get('analysis_overview', {}).get('analysis_data', {}).get(language, {}).get('technical_analysis')
     if technical_analysis:
         html_sections.append(f"""
         <div class="section">
-          <h2><span class="section-icon">⚡</span>Technical Analysis</h2>
+          <h2><span class="section-icon">⚡</span>{get_translation('technical_analysis', language)}</h2>
           <div class="analysis-content">
             {render_analysis_section(technical_analysis)}
           </div>
@@ -234,8 +236,8 @@ def format_analysis_for_email_comprehensive(analysis: Dict[str, Any]) -> Dict[st
         
         indicators_html = f"""
         <div class="section">
-          <h2><span class="section-icon">📈</span>Technical Indicators</h2>
-          <h3 style="color: #374151; margin: 0 0 16px 0;">Key Indicators</h3>
+          <h2><span class="section-icon">📈</span>{get_translation('technical_indicators', language)}</h2>
+          <h3 style="color: #374151; margin: 0 0 16px 0;">{get_translation('key_indicators', language)}</h3>
           <div class="metric-grid-3">
             <div class="metric-card blue">
               <div class="metric-value blue">{rsi_display}</div>
@@ -259,7 +261,7 @@ def format_analysis_for_email_comprehensive(analysis: Dict[str, Any]) -> Dict[st
             </div>
             <div class="metric-card gray">
               <div class="metric-value gray">{momentum_display}</div>
-              <div class="metric-label">Momentum</div>
+              <div class="metric-label">{get_translation('momentum', language)}</div>
             </div>
           </div>
         """
@@ -268,7 +270,7 @@ def format_analysis_for_email_comprehensive(analysis: Dict[str, Any]) -> Dict[st
         moving_averages = tech_indicators.get('moving_averages')
         if moving_averages:
             indicators_html += f"""
-          <h3 style="color: #374151; margin: 24px 0 16px 0;">Moving Averages</h3>
+          <h3 style="color: #374151; margin: 24px 0 16px 0;">{get_translation('moving_averages', language)}</h3>
           <div class="metric-grid" style="grid-template-columns: repeat(5, 1fr);">
             <div class="metric-card blue">
               <div class="metric-value blue">{format_currency(moving_averages.get('sma_20'))}</div>
@@ -297,19 +299,19 @@ def format_analysis_for_email_comprehensive(analysis: Dict[str, Any]) -> Dict[st
         bollinger_bands = tech_indicators.get('bollinger_bands')
         if bollinger_bands:
             indicators_html += f"""
-          <h3 style="color: #374151; margin: 24px 0 16px 0;">Bollinger Bands</h3>
+          <h3 style="color: #374151; margin: 24px 0 16px 0;">{get_translation('bollinger_bands', language)}</h3>
           <div class="metric-grid-3">
             <div class="metric-card blue">
               <div class="metric-value blue">{format_currency(bollinger_bands.get('upper'))}</div>
-              <div class="metric-label">Upper Band</div>
+              <div class="metric-label">{get_translation('upper_band', language)}</div>
             </div>
             <div class="metric-card gray">
               <div class="metric-value gray">{format_currency(bollinger_bands.get('middle'))}</div>
-              <div class="metric-label">Middle Band</div>
+              <div class="metric-label">{get_translation('middle_band', language)}</div>
             </div>
             <div class="metric-card blue">
               <div class="metric-value blue">{format_currency(bollinger_bands.get('lower'))}</div>
-              <div class="metric-label">Lower Band</div>
+              <div class="metric-label">{get_translation('lower_band', language)}</div>
             </div>
           </div>
             """
@@ -318,11 +320,11 @@ def format_analysis_for_email_comprehensive(analysis: Dict[str, Any]) -> Dict[st
         html_sections.append(indicators_html)
 
     # Fundamental Analysis
-    fundamental_analysis = analysis.get('analysis_overview', {}).get('analysis_data', {}).get('fundamental_analysis')
+    fundamental_analysis = analysis.get('analysis_overview', {}).get('analysis_data', {}).get(language, {}).get('fundamental_analysis')
     if fundamental_analysis:
         html_sections.append(f"""
         <div class="section">
-          <h2><span class="section-icon">📊</span>Fundamental Analysis</h2>
+          <h2><span class="section-icon">📊</span>{get_translation('fundamental_analysis', language)}</h2>
           <div class="analysis-content">
             {render_analysis_section(fundamental_analysis)}
           </div>
@@ -334,23 +336,23 @@ def format_analysis_for_email_comprehensive(analysis: Dict[str, Any]) -> Dict[st
     if income_data:
         html_sections.append(f"""
         <div class="section">
-          <h2><span class="section-icon">💰</span>Latest Quarter Financials</h2>
+          <h2><span class="section-icon">💰</span>{get_translation('latest_quarter_financials', language)}</h2>
           <div class="metric-grid-4">
             <div class="metric-card blue">
               <div class="metric-value blue">{format_large_number(income_data.get('totalRevenue'))}</div>
-              <div class="metric-label">Total Revenue</div>
+              <div class="metric-label">{get_translation('total_revenue', language)}</div>
             </div>
             <div class="metric-card blue">
               <div class="metric-value blue">{format_large_number(income_data.get('netIncome'))}</div>
-              <div class="metric-label">Net Income</div>
+              <div class="metric-label">{get_translation('net_income', language)}</div>
             </div>
             <div class="metric-card gray">
               <div class="metric-value gray">{format_large_number(income_data.get('grossProfit'))}</div>
-              <div class="metric-label">Gross Profit</div>
+              <div class="metric-label">{get_translation('gross_profit', language)}</div>
             </div>
             <div class="metric-card gray">
               <div class="metric-value gray">{format_large_number(income_data.get('operatingIncome'))}</div>
-              <div class="metric-label">Operating Income</div>
+              <div class="metric-label">{get_translation('operating_income', language)}</div>
             </div>
           </div>
         </div>
@@ -361,34 +363,34 @@ def format_analysis_for_email_comprehensive(analysis: Dict[str, Any]) -> Dict[st
     if balance_data:
         html_sections.append(f"""
         <div class="section">
-          <h2><span class="section-icon">🏛️</span>Balance Sheet Highlights</h2>
+          <h2><span class="section-icon">🏛️</span>{get_translation('balance_sheet_highlights', language)}</h2>
           <div class="metric-grid-4">
             <div class="metric-card blue">
               <div class="metric-value blue">{format_large_number(balance_data.get('totalAssets'))}</div>
-              <div class="metric-label">Total Assets</div>
+              <div class="metric-label">{get_translation('total_assets', language)}</div>
             </div>
             <div class="metric-card gray">
               <div class="metric-value gray">{format_large_number(balance_data.get('totalLiabilities'))}</div>
-              <div class="metric-label">Total Liabilities</div>
+              <div class="metric-label">{get_translation('total_liabilities', language)}</div>
             </div>
             <div class="metric-card blue">
               <div class="metric-value blue">{format_large_number(balance_data.get('totalShareholderEquity'))}</div>
-              <div class="metric-label">Shareholder Equity</div>
+              <div class="metric-label">{get_translation('shareholder_equity', language)}</div>
             </div>
             <div class="metric-card gray">
               <div class="metric-value gray">{format_large_number(balance_data.get('cashAndCashEquivalentsAtCarryingValue'))}</div>
-              <div class="metric-label">Cash & Equivalents</div>
+              <div class="metric-label">{get_translation('cash_equivalents', language)}</div>
             </div>
           </div>
         </div>
         """)
 
     # Risk Analysis
-    risk_analysis = analysis.get('analysis_overview', {}).get('analysis_data', {}).get('risk_analysis')
+    risk_analysis = analysis.get('analysis_overview', {}).get('analysis_data', {}).get(language, {}).get('risk_analysis')
     if risk_analysis:
         html_sections.append(f"""
         <div class="section">
-          <h2><span class="section-icon">🛡️</span>Risk Analysis</h2>
+          <h2><span class="section-icon">🛡️</span>{get_translation('risk_analysis', language)}</h2>
           <div class="analysis-content yellow">
             {render_analysis_section(risk_analysis)}
           </div>
@@ -411,15 +413,15 @@ def format_analysis_for_email_comprehensive(analysis: Dict[str, Any]) -> Dict[st
         
         html_sections.append(f"""
         <div class="section">
-          <h2><span class="section-icon">🎯</span>Earnings Estimates</h2>
+          <h2><span class="section-icon">🎯</span>{get_translation('earnings_estimates', language)}</h2>
           <div class="table-container">
             <table class="data-table">
               <thead>
                 <tr>
-                  <th>Period</th>
-                  <th>EPS Estimate</th>
-                  <th>High/Low</th>
-                  <th>Revenue Estimate</th>
+                  <th>{get_translation('period', language)}</th>
+                  <th>{get_translation('eps_estimate', language)}</th>
+                  <th>{get_translation('high_low', language)}</th>
+                  <th>{get_translation('revenue_estimate', language)}</th>
                 </tr>
               </thead>
               <tbody>
@@ -431,11 +433,11 @@ def format_analysis_for_email_comprehensive(analysis: Dict[str, Any]) -> Dict[st
         """)
 
     # Sentiment Analysis
-    sentiment_analysis = analysis.get('analysis_overview', {}).get('analysis_data', {}).get('sentiment_analysis')
+    sentiment_analysis = analysis.get('analysis_overview', {}).get('analysis_data', {}).get(language, {}).get('sentiment_analysis')
     if sentiment_analysis:
         html_sections.append(f"""
         <div class="section">
-          <h2><span class="section-icon">📊</span>Sentiment Analysis</h2>
+          <h2><span class="section-icon">📊</span>{get_translation('sentiment_analysis', language)}</h2>
           <div class="analysis-content yellow">
             {render_analysis_section(sentiment_analysis)}
           </div>
@@ -443,11 +445,11 @@ def format_analysis_for_email_comprehensive(analysis: Dict[str, Any]) -> Dict[st
         """)
 
     # Investment Insights
-    investment_insights = analysis.get('analysis_overview', {}).get('analysis_data', {}).get('investment_insights')
+    investment_insights = analysis.get('analysis_overview', {}).get('analysis_data', {}).get(language, {}).get('investment_insights')
     if investment_insights:
         html_sections.append(f"""
         <div class="section">
-          <h2><span class="section-icon">🎯</span>Investment Insights</h2>
+          <h2><span class="section-icon">🎯</span>{get_translation('investment_insights', language)}</h2>
           <div class="analysis-content blue">
             {render_analysis_section(investment_insights)}
           </div>
@@ -455,11 +457,11 @@ def format_analysis_for_email_comprehensive(analysis: Dict[str, Any]) -> Dict[st
         """)
 
     # Supporting Details
-    supporting_details = analysis.get('analysis_overview', {}).get('analysis_data', {}).get('supporting_details')
+    supporting_details = analysis.get('analysis_overview', {}).get('analysis_data', {}).get(language, {}).get('supporting_details')
     if supporting_details:
         html_sections.append(f"""
         <div class="section">
-          <h2><span class="section-icon">📊</span>Supporting Details</h2>
+          <h2><span class="section-icon">📊</span>{get_translation('supporting_details', language)}</h2>
           <div class="analysis-content blue">
             {render_analysis_section(supporting_details)}
           </div>
@@ -655,20 +657,19 @@ def format_analysis_for_email_comprehensive(analysis: Dict[str, Any]) -> Dict[st
 
     <div class="content">
       <div class="disclaimer">
-        <h3>⚠️ Important Disclaimer</h3>
+        <h3>⚠️ {get_translation('important_disclaimer', language)}</h3>
         <p style="margin: 0; line-height: 1.5;">
-          This analysis is generated by AI and is for educational purposes only. It should not be considered as financial advice. 
-          Always consult with a qualified financial advisor before making investment decisions. Past performance does not guarantee future results.
+          {get_translation('disclaimer_text', language)}
         </p>
       </div>
     </div>
 
     <div class="footer">
       <p style="margin: 0; color: #6b7280; font-size: 16px; font-weight: 600;">
-        Generated by <strong>Veloryn</strong> - AI-Powered Financial Intelligence
+        {get_translation('generated_by', language)} <strong>Veloryn</strong> - {get_translation('ai_powered_intelligence', language)}
       </p>
       <p style="margin: 8px 0 0 0; color: #9ca3af; font-size: 14px;">
-        © {datetime.now().year} Veloryn. All rights reserved.
+        © {datetime.now().year} Veloryn. {get_translation('all_rights_reserved', language)}
       </p>
     </div>
   </div>
@@ -676,41 +677,40 @@ def format_analysis_for_email_comprehensive(analysis: Dict[str, Any]) -> Dict[st
 </html>
     """
 
-    # Create plain text version
+    # Create plain text version with translations
     text_sections = []
-    text_sections.append(f"{ticker} Financial Analysis")
-    text_sections.append(f"Generated by Veloryn on {format_date(analysis.get('date') or analysis.get('timestamp') or analysis.get('created_at') or analysis.get('createdAt'))}")
+    text_sections.append(f"{ticker} {get_translation('financial_analysis', language)}")
+    text_sections.append(f"{get_translation('generated_by', language)} Veloryn {get_translation('generated_on', language).lower()} {format_date(analysis.get('date') or analysis.get('timestamp') or analysis.get('created_at') or analysis.get('createdAt'))}")
     if company_name:
-        text_sections.append(f"Company: {company_name}")
+        text_sections.append(f"{get_translation('company', language)}: {company_name}")
     text_sections.append("")
 
     if overall_analysis:
-        text_sections.append("OVERALL ANALYSIS")
+        text_sections.append(get_translation('overall_analysis', language).upper())
         if isinstance(overall_analysis, list):
-            text_sections.extend(overall_analysis)
+            text_sections.extend([str(item) for item in overall_analysis])
         else:
-            text_sections.append(overall_analysis)
+            text_sections.append(str(overall_analysis))
         text_sections.append("")
 
     if company_data:
-        text_sections.append("KEY FINANCIAL METRICS")
-        text_sections.append(f"Market Cap: {format_large_number(company_data.get('MarketCapitalization'))}")
-        text_sections.append(f"P/E Ratio: {company_data.get('PERatio', 'N/A')}")
-        text_sections.append(f"EPS: {format_currency(company_data.get('EPS'))}")
-        text_sections.append(f"Dividend Yield: {format_percent((company_data.get('DividendYield', 0) or 0) * 100)}")
-        text_sections.append(f"52-Week Range: {format_currency(company_data.get('_52WeekLow'))} - {format_currency(company_data.get('_52WeekHigh'))}")
-        text_sections.append(f"50-Day MA: {format_currency(company_data.get('_50DayMovingAverage'))}")
-        text_sections.append(f"200-Day MA: {format_currency(company_data.get('_200DayMovingAverage'))}")
+        text_sections.append(get_translation('key_financial_metrics', language).upper())
+        text_sections.append(f"{get_translation('market_cap', language)}: {format_large_number(company_data.get('MarketCapitalization'))}")
+        text_sections.append(f"{get_translation('pe_ratio', language)}: {company_data.get('PERatio', 'N/A')}")
+        text_sections.append(f"{get_translation('eps', language)}: {format_currency(company_data.get('EPS'))}")
+        text_sections.append(f"{get_translation('dividend_yield', language)}: {format_percent((company_data.get('DividendYield', 0) or 0) * 100)}")
+        text_sections.append(f"52W Range: {format_currency(company_data.get('_52WeekLow'))} - {format_currency(company_data.get('_52WeekHigh'))}")
+        text_sections.append(f"{get_translation('50_day_ma', language)}: {format_currency(company_data.get('_50DayMovingAverage'))}")
+        text_sections.append(f"{get_translation('200_day_ma', language)}: {format_currency(company_data.get('_200DayMovingAverage'))}")
         text_sections.append("")
 
     # Add other sections to text version...
-    text_sections.append("IMPORTANT DISCLAIMER")
-    text_sections.append("This analysis is generated by AI and is for educational purposes only. It should not be considered as financial advice.")
-    text_sections.append("Always consult with a qualified financial advisor before making investment decisions. Past performance does not guarantee future results.")
+    text_sections.append(get_translation('important_disclaimer', language).upper())
+    text_sections.append(get_translation('disclaimer_text', language))
     text_sections.append("")
     text_sections.append("---")
-    text_sections.append("Generated by Veloryn - AI-Powered Financial Intelligence")
-    text_sections.append(f"© {datetime.now().year} Veloryn. All rights reserved.")
+    text_sections.append(f"{get_translation('generated_by', language)} Veloryn - {get_translation('ai_powered_intelligence', language)}")
+    text_sections.append(f"© {datetime.now().year} Veloryn. {get_translation('all_rights_reserved', language)}")
 
     text = '\n'.join(text_sections)
 
@@ -719,8 +719,3 @@ def format_analysis_for_email_comprehensive(analysis: Dict[str, Any]) -> Dict[st
         'html': html,
         'text': text
     }
-
-# Keep the old function for backward compatibility
-def format_analysis_for_email(analysis: Dict[str, Any]) -> Dict[str, str]:
-    """Wrapper function for backward compatibility"""
-    return format_analysis_for_email_comprehensive(analysis)

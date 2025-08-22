@@ -3,6 +3,7 @@
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSubscription } from '@/hooks/useSubscription';
+import { useTranslation } from '@/hooks/useTranslation';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { FavoriteTickersWidget } from '@/components/FavoriteTickersWidget';
@@ -22,16 +23,17 @@ import {
 export default function DashboardPage() {
   const { user } = useAuth();
   const { hasActiveSubscription, loading, subscriptionTier } = useSubscription();
+  const { t } = useTranslation();
 
   if (!user) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardContent className="py-8 text-center">
-            <h2 className="text-xl font-semibold mb-4">Authentication Required</h2>
-            <p className="text-gray-600 mb-4">Please log in to access your dashboard.</p>
+            <h2 className="text-xl font-semibold mb-4">{t('authRequired')}</h2>
+            <p className="text-gray-600 mb-4">{t('authRequiredDesc')}</p>
             <Link href="/login">
-              <Button>Go to Login</Button>
+              <Button>{t('goToLogin')}</Button>
             </Link>
           </CardContent>
         </Card>
@@ -41,22 +43,22 @@ export default function DashboardPage() {
 
   const quickActions = [
     {
-      title: 'Browse Analysis',
-      description: 'View latest AI-generated financial analysis',
+      title: t('browseAnalysis'),
+      description: t('browseAnalysisDesc'),
       icon: BarChart3,
       href: '/analysis',
       color: 'bg-blue-500',
     },
     {
-      title: 'Favorite Tickers',
-      description: 'Manage your watchlist and daily updates',
+      title: t('favoriteTickers'),
+      description: t('favoriteTickersDesc'),
       icon: Star,
       href: '/settings',
       color: 'bg-yellow-500',
     },
     {
-      title: 'Account Settings',
-      description: 'Update preferences and subscription',
+      title: t('accountSettings'),
+      description: t('accountSettingsDesc'),
       icon: Settings,
       href: '/subscription',
       color: 'bg-gray-500',
@@ -69,10 +71,10 @@ export default function DashboardPage() {
         {/* Welcome Section */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-slate-900 mb-2">
-            Welcome back{user.name ? `, ${user.name}` : ''}!
+            {t('welcomeBack')}{user.name ? `, ${user.name}` : ''}!
           </h1>
           <p className="text-slate-600">
-            Your AI-powered financial analysis dashboard
+            {t('aiDashboardDesc')}
           </p>
         </div>
 
@@ -85,19 +87,19 @@ export default function DashboardPage() {
                   <UserIcon className="h-6 w-6 text-blue-600" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900">Account Status</h3>
+                  <h3 className="font-semibold text-gray-900">{t('accountStatus')}</h3>
                   <div className="flex items-center space-x-2 mt-1">
                     {loading ? (
-                      <span className="text-gray-500">Checking subscription...</span>
+                      <span className="text-gray-500">{t('checkingSubscription')}</span>
                     ) : hasActiveSubscription ? (
                       <>
                         <CheckCircle className="h-4 w-4 text-green-500" />
-                        <span className="text-green-600 font-medium">Membership Active</span>
+                        <span className="text-green-600 font-medium">{t('membershipActive')}</span>
                       </>
                     ) : (
                       <>
                         <Clock className="h-4 w-4 text-yellow-500" />
-                        <span className="text-yellow-600 font-medium">Free Tier</span>
+                        <span className="text-yellow-600 font-medium">{t('freeTier')}</span>
                       </>
                     )}
                   </div>
@@ -106,7 +108,7 @@ export default function DashboardPage() {
               {!hasActiveSubscription && !loading && (
                 <Link href="/pricing">
                   <Button>
-                    Upgrade to become a member
+                    {t('upgradeMember')}
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>
@@ -129,7 +131,7 @@ export default function DashboardPage() {
                     <p className="text-sm text-gray-600 mb-3">{action.description}</p>
                     <Link href={action.href}>
                       <Button variant="outline" size="sm" className="w-full">
-                        Open
+                        {t('open')}
                         <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
                     </Link>
@@ -148,24 +150,24 @@ export default function DashboardPage() {
           {/* Account Info */}
           <Card>
             <CardHeader>
-              <CardTitle>Account Information</CardTitle>
+              <CardTitle>{t('accountInformation')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Email</span>
+                  <span className="text-gray-600">{t('userEmail')}</span>
                   <span className="font-medium">{user.email}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Subscription</span>
+                  <span className="text-gray-600">{t('subscription')}</span>
                   <span className={`font-medium ${subscriptionTier ? 'text-green-600' : 'text-gray-600'}`}>
                     {subscriptionTier?.toUpperCase() || 'FREE'}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Favorite Tickers</span>
+                  <span className="text-gray-600">{t('favoriteTickers')}</span>
                   <span className="font-medium">
-                    {user.favoriteTickers?.length || 0} configured
+                    {user.favoriteTickers?.length || 0} {t('favoriteTickersCount')}
                   </span>
                 </div>
               </div>
@@ -175,7 +177,7 @@ export default function DashboardPage() {
           {/* Getting Started */}
           <Card>
             <CardHeader>
-              <CardTitle>Getting Started</CardTitle>
+              <CardTitle>{t('gettingStarted')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -186,8 +188,8 @@ export default function DashboardPage() {
                     </div>
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900">Set up your favorite tickers</p>
-                    <p className="text-sm text-gray-600">Add stocks you want to follow for daily updates</p>
+                    <p className="font-medium text-gray-900">{t('setupTickers')}</p>
+                    <p className="text-sm text-gray-600">{t('setupTickersDesc')}</p>
                   </div>
                 </div>
                 
@@ -198,8 +200,8 @@ export default function DashboardPage() {
                     </div>
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900">Browse AI analysis</p>
-                    <p className="text-sm text-gray-600">Explore our comprehensive financial reports</p>
+                    <p className="font-medium text-gray-900">{t('browseAIAnalysis')}</p>
+                    <p className="text-sm text-gray-600">{t('browseAIAnalysisDesc')}</p>
                   </div>
                 </div>
                 
@@ -210,8 +212,8 @@ export default function DashboardPage() {
                     </div>
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900">Receive daily updates</p>
-                    <p className="text-sm text-gray-600">Get analysis delivered to your inbox</p>
+                    <p className="font-medium text-gray-900">{t('receiveDailyUpdates')}</p>
+                    <p className="text-sm text-gray-600">{t('receiveDailyUpdatesDesc')}</p>
                   </div>
                 </div>
                 
@@ -219,7 +221,7 @@ export default function DashboardPage() {
                   <Link href="/settings">
                     <Button className="w-full">
                       <Star className="mr-2 h-4 w-4" />
-                      Configure Favorite Tickers
+                      {t('configureFavoriteTickers')}
                     </Button>
                   </Link>
                 </div>

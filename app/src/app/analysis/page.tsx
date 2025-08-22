@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useFavoriteTickers } from '@/hooks/useFavoriteTickers';
+import { useTranslation } from '@/hooks/useTranslation';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
@@ -26,6 +27,7 @@ export default function AnalysisPage() {
   const { user, firebaseUser, loading: authLoading } = useAuth();
   const { hasActiveSubscription, syncSubscription } = useSubscription();
   const { favoriteTickers } = useFavoriteTickers();
+  const { t } = useTranslation();
   const [analyses, setAnalyses] = useState<FinancialAnalysis[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedTicker, setSelectedTicker] = useState('');
@@ -169,7 +171,7 @@ export default function AnalysisPage() {
   };
 
   const formatDate = (date: unknown) => {
-    if (!date) return 'N/A';
+    if (!date) return t('analysisNotAvailable');
     
     // Handle Firestore Timestamp objects
     if (typeof date === 'object' && date !== null && '_seconds' in date) {
@@ -224,7 +226,7 @@ export default function AnalysisPage() {
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
-          <p className="mt-4 text-slate-600">Loading...</p>
+          <p className="mt-4 text-slate-600">{t('analysisLoading')}</p>
         </div>
       </div>
     );
@@ -236,10 +238,10 @@ export default function AnalysisPage() {
         <Card className="max-w-md">
           <CardContent className="text-center py-8">
             <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">Authentication Required</h2>
-            <p className="text-gray-600 mb-4">Please log in to view financial analyses.</p>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">{t('analysisAuthenticationRequired')}</h2>
+            <p className="text-gray-600 mb-4">{t('analysisAuthenticationDescription')}</p>
             <Link href="/login">
-              <Button>Log In</Button>
+              <Button>{t('analysisLogIn')}</Button>
             </Link>
           </CardContent>
         </Card>
@@ -253,10 +255,10 @@ export default function AnalysisPage() {
         <Card className="max-w-md">
           <CardContent className="text-center py-8">
             <TrendingUp className="h-12 w-12 text-blue-500 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">Subscription Required</h2>
-            <p className="text-gray-600 mb-4">Upgrade to access detailed financial analyses.</p>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">{t('analysisSubscriptionRequired')}</h2>
+            <p className="text-gray-600 mb-4">{t('analysisSubscriptionDescription')}</p>
             <Link href="/pricing">
-              <Button>View Pricing</Button>
+              <Button>{t('analysisViewPricing')}</Button>
             </Link>
           </CardContent>
         </Card>
@@ -278,7 +280,7 @@ export default function AnalysisPage() {
               </div>
               <div className="ml-3">
                 <p className="text-green-800">
-                  Welcome! Your subscription is now active. Enjoy unlimited access to AI-powered financial analysis.
+                  {t('analysisWelcomeMessage')}
                 </p>
               </div>
             </div>
@@ -287,8 +289,8 @@ export default function AnalysisPage() {
 
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900">Veloryn Financial Analysis</h1>
-          <p className="text-slate-600">AI-generated insights and market intelligence reports</p>
+          <h1 className="text-3xl font-bold text-slate-900">{t('analysisPageTitle')}</h1>
+          <p className="text-slate-600">{t('analysisPageSubtitle')}</p>
         </div>
 
         {/* Search and Filters */}
@@ -298,14 +300,14 @@ export default function AnalysisPage() {
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Ticker
+                    {t('analysisTicker')}
                   </label>
                   <select
                     value={selectedTicker}
                     onChange={(e) => setSelectedTicker(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
-                    <option value="">All Tickers</option>
+                    <option value="">{t('analysisAllTickers')}</option>
                     {availableTickers.map((ticker) => (
                       <option key={ticker} value={ticker}>
                         {ticker}
@@ -315,7 +317,7 @@ export default function AnalysisPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    From Date
+                    {t('analysisFromDate')}
                   </label>
                   <input
                     type="date"
@@ -326,7 +328,7 @@ export default function AnalysisPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    To Date
+                    {t('analysisToDate')}
                   </label>
                   <input
                     type="date"
@@ -338,7 +340,7 @@ export default function AnalysisPage() {
                 <div className="flex items-end">
                   <Button type="submit" className="w-full">
                     <Search className="h-4 w-4 mr-2" />
-                    Search
+                    {t('analysisSearch')}
                   </Button>
                 </div>
               </div>
@@ -358,7 +360,7 @@ export default function AnalysisPage() {
                     <div className="flex items-center space-x-1">
                       <Star className="h-4 w-4 text-yellow-500" />
                       <span className="text-sm font-medium text-gray-700">
-                        Show only my favorite tickers ({favoriteTickers.length})
+                        {t('analysisShowFavoritesOnly').replace('{count}', favoriteTickers.length.toString())}
                       </span>
                     </div>
                   </label>
@@ -378,7 +380,7 @@ export default function AnalysisPage() {
                       fetchAnalyses();
                     }}
                   >
-                    Clear All Filters
+                    {t('analysisClearAllFilters')}
                   </Button>
                 </div>
               )}
@@ -406,24 +408,24 @@ export default function AnalysisPage() {
               <TrendingUp className="h-16 w-16 text-gray-400 mx-auto mb-4" />
               {showFavoritesOnly ? (
                 <>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">No Analyses for Favorite Tickers</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('analysisNoAnalysesForFavorites')}</h3>
                   <p className="text-gray-600 mb-4">
-                    We don't have any analyses for your favorite tickers yet. Check back later or disable the favorites filter to see all available analyses.
+                    {t('analysisNoAnalysesForFavoritesDescription')}
                   </p>
                   <Button
                     variant="outline"
                     onClick={() => setShowFavoritesOnly(false)}
                   >
-                    Show All Analyses
+                    {t('analysisShowAllAnalyses')}
                   </Button>
                 </>
               ) : (
                 <>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">No Analysis Found</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('analysisNoAnalysisFound')}</h3>
                   <p className="text-gray-600 mb-4">
                     {selectedTicker || fromDate || toDate
-                      ? 'No analyses match your current filters.'
-                      : 'Financial analyses will appear here once they are generated.'}
+                      ? t('analysisNoAnalysisFoundDescription')
+                      : t('analysisNoAnalysisFoundGeneralDescription')}
                   </p>
                   {(selectedTicker || fromDate || toDate) && (
                     <Button
@@ -435,7 +437,7 @@ export default function AnalysisPage() {
                         fetchAnalyses();
                       }}
                     >
-                      Clear Filters
+                      {t('analysisClearFilters')}
                     </Button>
                   )}
                 </>
@@ -450,7 +452,9 @@ export default function AnalysisPage() {
                 <div className="flex items-center space-x-2">
                   <Star className="h-4 w-4 text-yellow-600" />
                   <span className="text-sm font-medium text-yellow-800">
-                    Showing {filteredAnalyses.length} of {analyses.length} analyses for your favorite tickers
+                    {t('analysisShowingFavoritesCount')
+                      .replace('{filtered}', filteredAnalyses.length.toString())
+                      .replace('{total}', analyses.length.toString())}
                   </span>
                 </div>
               </div>
@@ -482,7 +486,7 @@ export default function AnalysisPage() {
                               {companyName}
                             </CardTitle>
                             {isFavorite && (
-                              <div title="Favorite ticker">
+                              <div title={t('analysisFavoriteTickerTitle')}>
                                 <Star className="h-5 w-5 text-yellow-500 fill-current" />
                               </div>
                             )}
@@ -511,7 +515,7 @@ export default function AnalysisPage() {
                               <Calendar className="h-4 w-4" />
                               <span>{formatDate(analysis.timestamp || analysis.created_at || analysis.day)}</span>
                             </div>
-                            <span className="text-emerald-600 font-medium">AI Analysis</span>
+                            <span className="text-emerald-600 font-medium">{t('analysisAIAnalysis')}</span>
                           </div>
                         </div>
                       </div>
@@ -520,16 +524,8 @@ export default function AnalysisPage() {
                     <CardContent className="pt-0">
                       {/* Description Preview */}
                       <div className="mb-4">
-                        <p className="text-gray-700 leading-relaxed">
-                          {isExpanded ? description : 
-                            description.length > 200 ? 
-                              `${description.substring(0, 200)}...` : 
-                              description
-                          }
-                        </p>
-                        {isExpanded && (
                           <div className="mb-2">
-                            <span className="text-sm font-medium text-gray-700">Official Website: </span>
+                            <span className="text-sm font-medium text-gray-700">{t('analysisOfficialWebsite')}: </span>
                             <a 
                               href={officialSite} 
                               target="_blank" 
@@ -540,66 +536,12 @@ export default function AnalysisPage() {
                               <ExternalLink className="h-3 w-3" />
                             </a>
                           </div>
-                        )}
-                        
-                        {description.length > 200 && (
-                          <button
-                            onClick={() => toggleCardExpansion(analysis.id)}
-                            className="mt-2 text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center gap-1"
-                          >
-                            {isExpanded ? (
-                              <>
-                                <ChevronUp className="h-4 w-4" />
-                                Show Less
-                              </>
-                            ) : (
-                              <>
-                                <ChevronDown className="h-4 w-4" />
-                                Show More
-                              </>
-                            )}
-                          </button>
-                        )}
                       </div>
-
-                      {/* Additional Info when expanded */}
-                      {/* {isExpanded && (
-                        <div className="mb-4 p-4 bg-gray-50 rounded-lg">
-                          {officialSite && (
-                            <div className="mb-2">
-                              <span className="text-sm font-medium text-gray-700">Official Website: </span>
-                              <a 
-                                href={officialSite} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="text-blue-600 hover:text-blue-800 inline-flex items-center gap-1"
-                              >
-                                {officialSite}
-                                <ExternalLink className="h-3 w-3" />
-                              </a>
-                            </div>
-                          )}
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-                            {analysis.description && (
-                              <div>
-                                <span className="font-medium text-gray-700">Description: </span>
-                                <span className="text-gray-600">{analysis.description}</span>
-                              </div>
-                            )}
-                            {analysis.link && (
-                              <div>
-                                <span className="font-medium text-gray-700">Link: </span>
-                                <span className="text-gray-600">{analysis.link}</span>
-                              </div>
-                            )}
-                          </div>
-                        </div> */}
-                      {/* )} */}
                       
                       {/* Tags */}
                       <div className="flex flex-wrap gap-2 mb-4">
                         <span className="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-sm">
-                          Financial Analysis
+                          {t('analysisFinancialAnalysisTag')}
                         </span>
                         {industry && (
                           <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
@@ -611,7 +553,7 @@ export default function AnalysisPage() {
                       {/* Action Button */}
                       <Link href={`/analysis/${analysis.id}`} className="block">
                         <Button className="w-full">
-                          Read Full Analysis
+                          {t('analysisReadFullAnalysis')}
                           <ChevronRight className="h-4 w-4 ml-2" />
                         </Button>
                       </Link>

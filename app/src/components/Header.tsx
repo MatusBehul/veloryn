@@ -6,13 +6,16 @@ import { signOut } from 'firebase/auth';
 import { getFirebaseAuth } from '@/lib/firebase';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSubscription } from '@/hooks/useSubscription';
+import { useTranslation } from '@/hooks/useTranslation';
 import { Button } from '@/components/ui/Button';
 import { VelorynLogo } from '@/components/VelorynLogo';
+import { LanguagePreferenceSelector } from '@/components/LanguagePreferenceSelector';
 import { User, LogOut, CreditCard, Crown, Plus } from 'lucide-react';
 
 export function Header() {
   const { user } = useAuth();
   const { hasActiveSubscription, createPortalSession, createCheckoutSession, loading, subscriptionTier } = useSubscription();
+  const { t } = useTranslation();
 
   const handleLogout = async () => {
     try {
@@ -60,14 +63,14 @@ export function Header() {
                   href="/pricing"
                   className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
                 >
-                  Pricing
+                  {t('pricing')}
                 </Link>
 
                 <Link
                   href="/dashboard"
                   className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
                 >
-                  Dashboard
+                  {t('dashboard')}
                 </Link>
                 
                 {hasActiveSubscription && (
@@ -75,7 +78,7 @@ export function Header() {
                     href="/analysis"
                     className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
                   >
-                    Analysis
+                    {t('analysis')}
                   </Link>
                 )}
 
@@ -83,7 +86,7 @@ export function Header() {
                   href="/settings"
                   className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
                 >
-                  Settings
+                  {t('settings')}
                 </Link>
                 
                 {/* Membership Status & Actions */}
@@ -99,7 +102,7 @@ export function Header() {
                         size="sm"
                         onClick={handleManageSubscription}
                         className="p-2"
-                        title="Manage Subscription"
+                        title={t('manage_subscription')}
                         disabled={loading}
                       >
                         <CreditCard className="h-4 w-4" />
@@ -113,12 +116,13 @@ export function Header() {
                         className="flex items-center space-x-1"
                       >
                         <Plus className="h-4 w-4" />
-                        <span>Upgrade</span>
+                        <span>{t('upgrade')}</span>
                       </Button>
                     </Link>
                   )}
                   
                   {/* Language Selector */}
+                  <LanguagePreferenceSelector />
                   
                   <div className="flex items-center space-x-2">
                     <div className="flex items-center space-x-1">
@@ -130,7 +134,7 @@ export function Header() {
                       size="sm"
                       onClick={handleLogout}
                       className="p-2"
-                      title="Sign Out"
+                      title={t('logout')}
                     >
                       <LogOut className="h-4 w-4" />
                     </Button>
@@ -143,20 +147,21 @@ export function Header() {
                   href="/pricing"
                   className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
                 >
-                  Pricing
+                  {t('pricing')}
                 </Link>
                 <Link
                   href="/contact"
                   className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
                 >
-                  Contact
+                  {t('contact')}
                 </Link>
                 <div className="flex items-center space-x-2 border-l border-gray-200 pl-4">
                   {/* Language Selector for non-authenticated users */}
-                  <span className="text-sm text-gray-600">Starting at €2/month</span>
+                  <LanguagePreferenceSelector />
+                                    <span className="text-sm text-gray-600">{t('starting_at_price')}</span>
                   <Link href="/login">
                     <Button variant="outline" size="sm">
-                      Sign In
+                      {t('login')}
                     </Button>
                   </Link>
                 </div>

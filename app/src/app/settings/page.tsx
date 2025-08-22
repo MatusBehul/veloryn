@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useFavoriteTickers } from '@/hooks/useFavoriteTickers';
+import { useTranslation } from '@/hooks/useTranslation';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
@@ -11,6 +12,7 @@ import { ArrowLeft, Plus, X, Bell, Star } from 'lucide-react';
 
 export default function SettingsPage() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const {
     favoriteTickers,
     loading,
@@ -31,7 +33,7 @@ export default function SettingsPage() {
       setSaving(true);
       await addTicker(newTicker.trim());
       setNewTicker('');
-      setSuccessMessage('Ticker added successfully!');
+      setSuccessMessage(t('tickerAddedSuccessfully'));
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err) {
       console.error('Error adding ticker:', err);
@@ -41,11 +43,11 @@ export default function SettingsPage() {
   };
 
   const handleRemoveTicker = async (symbol: string) => {
-    if (!window.confirm(`Are you sure you want to remove ${symbol} from your favorites?`)) return;
+    if (!window.confirm(t('removeTickerConfirmation').replace('{symbol}', symbol))) return;
     try {
       setSaving(true);
       await removeTicker(symbol);
-      setSuccessMessage('Ticker removed successfully!');
+      setSuccessMessage(t('tickerRemovedSuccessfully'));
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err) {
       console.error('Error removing ticker:', err);
@@ -58,7 +60,10 @@ export default function SettingsPage() {
     try {
       setSaving(true);
       await toggleDailyUpdates(symbol, enabled);
-      setSuccessMessage(`Daily updates ${enabled ? 'enabled' : 'disabled'} for ${symbol}`);
+      const message = enabled 
+        ? t('dailyUpdatesEnabledFor').replace('{symbol}', symbol)
+        : t('dailyUpdatesDisabledFor').replace('{symbol}', symbol);
+      setSuccessMessage(message);
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err) {
       console.error('Error toggling daily updates:', err);
@@ -78,10 +83,10 @@ export default function SettingsPage() {
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardContent className="py-8 text-center">
-            <h2 className="text-xl font-semibold mb-4">Authentication Required</h2>
-            <p className="text-gray-600 mb-4">Please log in to access your settings.</p>
+            <h2 className="text-xl font-semibold mb-4">{t('settingsAuthenticationRequired')}</h2>
+            <p className="text-gray-600 mb-4">{t('settingsPleaseLogInToAccessSettings')}</p>
             <Link href="/login">
-              <Button>Go to Login</Button>
+              <Button>{t('settingsGoToLogin')}</Button>
             </Link>
           </CardContent>
         </Card>
@@ -96,10 +101,10 @@ export default function SettingsPage() {
         <div className="mb-8">
           <Link href="/dashboard" className="inline-flex items-center text-blue-500 hover:text-blue-600 mb-4">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Dashboard
+            {t('settingsBackToDashboard')}
           </Link>
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">Settings</h1>
-          <p className="text-slate-600">Manage your favorite tickers and daily update preferences</p>
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">{t('settingsTitle')}</h1>
+          <p className="text-slate-600">{t('manageFavoriteTickersAndDailyUpdates')}</p>
         </div>
 
         {/* Error and Success Messages */}
@@ -120,10 +125,10 @@ export default function SettingsPage() {
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Star className="h-5 w-5 text-yellow-500" />
-              <span>Favorite Tickers</span>
+              <span>{t('favoriteTickersSection')}</span>
             </CardTitle>
             <p className="text-sm text-gray-600">
-              Add stock tickers you want to follow. You can enable daily analysis updates for each ticker.
+              {t('addStockTickersDescription')}
             </p>
           </CardHeader>
           <CardContent>
@@ -131,7 +136,7 @@ export default function SettingsPage() {
             <div className="mb-6">
               <div className="flex space-x-2">
                 <Input
-                  placeholder="Enter ticker symbol (e.g., AAPL, GOOGL)"
+                  placeholder={t('enterTickerSymbol')}
                   value={newTicker}
                   onChange={(e) => setNewTicker(e.target.value)}
                   onKeyPress={handleKeyPress}
@@ -144,7 +149,7 @@ export default function SettingsPage() {
                   className="flex items-center space-x-2"
                 >
                   <Plus className="h-4 w-4" />
-                  <span>Add</span>
+                  <span>{t('settingsAdd')}</span>
                 </Button>
               </div>
             </div>
@@ -152,13 +157,13 @@ export default function SettingsPage() {
             {/* Tickers List */}
             {loading ? (
               <div className="text-center py-8">
-                <p className="text-gray-500">Loading your favorite tickers...</p>
+                <p className="text-gray-500">{t('loadingFavoriteTickers')}</p>
               </div>
             ) : favoriteTickers.length === 0 ? (
               <div className="text-center py-8">
                 <Star className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                <p className="text-gray-500 mb-2">No favorite tickers yet</p>
-                <p className="text-sm text-gray-400">Add some tickers above to get started with daily updates</p>
+                <p className="text-gray-500 mb-2">{t('noFavoriteTickersYetSettings')}</p>
+                <p className="text-sm text-gray-400">{t('addSomeTickersAboveToGetStarted')}</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -171,7 +176,7 @@ export default function SettingsPage() {
                           <p className="text-sm text-gray-600">{ticker.name}</p>
                         )}
                         {ticker.dailyUpdates && (
-                          <span className="ml-2 px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full align-middle">Daily</span>
+                          <span className="ml-2 px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full align-middle">{t('dailyBadge')}</span>
                         )}
                       </div>
                     </div>
@@ -197,7 +202,7 @@ export default function SettingsPage() {
                           </div>
                         </label>
                         <span className="text-sm text-gray-600">
-                          {ticker.dailyUpdates ? 'Daily updates on' : 'Daily updates off'}
+                          {ticker.dailyUpdates ? t('dailyUpdatesOn') : t('dailyUpdatesOff')}
                         </span>
                       </div>
 
@@ -222,12 +227,12 @@ export default function SettingsPage() {
         {/* Info Section */}
         <Card>
           <CardContent className="py-6">
-            <h3 className="font-semibold text-gray-900 mb-2">About Daily Updates</h3>
+            <h3 className="font-semibold text-gray-900 mb-2">{t('aboutDailyUpdates')}</h3>
             <div className="space-y-2 text-sm text-gray-600">
-              <p>• Daily updates will be sent to your registered email address</p>
-              <p>• Updates include AI-generated analysis, technical indicators, and market sentiment</p>
-              <p>• You can enable or disable updates for individual tickers at any time</p>
-              <p>• Updates are sent on market days (Monday-Friday) before market open</p>
+              <p>{t('dailyUpdatesDescription1')}</p>
+              <p>{t('dailyUpdatesDescription2')}</p>
+              <p>{t('dailyUpdatesDescription3')}</p>
+              <p>{t('dailyUpdatesDescription4')}</p>
             </div>
           </CardContent>
         </Card>

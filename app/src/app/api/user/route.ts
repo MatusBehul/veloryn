@@ -45,6 +45,7 @@ export async function GET(request: NextRequest) {
             name: firebaseUser.name || null,
             subscriptionStatus: 'inactive',
             favoriteTickers: [],
+            preferredLanguage: 'en', // Default to English
             createdAt: new Date(),
             updatedAt: new Date(),
           };

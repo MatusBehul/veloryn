@@ -13,6 +13,7 @@ interface AuthContextType {
   signUp: (email: string, password: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -38,7 +39,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const ensureIntegrationProfile = async (token: string, email: string) => {
     // Check if integration is enabled
     if (process.env.NEXT_PUBLIC_ENABLE_INTEGRATION !== 'true') {
-      console.log('🔇 Integration disabled, skipping profile creation');
+      // console.log('🔇 Integration disabled, skipping profile creation');
       return;
     }
 
@@ -71,6 +72,39 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
+  // Function to fetch user data
+  const fetchUserData = async (firebaseUser: FirebaseUser) => {
+    try {
+      const token = await firebaseUser.getIdToken();
+      const response = await fetch('/api/user', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      
+      if (response.ok) {
+        const userData = await response.json();
+        setUser(userData);
+        
+        // Ensure user profile exists in integration platform
+        await ensureIntegrationProfile(token, firebaseUser.email!);
+      } else {
+        console.error('Error fetching user data');
+        setUser(null);
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      setUser(null);
+    }
+  };
+
+  // Function to refresh user data manually
+  const refreshUser = async () => {
+    if (firebaseUser) {
+      await fetchUserData(firebaseUser);
+    }
+  };
+
   useEffect(() => {
     const auth = getFirebaseAuth();
     if (!auth) {
@@ -83,29 +117,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setFirebaseUser(firebaseUser);
       
       if (firebaseUser) {
-        // Fetch user data with subscription info
-        try {
-          const token = await firebaseUser.getIdToken();
-          const response = await fetch('/api/user', {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          
-          if (response.ok) {
-            const userData = await response.json();
-            setUser(userData);
-            
-            // Ensure user profile exists in integration platform
-            await ensureIntegrationProfile(token, firebaseUser.email!);
-          } else {
-            console.error('Error fetching user data');
-            setUser(null);
-          }
-        } catch (error) {
-          console.error('Error fetching user data:', error);
-          setUser(null);
-        }
+        await fetchUserData(firebaseUser);
       } else {
         setUser(null);
       }
@@ -149,6 +161,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     signUp,
     signInWithGoogle,
     logout,
+    refreshUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

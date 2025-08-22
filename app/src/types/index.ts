@@ -14,6 +14,7 @@ export interface User {
   customerId?: string;
   currentPeriodEnd?: number;
   favoriteTickers?: FavoriteTicker[];
+  preferredLanguage?: string;
 }
 
 // New comprehensive analysis structure types
