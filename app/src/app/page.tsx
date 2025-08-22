@@ -82,11 +82,11 @@ export default function HomePage() {
                 <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
                   <TrendingUp className="h-6 w-6 text-blue-500" />
                 </div>
-                <CardTitle>{t('realTimeTitle')}</CardTitle>
+                <CardTitle>{t('secFillingAnalysisTitle')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-slate-600">
-                  {t('realTimeDescription')}
+                  {t('secFillingAnalysisDescription')}
                 </p>
               </CardContent>
             </Card>
@@ -96,11 +96,11 @@ export default function HomePage() {
                 <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center mb-4">
                   <BarChart3 className="h-6 w-6 text-emerald-600" />
                 </div>
-                <CardTitle>{t('aiAnalysisTitle')}</CardTitle>
+                <CardTitle>{t('marketDataAnalysisTitle')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600">
-                  {t('aiAnalysisDescription')}
+                  {t('marketDataAnalysisDescription')}
                 </p>
               </CardContent>
             </Card>
@@ -110,11 +110,11 @@ export default function HomePage() {
                 <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
                   <Brain className="h-6 w-6 text-purple-600" />
                 </div>
-                <CardTitle>{t('portfolioTitle')}</CardTitle>
+                <CardTitle>{t('sentimentAnalysisTitle')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600">
-                  {t('portfolioDescription')}
+                  {t('sentimentAnalysisDescription')}
                 </p>
               </CardContent>
             </Card>
@@ -124,11 +124,11 @@ export default function HomePage() {
                 <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mb-4">
                   <Shield className="h-6 w-6 text-red-600" />
                 </div>
-                <CardTitle>{t('dataAccessTitle')}</CardTitle>
+                <CardTitle>{t('riskManagementTitle')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600">
-                  {t('dataAccessDescription')}
+                  {t('riskManagementDescription')}
                 </p>
               </CardContent>
             </Card>
@@ -138,11 +138,11 @@ export default function HomePage() {
                 <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mb-4">
                   <Zap className="h-6 w-6 text-yellow-600" />
                 </div>
-                <CardTitle>{t('aiAnalysisTitle')}</CardTitle>
+                <CardTitle>{t('tradingStrategiesTitle')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600">
-                  {t('aiAnalysisDescription')}
+                  {t('tradingStrategiesDescription')}
                 </p>
               </CardContent>
             </Card>
@@ -152,11 +152,11 @@ export default function HomePage() {
                 <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
                   <Users className="h-6 w-6 text-indigo-600" />
                 </div>
-                <CardTitle>{t('intelligentTitle')}</CardTitle>
+                <CardTitle>{t('multiAgentCollaborationTitle')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600">
-                  {t('intelligentDescription')}
+                  {t('multiAgentCollaborationDescription')}
                 </p>
               </CardContent>
             </Card>
@@ -191,16 +191,16 @@ export default function HomePage() {
                 <div className="flex items-start">
                   <CheckCircle className="h-6 w-6 text-green-500 mt-1 mr-3 flex-shrink-0" />
                   <div>
-                    <h3 className="font-semibold text-gray-900">{t('intelligentTitle')}</h3>
-                    <p className="text-gray-600">{t('intelligentDescription')}</p>
+                    <h3 className="font-semibold text-gray-900">{t('tradingStrategiesTitle')}</h3>
+                    <p className="text-gray-600">{t('tradingStrategiesDescription')}</p>
                   </div>
                 </div>
                 
                 <div className="flex items-start">
                   <CheckCircle className="h-6 w-6 text-green-500 mt-1 mr-3 flex-shrink-0" />
                   <div>
-                    <h3 className="font-semibold text-gray-900">{t('riskManagementTitle')}</h3>
-                    <p className="text-gray-600">{t('riskManagementDescription')}</p>
+                    <h3 className="font-semibold text-gray-900">{t('multiAgentCollaborationTitle')}</h3>
+                    <p className="text-gray-600">{t('multiAgentCollaborationDescription')}</p>
                   </div>
                 </div>
                 
