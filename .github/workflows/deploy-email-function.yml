@@ -79,4 +79,4 @@ jobs:
           --trigger-topic email-analysis-requests \
           --memory 512MB \
           --timeout 540s \
-          --set-env-vars="GCP_PROJECT=${{ vars.GOOGLE_CLOUD_PROJECT }},MAILGUN_API_KEY=${{ secrets.MAILGUN_API_KEY }},MAILGUN_DOMAIN=${{ vars.MAILGUN_DOMAIN }}"
+          --set-env-vars="ISPROD=${{ vars.ISPROD }},GCP_PROJECT=${{ vars.GOOGLE_CLOUD_PROJECT }},MAILGUN_API_KEY=${{ secrets.MAILGUN_API_KEY }},MAILGUN_DOMAIN=${{ vars.MAILGUN_DOMAIN }}"
