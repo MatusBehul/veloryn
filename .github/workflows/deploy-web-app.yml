@@ -47,6 +47,16 @@ jobs:
     - name: Create build-time .env for Next.js
       run: |
         cd app
+        echo "=== Environment: ${{ env.DEPLOY_ENV }} ==="
+        echo "=== Checking environment variables ==="
+        echo "GOOGLE_CLOUD_PROJECT: ${{ vars.GOOGLE_CLOUD_PROJECT }}"
+        echo "GOOGLE_CLOUD_LOCATION: ${{ vars.GOOGLE_CLOUD_LOCATION }}"
+        echo "FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY != '' && 'SET' || 'MISSING' }}"
+        echo "FIREBASE_CLIENT_EMAIL: ${{ secrets.FIREBASE_CLIENT_EMAIL != '' && 'SET' || 'MISSING' }}"
+        echo "FIREBASE_PRIVATE_KEY: ${{ secrets.FIREBASE_PRIVATE_KEY != '' && 'SET' || 'MISSING' }}"
+        echo "STRIPE_PUBLISHABLE_KEY: ${{ secrets.STRIPE_PUBLISHABLE_KEY != '' && 'SET' || 'MISSING' }}"
+        echo "STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY != '' && 'SET' || 'MISSING' }}"
+        echo "=== Creating .env file ==="
         echo "NEXT_PUBLIC_FIREBASE_PROJECT_ID=${{ vars.GOOGLE_CLOUD_PROJECT }}" >> .env
         echo "NEXT_PUBLIC_FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY }}" >> .env
         echo "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=${{ vars.GOOGLE_CLOUD_PROJECT }}.firebaseapp.com" >> .env
