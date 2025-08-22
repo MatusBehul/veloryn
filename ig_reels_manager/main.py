@@ -18,7 +18,9 @@ def run(cmd):
 
 def elevenlabs_tts(text: str, out_audio_path: str):
     api_key = os.environ["ELEVENLABS_API_KEY"]
-    voice_id = os.environ.get("ELEVENLABS_VOICE_ID", "JBFqnCBsd6RMkjVDRZzb")
+    if not api_key:
+        raise ValueError("Missing ELEVENLABS_API_KEY environment variable.")
+    voice_id = "JBFqnCBsd6RMkjVDRZzb"
     url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}"
     headers = {
         "xi-api-key": api_key,
@@ -27,7 +29,7 @@ def elevenlabs_tts(text: str, out_audio_path: str):
     }
     payload = {
         "text": text,
-        "model_id": os.environ.get("ELEVENLABS_MODEL", "eleven_multilingual_v2"),
+        "model_id": "eleven_multilingual_v2",
         "voice_settings": {"stability": 0.35, "similarity_boost": 0.7},
     }
     with requests.post(url, headers=headers, json=payload, stream=True, timeout=120) as r:
