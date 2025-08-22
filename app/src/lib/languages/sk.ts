@@ -461,5 +461,19 @@ export const SK_TRANSLATIONS = {
     faqQuestion3: 'Existuje bezplatná skúšobná verzia?',
     faqAnswer3: 'Áno, môžete začať s bezplatným plánom a preskúmať základné funkcie pred prechodom na Premium.',
     faqQuestion4: 'Ako presné sú predikcie AI?',
-    faqAnswer4: 'Naša AI poskytuje analýzy iba na vzdelávacie účely. Nie je to finančné poradenstvo a presnosť nie je zaručená.'
+    faqAnswer4: 'Naša AI poskytuje analýzy iba na vzdelávacie účely. Nie je to finančné poradenstvo a presnosť nie je zaručená.',
+
+    // login page translations (Slovak)
+    loginPageSignUpTitleMessage: 'Vytvorte si účet',
+    loginPageSignInTitleMessage: 'Prihláste sa do svojho účtu',
+    loginPageAccessTitle: 'Prístup k finančnej analýze inštitucionálnej kvality',
+    loginPageEmailLabel: 'Emailová adresa',
+    loginPagePasswordLabel: 'Heslo',
+    loginPageSignIn: 'Prihlásiť sa',
+    loginPageSignUp: 'Registrovať sa',
+    loginPageOrContinueWith: 'Alebo pokračovať s',
+    loginPageSignInWithGoogle: 'Prihlásiť sa cez Google',
+    loginPageDontHaveAccount: "Nemáte účet? Zaregistrujte sa",
+    loginPageAlreadyHaveAccount: 'Máte už účet? Prihláste sa',
+    loginPageDisclaimer: 'Táto platforma poskytuje finančné analýzy generované AI iba na vzdelávacie a výskumné účely. Nie je to finančné poradenstvo.',
 } as const;

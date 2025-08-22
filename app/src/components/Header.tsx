@@ -9,7 +9,7 @@ import { useSubscription } from '@/hooks/useSubscription';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Button } from '@/components/ui/Button';
 import { VelorynLogo } from '@/components/VelorynLogo';
-import { LanguagePreferenceSelector } from '@/components/LanguagePreferenceSelector';
+import { LanguageSelector } from '@/components/LanguageSelector';
 import { User, LogOut, CreditCard, Crown, Plus } from 'lucide-react';
 
 export function Header() {
@@ -122,7 +122,7 @@ export function Header() {
                   )}
                   
                   {/* Language Selector */}
-                  <LanguagePreferenceSelector />
+                  <LanguageSelector variant="dropdown" />
                   
                   <div className="flex items-center space-x-2">
                     <div className="flex items-center space-x-1">
@@ -157,7 +157,7 @@ export function Header() {
                 </Link>
                 <div className="flex items-center space-x-2 border-l border-gray-200 pl-4">
                   {/* Language Selector for non-authenticated users */}
-                  <LanguagePreferenceSelector />
+                  <LanguageSelector variant="dropdown" />
                                     <span className="text-sm text-gray-600">{t('starting_at_price')}</span>
                   <Link href="/login">
                     <Button variant="outline" size="sm">

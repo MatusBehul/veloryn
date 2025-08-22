@@ -48,11 +48,23 @@ export async function POST(request: NextRequest) {
       try {
         const userDocRef = adminDb.collection('users').doc(uid);
         
-        // Update the user document with the new preferred language
-        await userDocRef.update({
-          preferredLanguage: preferredLanguage,
-          updatedAt: new Date(),
-        });
+        // Check if user document exists
+        const userDoc = await userDocRef.get();
+        
+        if (userDoc.exists) {
+          // Update existing user document
+          await userDocRef.update({
+            preferredLanguage: preferredLanguage,
+            updatedAt: new Date(),
+          });
+        } else {
+          // Create new user document if it doesn't exist
+          await userDocRef.set({
+            preferredLanguage: preferredLanguage,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          });
+        }
 
         console.log(`Updated preferred language to ${preferredLanguage} for user ${uid}`);
 

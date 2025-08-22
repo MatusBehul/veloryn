@@ -8,6 +8,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { MarketingContent } from '@/components/MarketingContent';
+import { ClientOnly } from '@/components/ClientOnly';
 import { 
   TrendingUp, 
   BarChart3, 
@@ -48,7 +49,7 @@ export default function HomePage() {
                 <>
                   <Link href="/login">
                     <Button size="lg" className="text-lg px-8 py-3">
-                      {t('get_started')} - €5/month
+                      {t('starting_at_price')}
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Button>
                   </Link>

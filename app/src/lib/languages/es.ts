@@ -462,4 +462,18 @@ export const ES_TRANSLATIONS = {
     faqAnswer3: 'Sí, puede comenzar con nuestro plan gratuito para explorar funciones básicas antes de mejorar a Premium.',
     faqQuestion4: '¿Qué tan precisas son las predicciones de IA?',
     faqAnswer4: 'Nuestra IA proporciona análisis solo con fines educativos. No es asesoramiento financiero y la precisión no está garantizada.',
+
+    // login page translations (Spanish)
+    loginPageSignUpTitleMessage: 'Crea tu cuenta',
+    loginPageSignInTitleMessage: 'Inicia sesión en tu cuenta',
+    loginPageAccessTitle: 'Accede a análisis financieros de calidad institucional',
+    loginPageEmailLabel: 'Correo electrónico',
+    loginPagePasswordLabel: 'Contraseña',
+    loginPageSignIn: 'Iniciar sesión',
+    loginPageSignUp: 'Registrarse',
+    loginPageOrContinueWith: 'O continuar con',
+    loginPageSignInWithGoogle: 'Iniciar sesión con Google',
+    loginPageDontHaveAccount: "¿No tienes una cuenta? Regístrate",
+    loginPageAlreadyHaveAccount: '¿Ya tienes una cuenta? Inicia sesión',
+    loginPageDisclaimer: 'Esta plataforma proporciona análisis financieros generados por IA solo con fines educativos e investigativos. No es asesoramiento financiero.'
 } as const;

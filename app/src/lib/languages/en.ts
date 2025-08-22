@@ -461,5 +461,19 @@ export const EN_TRANSLATIONS = {
     faqQuestion3: 'Is there a free trial?',
     faqAnswer3: 'Yes, you can start with our free plan to explore basic features before upgrading to Premium.',
     faqQuestion4: 'How accurate are the AI predictions?',
-    faqAnswer4: 'Our AI provides analysis for educational purposes only. It\'s not financial advice and accuracy is not guaranteed.'
+    faqAnswer4: 'Our AI provides analysis for educational purposes only. It\'s not financial advice and accuracy is not guaranteed.',
+
+    // login page translations
+    loginPageSignUpTitleMessage: 'Create your account',
+    loginPageSignInTitleMessage: 'Sign in to your account',
+    loginPageAccessTitle: 'Access institutional-quality financial analysis',
+    loginPageEmailLabel: 'Email address',
+    loginPagePasswordLabel: 'Password',
+    loginPageSignIn: 'Sign in',
+    loginPageSignUp: 'Sign up',
+    loginPageOrContinueWith: 'Or continue with',
+    loginPageSignInWithGoogle: 'Sign in with Google',
+    loginPageDontHaveAccount: "Don't have an account? Sign up",
+    loginPageAlreadyHaveAccount: 'Already have an account? Sign in',
+    loginPageDisclaimer: 'This platform provides AI-generated financial analysis for educational and research purposes only. Not financial advice.',
 } as const;

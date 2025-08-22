@@ -4,6 +4,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User as FirebaseUser, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { getFirebaseAuth } from '@/lib/firebase';
 import { User } from '@/types';
+import { syncLanguageOnLogin } from '@/lib/languages/auth-helpers';
 
 interface AuthContextType {
   user: User | null;
@@ -88,6 +89,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
         
         // Ensure user profile exists in integration platform
         await ensureIntegrationProfile(token, firebaseUser.email!);
+        
+        // Sync language preferences
+        await syncLanguageOnLogin(firebaseUser);
       } else {
         console.error('Error fetching user data');
         setUser(null);

@@ -97,21 +97,24 @@ export type UITranslationKey = keyof typeof EN_TRANSLATIONS;
 
 // Function to get UI translation
 export function getUITranslation(key: UITranslationKey, languageCode: string = DEFAULT_LANGUAGE): string {
+    // Fallback to the key itself if translation is not found
+    const fallback = EN_TRANSLATIONS[key] || key;
+    
     switch (languageCode) {
     case 'en':
-      return EN_TRANSLATIONS[key] || EN_TRANSLATIONS[key] || key;
+      return EN_TRANSLATIONS[key] || fallback;
     case 'de':
-      return DE_TRANSLATIONS[key] || EN_TRANSLATIONS[key] || key;
+      return DE_TRANSLATIONS[key] || fallback;
     case 'it':
-      return IT_TRANSLATIONS[key] || EN_TRANSLATIONS[key] || key;
+      return IT_TRANSLATIONS[key] || fallback;
     case 'es':
-      return ES_TRANSLATIONS[key] || EN_TRANSLATIONS[key] || key;
+      return ES_TRANSLATIONS[key] || fallback;
     case 'sk':
-      return SK_TRANSLATIONS[key] || EN_TRANSLATIONS[key] || key;
+      return SK_TRANSLATIONS[key] || fallback;
     case 'cz':
-      return CZ_TRANSLATIONS[key] || EN_TRANSLATIONS[key] || key;
+      return CZ_TRANSLATIONS[key] || fallback;
     // Future cases for other languages can be added here
     default:
-      return EN_TRANSLATIONS[key] || EN_TRANSLATIONS[key] || key;
+      return fallback;
     }
 }

@@ -461,5 +461,20 @@ export const DE_TRANSLATIONS = {
     faqQuestion3: 'Gibt es eine kostenlose Testphase?',
     faqAnswer3: 'Ja, starten Sie mit unserem kostenlosen Plan, um die Basisfunktionen zu erkunden, bevor Sie auf Premium upgraden.',
     faqQuestion4: 'Wie genau sind die KI-Vorhersagen?',
-    faqAnswer4: 'Unsere KI liefert Analysen ausschließlich zu Bildungszwecken. Es ist keine Finanzberatung und Genauigkeit ist nicht garantiert.'
+    faqAnswer4: 'Unsere KI liefert Analysen ausschließlich zu Bildungszwecken. Es ist keine Finanzberatung und Genauigkeit ist nicht garantiert.',
+
+    // login page translations (German)
+    loginPageSignUpTitleMessage: 'Erstellen Sie Ihr Konto',
+    loginPageSignInTitleMessage: 'Melden Sie sich bei Ihrem Konto an',
+    loginPageAccessTitle: 'Zugang zu Finanzanalysen in institutioneller Qualität',
+    loginPageEmailLabel: 'E-Mail-Adresse',
+    loginPagePasswordLabel: 'Passwort',
+    loginPageSignIn: 'Anmelden',
+    loginPageSignUp: 'Registrieren',
+    loginPageOrContinueWith: 'Oder fortfahren mit',
+    loginPageSignInWithGoogle: 'Mit Google anmelden',
+    loginPageDontHaveAccount: "Noch kein Konto? Registrieren",
+    loginPageAlreadyHaveAccount: 'Sie haben bereits ein Konto? Anmelden',
+    loginPageDisclaimer: 'Diese Plattform bietet KI-generierte Finanzanalysen ausschließlich zu Bildungs- und Forschungszwecken. Keine Finanzberatung.',
+
 } as const;

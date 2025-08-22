@@ -8,6 +8,7 @@ import { Card, CardContent } from '@/components/ui/Card';
 import { FirebaseDebug } from '@/components/FirebaseDebug';
 import { TrendingUp } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -15,6 +16,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const { t } = useTranslation();
 
   const { signIn, signUp, signInWithGoogle } = useAuth();
   const router = useRouter();
@@ -64,10 +66,10 @@ export default function LoginPage() {
           <TrendingUp className="h-12 w-12 text-blue-600" />
         </div>
         <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
-          {isLogin ? 'Sign in to your account' : 'Create your account'}
+          {isLogin ? t('loginPageSignInTitleMessage') : t('loginPageSignUpTitleMessage')}
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
-          Access institutional-quality financial analysis
+          {t('loginPageAccessTitle')}
         </p>
       </div>
 
@@ -82,7 +84,7 @@ export default function LoginPage() {
               )}
 
               <Input
-                label="Email address"
+                label={t('loginPageEmailLabel')}
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -91,7 +93,7 @@ export default function LoginPage() {
               />
 
               <Input
-                label="Password"
+                label={t('loginPagePasswordLabel')}
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -104,7 +106,7 @@ export default function LoginPage() {
                 className="w-full"
                 loading={loading}
               >
-                {isLogin ? 'Sign in' : 'Sign up'}
+                {isLogin ? t('loginPageSignIn') : t('loginPageSignUp')}
               </Button>
 
               <div className="relative">
@@ -112,7 +114,7 @@ export default function LoginPage() {
                   <div className="w-full border-t border-gray-300" />
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-white text-gray-500">Or continue with</span>
+                  <span className="px-2 bg-white text-gray-500">{t('loginPageOrContinueWith')}</span>
                 </div>
               </div>
 
@@ -141,7 +143,7 @@ export default function LoginPage() {
                     d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                   />
                 </svg>
-                Sign in with Google
+                {t('loginPageSignInWithGoogle')}
               </Button>
             </form>
 
@@ -153,8 +155,8 @@ export default function LoginPage() {
                   onClick={() => setIsLogin(!isLogin)}
                 >
                   {isLogin
-                    ? "Don't have an account? Sign up"
-                    : 'Already have an account? Sign in'}
+                    ? t('loginPageDontHaveAccount')
+                    : t('loginPageAlreadyHaveAccount')}
                 </button>
               </div>
             </div>
@@ -164,11 +166,9 @@ export default function LoginPage() {
         <div className="mt-8">
           <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
             <p className="text-sm text-yellow-800">
-              <strong>Educational Use:</strong> This platform provides AI-generated financial analysis 
-              for educational and research purposes only. Not financial advice.
+              <strong>{t('loginPageDisclaimer')}</strong>
             </p>
           </div>
-          <FirebaseDebug />
         </div>
       </div>
     </div>
