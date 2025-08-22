@@ -21,7 +21,7 @@ console.log('Pub/Sub configuration:', {
   projectId: PROJECT_ID,
   hasCredentials: !!(process.env.FIREBASE_CLIENT_EMAIL && process.env.FIREBASE_PRIVATE_KEY),
   clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-  topicName: EMAIL_TOPIC_NAME
+  topicName: EMAIL_TOPIC_NAME,
 });
 
 const pubsub = new PubSub(pubsubConfig);
@@ -47,13 +47,25 @@ export async function POST(request: NextRequest) {
 
     console.log("Queueing email for analysisId:", analysisId);
 
+    // Fetch user data to get preferred language
+    let userLanguage = 'en'; // Default to English
+    try {
+      const userDoc = await adminDb.collection('users').doc(userId).get();
+      if (userDoc.exists) {
+        const userData = userDoc.data();
+        userLanguage = userData?.preferredLanguage || 'en';
+      }
+    } catch (userError) {
+      console.warn('Failed to fetch user language preference, using default:', userError);
+    }
+
     // Create the email request message
     const emailRequest: EmailRequest = {
       analysisId,
       ticker,
       recipients: [recipientEmail],
       requestedAt: new Date().toISOString(),
-      // analysisData: analysisData, // Include the full analysis data
+      language: userLanguage, // Include the user's preferred language
     };
 
     console.log("emailRequest", emailRequest)

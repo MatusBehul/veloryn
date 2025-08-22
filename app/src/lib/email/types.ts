@@ -46,7 +46,7 @@ export interface EmailRequest {
   ticker: string;
   recipients: string[];
   requestedAt: string;
-  analysisData?: any; // The full analysis data from the API
+  language: string; // The user's preferred language
 }
 
 export interface EmailContent {
