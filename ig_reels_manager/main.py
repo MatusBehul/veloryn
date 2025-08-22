@@ -43,8 +43,36 @@ def elevenlabs_tts(text: str, out_audio_path: str):
                     f.write(chunk)
 
 def make_video(text, audio_path, out_path):
-    # Simple background (black)
-    cmd = f'ffmpeg -y -f lavfi -i color=c=black:s=1080x1920:d=10 -i {audio_path} -c:v libx264 -r 30 -c:a aac -shortest {out_path}'
+    # Get the audio duration first
+    import subprocess
+    import json
+    
+    ## STATIC BLACK BACKGROUND
+    # # Use ffprobe to get audio duration
+    # probe_cmd = ['ffprobe', '-v', 'quiet', '-print_format', 'json', '-show_format', audio_path]
+    # result = subprocess.run(probe_cmd, capture_output=True, text=True, check=True)
+    # audio_info = json.loads(result.stdout)
+    # duration = float(audio_info['format']['duration'])
+    
+    # print(f"Audio duration: {duration:.2f} seconds")
+    
+    # # Create video with dynamic duration matching the audio
+    # cmd = f'ffmpeg -y -f lavfi -i color=c=black:s=1080x1920:d={duration} -i {audio_path} -c:v libx264 -r 30 -c:a aac -shortest {out_path}'
+    # run(cmd)
+
+    ## FINANCIAL THEMED BACKGROUND WITH MOVING LINES (LIKE STOCK CHARTS)
+    probe_cmd = ['ffprobe', '-v', 'quiet', '-print_format', 'json', '-show_format', audio_path]
+    result = subprocess.run(probe_cmd, capture_output=True, text=True, check=True)
+    audio_info = json.loads(result.stdout)
+    duration = float(audio_info['format']['duration'])
+    
+    print(f"Audio duration: {duration:.2f} seconds")
+    
+    # Create financial-themed background with moving lines (like stock charts)
+    cmd = f'''ffmpeg -y -f lavfi -i "color=c=0x1a1a2e:s=1080x1920:d={duration}" -i {audio_path} -filter_complex "
+    [0:v]geq=r='if(lt(abs(sin(2*PI*X/W+t)),0.02),100,16)':g='if(lt(abs(sin(2*PI*X/W+t)),0.02),255,26)':b='if(lt(abs(sin(2*PI*X/W+t)),0.02),100,46)'[lines];
+    [lines]geq=r='r(X,Y)+20*sin(2*PI*t)':g='g(X,Y)+20*cos(2*PI*t)':b='b(X,Y)'[final]
+    " -map "[final]" -map 1:a -c:v libx264 -r 30 -c:a aac -shortest {out_path}'''
     run(cmd)
 
 
@@ -59,13 +87,13 @@ def upload_and_sign(local_path):
     
     print(f"Uploading to bucket: {bucket_name}, blob: {blob_name}")
     blob.upload_from_filename(local_path, content_type="video/mp4")
-    url = blob.generate_signed_url(
-        version="v4",
-        expiration=timedelta(hours=3),
-        method="GET",
-        content_type="video/mp4",
-    )
-    return url
+    # url = blob.generate_signed_url(
+    #     version="v4",
+    #     expiration=timedelta(hours=3),
+    #     method="GET",
+    #     content_type="video/mp4",
+    # )
+    # return url
 
 # ----- Entry point (Pub/Sub) -----
 @functions_framework.cloud_event
@@ -126,8 +154,8 @@ def entrypoint(cloud_event):
             make_video(text, audio, video)
             
             print("Uploading video to Google Cloud Storage...")
-            gcs_url = upload_and_sign(video)
-            print("Video uploaded:", gcs_url)
+            upload_and_sign(video)
+            print("Video uploaded")
 
     except Exception as e:
         print("ERROR:", repr(e))
