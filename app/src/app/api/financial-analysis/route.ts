@@ -49,34 +49,23 @@ export async function GET(request: NextRequest) {
       let query = adminDb.collection('financial_analysis');
 
       // If we have filters, we need to be more careful about indexing
-      if (ticker && !fromDate && !toDate) {
+      if (ticker) {
         // Simple ticker filter - order by timestamp
-        query = query.where('ticker', '==', ticker.toUpperCase()).orderBy('timestamp', 'desc').limit(limit);
-      } else if (!ticker && (fromDate || toDate)) {
-        // Date range only - order by timestamp
-        query = query.orderBy('timestamp', 'desc');
-        
-        if (fromDate) {
-          const fromTimestamp = new Date(fromDate);
-          query = query.where('timestamp', '>=', fromTimestamp);
-        }
-
-        if (toDate) {
-          const toTimestamp = new Date(toDate);
-          toTimestamp.setHours(23, 59, 59, 999);
-          query = query.where('timestamp', '<=', toTimestamp);
-        }
-        
-        query = query.limit(limit);
-      } else if (ticker && (fromDate || toDate)) {
-        // Complex case: ticker + date range - get more data and filter in memory
-        console.log(`Complex case: ticker=${ticker.toUpperCase()}, fromDate=${fromDate}, toDate=${toDate}`);
-        query = query.where('ticker', '==', ticker.toUpperCase()).orderBy('timestamp', 'desc').limit(100);
-      } else {
-        // No filters - simple case
-        query = query.orderBy('timestamp', 'desc').limit(limit);
+        query = query.where('ticker', '==', ticker.toUpperCase())
+      }
+      if (fromDate) {
+        const fromTimestamp = new Date(fromDate);
+        query = query.where('timestamp', '>=', fromTimestamp);
       }
 
+      if (toDate) {
+        const toTimestamp = new Date(toDate);
+        toTimestamp.setHours(23, 59, 59, 999);
+        query = query.where('timestamp', '<=', toTimestamp);
+      }
+
+      query = query.orderBy('timestamp', 'desc').limit(limit);
+      
       const snapshot = await query.get();
       let analyses = snapshot.docs.map((doc: any) => ({
         id: doc.id,
