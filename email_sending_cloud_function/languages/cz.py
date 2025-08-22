@@ -1,4 +1,4 @@
-CS_TRANSLATIONS = {
+CZ_TRANSLATIONS = {
     'financial_analysis': 'Finanční analýza',
     'ai_generated_report': 'Zpráva o tržní inteligenci generovaná AI',
     'generated_on': 'Vygenerováno dne',
