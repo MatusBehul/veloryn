@@ -52,12 +52,12 @@ def upload_and_sign(local_path):
     blob_name = f"reels/{datetime.now(timezone.utc).strftime('%Y%m%d')}-{uuid.uuid4().hex}.mp4"
     blob = bucket.blob(blob_name)
     blob.upload_from_filename(local_path, content_type="video/mp4")
-    url = blob.generate_signed_url(
-        version="v4",
-        expiration=timedelta(hours=3),
-        method="GET",
-        content_type="video/mp4",
-    )
+    
+    # Make the blob publicly readable instead of using signed URLs
+    # since Cloud Functions don't have private keys for signing
+    blob.make_public()
+    url = blob.public_url
+    
     return url
 
 # ----- Entry point (Pub/Sub) -----
