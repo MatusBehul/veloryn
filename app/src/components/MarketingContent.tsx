@@ -28,7 +28,7 @@ export function MarketingContent({ showLoading = true }: MarketingContentProps) 
   const handleMarketingIntegration = async () => {
     setHasExecuted(true);
     
-    console.log('MarketingContent: Starting integration with user:', user?.email || 'anonymous');
+    // console.log('MarketingContent: Starting integration with user:', user?.email || 'anonymous');
     
     try {
       const result = await executeIntegration({
@@ -58,7 +58,7 @@ export function MarketingContent({ showLoading = true }: MarketingContentProps) 
         setMarketingData(extractedData);
         console.log('Marketing integration successful:', result);
       } else {
-        console.log('Marketing integration failed, using default content');
+        // console.log('Marketing integration failed, using default content');
       }
     } catch (err) {
       console.log('Marketing integration error, using default content:', err);

@@ -76,7 +76,6 @@ jobs:
         ls -la
         cd app
         ls -la
-        cat .env
 
         docker build . -t ${{ env.IMAGE_NAME }} -f Dockerfile
 

@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
       console.log(`🔗 Subscription is ${latestSubscription.status}, creating integration platform profile`);
       await createSubscriptionProfile(latestSubscription.id, userData.email);
     } else if (!INTEGRATION_ENABLED) {
-      console.log('🔇 Integration disabled, skipping subscription profile creation');
+      // console.log('🔇 Integration disabled, skipping subscription profile creation');
     } else if (!userData.email) {
       console.warn(`⚠️ No email found for user ${userId}, skipping integration platform profile creation`);
     } else {
@@ -128,7 +128,7 @@ export async function POST(request: NextRequest) {
 // Function to create subscription profile in integration platform
 async function createSubscriptionProfile(subscriptionId: string, userEmail: string) {
   if (!INTEGRATION_ENABLED) {
-    console.log('🔇 Integration disabled, skipping subscription profile creation');
+    // console.log('🔇 Integration disabled, skipping subscription profile creation');
     return;
   }
 

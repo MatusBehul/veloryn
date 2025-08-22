@@ -289,7 +289,7 @@ async function handlePaymentFailed(invoice: Stripe.Invoice) {
 // Function to create subscription profile in integration platform
 async function createSubscriptionProfile(subscriptionId: string, userEmail: string) {
   if (!INTEGRATION_ENABLED) {
-    console.log('🔇 Integration disabled, skipping subscription profile creation');
+    // console.log('🔇 Integration disabled, skipping subscription profile creation');
     return;
   }
 

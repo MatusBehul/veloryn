@@ -23,8 +23,8 @@ export function useIntegration() {
   const executeIntegration = async (request: IntegrationRequest = {}): Promise<IntegrationResponse | null> => {
     // Check if integration is enabled
     if (process.env.NEXT_PUBLIC_ENABLE_INTEGRATION !== 'true') {
-      console.log('🔇 Integration disabled, skipping execution');
-      return { success: false, message: 'Integration disabled', data: null };
+      // console.log('🔇 Integration disabled, skipping execution');
+      return { success: false, message: 'Integration disabled', email: '', data: null };
     }
 
     setLoading(true);
