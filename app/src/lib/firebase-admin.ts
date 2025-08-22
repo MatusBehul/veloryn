@@ -5,6 +5,10 @@ import { getAuth } from 'firebase-admin/auth';
 // Check if we're in a build environment and skip Firebase initialization
 const isBuilding = process.env.NODE_ENV === 'production' && !process.env.FIREBASE_PROJECT_ID;
 
+console.log("------------")
+console.log(process.env)
+console.log("------------")
+
 let app: any = null;
 let adminDb: any = null;
 let adminAuth: any = null;

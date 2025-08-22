@@ -32,6 +32,9 @@ def elevenlabs_tts(text: str, out_audio_path: str):
         "model_id": "eleven_multilingual_v2",
         "voice_settings": {"stability": 0.35, "similarity_boost": 0.7},
     }
+    print(url)
+    print(headers)
+    print(payload)
     with requests.post(url, headers=headers, json=payload, stream=True, timeout=120) as r:
         r.raise_for_status()
         with open(out_audio_path, "wb") as f:
