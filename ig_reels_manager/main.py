@@ -5,6 +5,7 @@ import shlex
 import subprocess
 import tempfile
 import uuid
+import functions_framework
 from datetime import datetime, timedelta, timezone
 
 import requests
@@ -58,6 +59,7 @@ def upload_and_sign(local_path):
     return url
 
 # ----- Entry point (Pub/Sub) -----
+@functions_framework.cloud_event
 def entrypoint(cloud_event):
     """
     CloudEvent data:
