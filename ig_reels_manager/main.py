@@ -16,6 +16,16 @@ def run(cmd):
     print("+", cmd)
     subprocess.run(shlex.split(cmd), check=True)
 
+def run_args(args: list[str]):
+    # Log a shell-escaped preview for easier debugging
+    import shlex as _sh
+    print("+", " ".join(_sh.quote(a) for a in args))
+    proc = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    print(proc.stdout)  # always log ffmpeg/ffprobe output
+    if proc.returncode != 0:
+        raise RuntimeError(f"Command failed with exit {proc.returncode}")
+
+
 def elevenlabs_tts(text: str, out_audio_path: str):
     api_key = os.environ["ELEVENLABS_API_KEY"]
     if not api_key:
@@ -63,17 +73,30 @@ def make_video(text, audio_path, out_path):
     ## FINANCIAL THEMED BACKGROUND WITH MOVING LINES (LIKE STOCK CHARTS)
     probe_cmd = ['ffprobe', '-v', 'quiet', '-print_format', 'json', '-show_format', audio_path]
     result = subprocess.run(probe_cmd, capture_output=True, text=True, check=True)
-    audio_info = json.loads(result.stdout)
-    duration = float(audio_info['format']['duration'])
+    info = json.loads(result.stdout)
+    duration = float(info['format']['duration'])
+    print(f"Audio duration: {duration:.2f}s")
     
-    print(f"Audio duration: {duration:.2f} seconds")
-    
-    # Create financial-themed background with moving lines (like stock charts)
-    cmd = f'''ffmpeg -y -f lavfi -i "color=c=0x1a1a2e:s=1080x1920:d={duration}" -i {audio_path} -filter_complex "
-    [0:v]geq=r='if(lt(abs(sin(2*PI*X/W+t)),0.02),100,16)':g='if(lt(abs(sin(2*PI*X/W+t)),0.02),255,26)':b='if(lt(abs(sin(2*PI*X/W+t)),0.02),100,46)'[lines];
-    [lines]geq=r='r(X,Y)+20*sin(2*PI*t)':g='g(X,Y)+20*cos(2*PI*t)':b='b(X,Y)'[final]
-    " -map "[final]" -map 1:a -c:v libx264 -r 30 -c:a aac -shortest {out_path}'''
-    run(cmd)
+    # Build a robust filtergraph (no geq/newlines)
+    # 1) Moving grid on dark background
+    # 2) Audio waveform at bottom (1080x240)
+    filtergraph = (
+        "[0:v]drawgrid=w=120:h=120:x='mod(-t*60,120)':y=0:c=0x2e3a59@0.55[bg];"
+        "[1:a]showwaves=s=1080x240:mode=line:rate=30,format=rgba[wave];"
+        "[bg][wave]overlay=x=0:y=1680:shortest=1[v]"
+    )
+
+    args = [
+        "ffmpeg", "-y",
+        "-f", "lavfi", "-i", f"color=c=#1a1a2e:s=1080x1920:d={duration}",
+        "-i", audio_path,
+        "-filter_complex", filtergraph,
+        "-map", "[v]", "-map", "1:a",
+        "-c:v", "libx264", "-preset", "veryfast", "-crf", "20",
+        "-c:a", "aac", "-b:a", "192k",
+        "-r", "30", "-shortest", out_path
+    ]
+    run_args(args)
 
 
 def upload_and_sign(local_path):
