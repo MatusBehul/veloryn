@@ -9,16 +9,33 @@ def get_translation(key: str, language: str = 'en') -> str:
     """Get translation for a given key and language"""
     match language:
         case 'de':
-            return DE_TRANSLATIONS.get(language, EN_TRANSLATIONS).get(key, EN_TRANSLATIONS[key])
+            if key not in DE_TRANSLATIONS:
+                print(f"No German translation found for key '{key}', defaulting to English.")
+            return DE_TRANSLATIONS.get(key, EN_TRANSLATIONS[key])
         case 'it':
-            return IT_TRANSLATIONS.get(language, EN_TRANSLATIONS).get(key, EN_TRANSLATIONS[key])
+            if key not in IT_TRANSLATIONS:
+                print(f"No Italian translation found for key '{key}', defaulting to English.")
+            return IT_TRANSLATIONS.get(key, EN_TRANSLATIONS[key])
         case 'es':
-            return ES_TRANSLATIONS.get(language, EN_TRANSLATIONS).get(key, EN_TRANSLATIONS[key])
+            if key not in ES_TRANSLATIONS:
+                print(f"No Spanish translation found for key '{key}', defaulting to English.")
+            return ES_TRANSLATIONS.get(key, EN_TRANSLATIONS[key])
         case 'sk':
-            return SK_TRANSLATIONS.get(language, EN_TRANSLATIONS).get(key, EN_TRANSLATIONS[key])
+            if key not in SK_TRANSLATIONS:
+                print(f"No Slovak translation found for key '{key}', defaulting to English.")
+            return SK_TRANSLATIONS.get(key, EN_TRANSLATIONS[key])
         case 'cz':
-            return CZ_TRANSLATIONS.get(language, EN_TRANSLATIONS).get(key, EN_TRANSLATIONS[key])
+            if key not in CZ_TRANSLATIONS:
+                print(f"No Czech translation found for key '{key}', defaulting to English.")
+            return CZ_TRANSLATIONS.get(key, EN_TRANSLATIONS[key])
+        case 'en':
+            if key not in EN_TRANSLATIONS:
+                print(f"No English translation found for key '{key}', defaulting to KEY.")
+            return EN_TRANSLATIONS.get(key, key)
         case _:
-            return EN_TRANSLATIONS.get(language, EN_TRANSLATIONS[key])
+            print(f"No translation found for language '{language}', defaulting to English.")
+            if key not in EN_TRANSLATIONS:
+                print(f"No English translation found for key '{key}', defaulting to KEY.")
+            return EN_TRANSLATIONS.get(key, key)
 
 
