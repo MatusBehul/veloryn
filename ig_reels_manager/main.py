@@ -50,17 +50,21 @@ def make_video(text, audio_path, out_path):
 
 def upload_and_sign(local_path):
     bucket_name = os.environ["GCS_BUCKET"].replace("gs://", "").split("/", 1)[0]  
+    
+    # Initialize client - will use default service account or service account from environment
     client = storage.Client()
     bucket = client.bucket(bucket_name)
     blob_name = f"reels/{datetime.now(timezone.utc).strftime('%Y%m%d')}-{uuid.uuid4().hex}.mp4"
     blob = bucket.blob(blob_name)
+    
+    print(f"Uploading to bucket: {bucket_name}, blob: {blob_name}")
     blob.upload_from_filename(local_path, content_type="video/mp4")
-    
-    # Make the blob publicly readable instead of using signed URLs
-    # since Cloud Functions don't have private keys for signing
-    blob.make_public()
-    url = blob.public_url
-    
+    url = blob.generate_signed_url(
+        version="v4",
+        expiration=timedelta(hours=3),
+        method="GET",
+        content_type="video/mp4",
+    )
     return url
 
 # ----- Entry point (Pub/Sub) -----
@@ -71,24 +75,43 @@ def entrypoint(cloud_event):
       { "message": { "data": base64(json.dumps({"analysis_id": "...", "hashtags": "...", "caption": "..." })) } }
     """
     try:
+        print("Starting Instagram Reels generation...")
+        
+        # Validate required environment variables
+        required_env_vars = ["GCS_BUCKET", "ELEVENLABS_API_KEY"]
+        missing_vars = [var for var in required_env_vars if not os.environ.get(var)]
+        if missing_vars:
+            raise ValueError(f"Missing required environment variables: {missing_vars}")
+        
+        print(f"Environment check passed. Using bucket: {os.environ['GCS_BUCKET']}")
+        
         enc = cloud_event.data.get("message", {}).get("data", "")
         payload = json.loads(base64.b64decode(enc or b"{}").decode("utf-8"))
+        print(f"Received payload: {payload}")
+        
         if "analysis_id" not in payload:
             raise ValueError("Missing 'analysis_id' in Pub/Sub message data JSON.")
 
         analysis_id = payload.get("analysis_id")
+        print(f"Processing analysis_id: {analysis_id}")
 
         db = firestore.Client()
         doc = db.collection("financial_analysis").document(analysis_id).collection("data").document("analysis_overview").get()
         data = doc.to_dict() or {}
         if not data:
             raise ValueError(f"Firestore doc not found: financial_analysis/{analysis_id}")
+        
+        print(f"Retrieved analysis data structure: {list(data.keys()) if data else 'No data'}")
+        
         text = ". ".join([
             # data["analysis_data"]["en"]["fundamental_analysis"][0],
             # *data["analysis_data"]["en"]["investment_insights"],
             data["analysis_data"]["en"]["sentiment_analysis"][0],
             # data["analysis_data"]["en"]["technical_analysis"][0],
         ])
+        
+        print(f"Generated text for TTS: {text[:100]}..." if len(text) > 100 else f"Generated text for TTS: {text}")
+        
         if not text:
             raise ValueError(f"Empty 'text' in Firestore doc: financial_analysis/{analysis_id}")
 
@@ -96,8 +119,13 @@ def entrypoint(cloud_event):
             audio = f"{td}/voice.mp3"
             video = f"{td}/reel.mp4"
 
+            print("Generating audio with ElevenLabs TTS...")
             elevenlabs_tts(text, audio)
+            
+            print("Creating video with FFmpeg...")
             make_video(text, audio, video)
+            
+            print("Uploading video to Google Cloud Storage...")
             gcs_url = upload_and_sign(video)
             print("Video uploaded:", gcs_url)
 
