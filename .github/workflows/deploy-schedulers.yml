@@ -168,7 +168,7 @@ jobs:
           
           gcloud scheduler jobs update pubsub "$JOB_NAME" \
             --location=${{ vars.GOOGLE_CLOUD_LOCATION }} \
-            --schedule="0 0 * * *" \
+            --schedule="0 0 * * 1-5" \
             --time-zone="UTC" \
             --topic="global-us-data-collector-topic" \
             --message-body='{"trigger":"check"}' \
@@ -183,7 +183,7 @@ jobs:
           
           gcloud scheduler jobs create pubsub "$JOB_NAME" \
             --location=${{ vars.GOOGLE_CLOUD_LOCATION }} \
-            --schedule="0 0 * * *" \
+            --schedule="0 0 * * 1-5" \
             --time-zone="UTC" \
             --topic="global-us-data-collector-topic" \
             --message-body='{"trigger":"check"}' \

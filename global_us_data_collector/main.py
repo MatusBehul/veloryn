@@ -75,7 +75,7 @@ class FinancialDataTool:
         """
         Get global US inflation data
         Args:
-        Returns:
+        Returns: List of GlobalUSInflationDataModel or empty list on error
         """
         try:
             
@@ -92,21 +92,22 @@ class FinancialDataTool:
                     retrieved_data = [GlobalUSInflationDataModel(**sheet) for sheet in data["data"]]
                 else:
                     print("Error fetching inflation data: No data found in response", data)
+                    return []
             else:
                 print(f"Error fetching inflation data: {response.status_code} - {response.text}")
-                return {'error': 'Failed to fetch inflation data', 'function': 'INFLATION'}
+                return []
 
             return retrieved_data
 
         except Exception as e:
             print(f"Error fetching quote for function INFLATION: {e}")
-            return {'error': str(e), 'function': 'INFLATION'}
+            return []
 
     def get_global_us_cpi_data(self):
         """
         Get global US CPI data
         Args:
-        Returns:
+        Returns: List of GlobalUSCPIDataModel or empty list on error
         """
         try:
             
@@ -123,21 +124,22 @@ class FinancialDataTool:
                     retrieved_data = [GlobalUSCPIDataModel(**sheet) for sheet in data["data"]]
                 else:
                     print("Error fetching cpi data: No data found in response", data)
+                    return []
             else:
                 print(f"Error fetching cpi data: {response.status_code} - {response.text}")
-                return {'error': 'Failed to fetch cpi data', 'function': 'CPI'}
+                return []
 
             return retrieved_data
 
         except Exception as e:
             print(f"Error fetching quote for function CPI: {e}")
-            return {'error': str(e), 'function': 'CPI'}
+            return []
 
     def get_global_us_federal_funds_rate_data(self):
         """
         Get global US Federal Funds Rate data
         Args:
-        Returns:
+        Returns: List of GlobalUSFederalFundsRateDataModel or empty list on error
         """
         try:
             
@@ -154,21 +156,22 @@ class FinancialDataTool:
                     retrieved_data = [GlobalUSFederalFundsRateDataModel(**sheet) for sheet in data["data"]]
                 else:
                     print("Error fetching federal funds rate data: No data found in response", data)
+                    return []
             else:
                 print(f"Error fetching federal funds rate data: {response.status_code} - {response.text}")
-                return {'error': 'Failed to fetch federal funds rate data', 'function': 'FEDERAL_FUNDS_RATE'}
+                return []
 
             return retrieved_data
 
         except Exception as e:
             print(f"Error fetching quote for function FEDERAL_FUNDS_RATE: {e}")
-            return {'error': str(e), 'function': 'FEDERAL_FUNDS_RATE'}
+            return []
 
     def get_global_us_retail_sales_data(self):
         """
         Get global US retail sales data
         Args:
-        Returns:
+        Returns: List of GlobalUSRetailSalesDataModel or empty list on error
         """
         try:
             
@@ -185,21 +188,22 @@ class FinancialDataTool:
                     retrieved_data = [GlobalUSRetailSalesDataModel(**sheet) for sheet in data["data"]]
                 else:
                     print("Error fetching retail sales data: No data found in response", data)
+                    return []
             else:
                 print(f"Error fetching retail sales data: {response.status_code} - {response.text}")
-                return {'error': 'Failed to fetch retail sales data', 'function': 'RETAIL_SALES'}
+                return []
 
             return retrieved_data
 
         except Exception as e:
             print(f"Error fetching quote for function RETAIL_SALES: {e}")
-            return {'error': str(e), 'function': 'RETAIL_SALES'}
+            return []
 
     def get_global_us_unemployment_data(self):
         """
         Get global US unemployment data
         Args:
-        Returns:
+        Returns: List of GlobalUSUnemploymentDataModel or empty list on error
         """
         try:
             
@@ -216,15 +220,16 @@ class FinancialDataTool:
                     retrieved_data = [GlobalUSUnemploymentDataModel(**sheet) for sheet in data["data"]]
                 else:
                     print("Error fetching unemployment data: No data found in response", data)
+                    return []
             else:
                 print(f"Error fetching unemployment data: {response.status_code} - {response.text}")
-                return {'error': 'Failed to fetch unemployment data', 'function': 'UNEMPLOYMENT'}
+                return []
 
             return retrieved_data
 
         except Exception as e:
             print(f"Error fetching quote for function UNEMPLOYMENT: {e}")
-            return {'error': str(e), 'function': 'UNEMPLOYMENT'}
+            return []
 
 
 # Create the financial data tool instance
@@ -248,9 +253,7 @@ def refresh_global_us_data(cloud_event):
         unemployment_data = financial_data_tool.get_global_us_unemployment_data()
 
         # Save data to Firestore
-        if isinstance(inflation_data, dict):
-            print(f"Error fetching inflation data: {inflation_data}")
-        else:
+        if len(inflation_data) > 0:
             db.collection('global_us_data').document('inflation').set({
                 'data': [data.model_dump() for data in inflation_data],
                 'timestamp': firestore.SERVER_TIMESTAMP
@@ -259,9 +262,11 @@ def refresh_global_us_data(cloud_event):
                 'data': [data.model_dump() for data in inflation_data],
                 'timestamp': firestore.SERVER_TIMESTAMP
             })
-        if isinstance(cpi_data, dict):
-            print(f"Error fetching CPI data: {cpi_data}")
+            logger.info("✅ Saved inflation data to Firestore")
         else:
+            logger.warning("⚠️ No inflation data to save")
+            
+        if len(cpi_data) > 0:
             db.collection('global_us_data').document('cpi').set({
                 'data': [data.model_dump() for data in cpi_data],
                 'timestamp': firestore.SERVER_TIMESTAMP
@@ -270,9 +275,11 @@ def refresh_global_us_data(cloud_event):
                 'data': [data.model_dump() for data in cpi_data],
                 'timestamp': firestore.SERVER_TIMESTAMP
             })
-        if isinstance(federal_funds_rate_data, dict):
-            print(f"Error fetching Federal Funds Rate data: {federal_funds_rate_data}")
+            logger.info("✅ Saved CPI data to Firestore")
         else:
+            logger.warning("⚠️ No CPI data to save")
+            
+        if len(federal_funds_rate_data) > 0:
             db.collection('global_us_data').document('federal_funds_rate').set({
                 'data': [data.model_dump() for data in federal_funds_rate_data],
                 'timestamp': firestore.SERVER_TIMESTAMP
@@ -281,9 +288,11 @@ def refresh_global_us_data(cloud_event):
                 'data': [data.model_dump() for data in federal_funds_rate_data],
                 'timestamp': firestore.SERVER_TIMESTAMP
             })
-        if isinstance(retail_sales_data, dict):
-            print(f"Error fetching Retail Sales data: {retail_sales_data}")
+            logger.info("✅ Saved federal funds rate data to Firestore")
         else:
+            logger.warning("⚠️ No federal funds rate data to save")
+            
+        if len(retail_sales_data) > 0:
             db.collection('global_us_data').document('retail_sales').set({
                 'data': [data.model_dump() for data in retail_sales_data],
                 'timestamp': firestore.SERVER_TIMESTAMP
@@ -292,9 +301,11 @@ def refresh_global_us_data(cloud_event):
                 'data': [data.model_dump() for data in retail_sales_data],
                 'timestamp': firestore.SERVER_TIMESTAMP
             })
-        if isinstance(unemployment_data, dict):
-            print(f"Error fetching Unemployment data: {unemployment_data}")
+            logger.info("✅ Saved retail sales data to Firestore")
         else:
+            logger.warning("⚠️ No retail sales data to save")
+            
+        if len(unemployment_data) > 0:
             db.collection('global_us_data').document('unemployment').set({
                 'data': [data.model_dump() for data in unemployment_data],
                 'timestamp': firestore.SERVER_TIMESTAMP
@@ -303,6 +314,9 @@ def refresh_global_us_data(cloud_event):
                 'data': [data.model_dump() for data in unemployment_data],
                 'timestamp': firestore.SERVER_TIMESTAMP
             })
+            logger.info("✅ Saved unemployment data to Firestore")
+        else:
+            logger.warning("⚠️ No unemployment data to save")
 
         logger.info(f"✅ Completed daily check")
     except Exception as e:
