@@ -583,8 +583,16 @@ class FinancialDataTool:
             stock_income_statement_data = self.get_stock_income_statement_data(symbol)
             stock_estimates_data = self.get_stock_estimates_data(symbol)
             
-            # Execute all tasks simultaneously
-            # results = await asyncio.gather(*tasks, return_exceptions=True)
+            # Apply stock split adjustments to historical prices
+            if isinstance(stock_splits_data, list) and len(stock_splits_data) > 0:
+                print(f"Applying stock split adjustments for {symbol}...")
+                stock_hourly_quote = self.apply_split_adjustments(stock_hourly_quote, stock_splits_data) if isinstance(stock_hourly_quote, list) else stock_hourly_quote
+                stock_daily_quote = self.apply_split_adjustments(stock_daily_quote, stock_splits_data) if isinstance(stock_daily_quote, list) else stock_daily_quote
+                stock_weekly_quote = self.apply_split_adjustments(stock_weekly_quote, stock_splits_data) if isinstance(stock_weekly_quote, list) else stock_weekly_quote
+                stock_monthly_quote = self.apply_split_adjustments(stock_monthly_quote, stock_splits_data) if isinstance(stock_monthly_quote, list) else stock_monthly_quote
+                print(f"✅ Split adjustments applied for {symbol}")
+            else:
+                print(f"No stock splits found for {symbol} - no price adjustments needed")
             
             # Structure the response
             comprehensive_data = ComprehensiveStockDataModel(
@@ -902,6 +910,71 @@ class FinancialDataTool:
             "volume_trend_percent": float(volume_trend),
             "market_cap_trend_percent": float(market_cap_trend)
         }
+
+    def apply_split_adjustments(self, price_data: List[StockRealtimeDataModel], splits_data: List) -> List[StockRealtimeDataModel]:
+        """
+        Apply stock split adjustments to historical price data
+        
+        Args:
+            price_data: List of price data points (newest first from API)
+            splits_data: List of stock split data with effective_date and split_factor
+            
+        Returns:
+            List of price data with split-adjusted prices
+            
+        Example:
+            - Split 2:1 means split_factor = 2, so divide historical prices by 2
+            - Split 3:1 means split_factor = 3, so divide historical prices by 3
+            - Tesla example: 2022-08-25 split factor 3, 2020-08-31 split factor 5
+        """
+        if not price_data or not splits_data:
+            return price_data
+        
+        try:
+            # Sort splits by effective date (newest first to oldest)
+            sorted_splits = sorted(splits_data, key=lambda x: x.effective_date, reverse=True)
+            
+            print(f"Found {len(sorted_splits)} stock splits to process:")
+            for split in sorted_splits:
+                print(f"  - {split.effective_date}: {split.split_factor}:1 split")
+            
+            # Create adjusted price data list
+            adjusted_prices = []
+            
+            for price_point in price_data:
+                # Calculate cumulative adjustment factor for this price point
+                cumulative_adjustment = 1.0
+                
+                for split in sorted_splits:
+                    # If the price date is before the split effective date, apply the adjustment
+                    if price_point.date < split.effective_date:
+                        cumulative_adjustment *= split.split_factor
+                        print(f"  Applying {split.split_factor}:1 split to {price_point.date} (factor: {cumulative_adjustment})")
+                
+                # Apply cumulative adjustment to all price fields
+                if cumulative_adjustment > 1.0:
+                    adjusted_price = StockRealtimeDataModel(
+                        date=price_point.date,
+                        open=round(price_point.open / cumulative_adjustment, 4),
+                        high=round(price_point.high / cumulative_adjustment, 4),
+                        low=round(price_point.low / cumulative_adjustment, 4),
+                        close=round(price_point.close / cumulative_adjustment, 4),
+                        volume=int(price_point.volume * cumulative_adjustment)  # Volume increases proportionally
+                    )
+                    print(f"  Adjusted {price_point.date}: ${price_point.close:.2f} → ${adjusted_price.close:.2f} (factor: {cumulative_adjustment})")
+                else:
+                    # No adjustment needed (price is after all splits)
+                    adjusted_price = price_point
+                
+                adjusted_prices.append(adjusted_price)
+            
+            print(f"✅ Successfully applied split adjustments to {len(adjusted_prices)} price points")
+            return adjusted_prices
+            
+        except Exception as e:
+            print(f"❌ Error applying split adjustments: {e}")
+            # Return original data if adjustment fails
+            return price_data
 
 # Create the financial data tool instance
 get_stock_data_tool = FinancialDataTool()
