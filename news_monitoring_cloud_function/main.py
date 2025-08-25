@@ -50,7 +50,7 @@ class NewsMonitoringService:
             params = {
                 'function': 'NEWS_SENTIMENT',
                 'tickers': '',  # Empty for general market news
-                'limit': 1000,  # Maximum allowed
+                'limit': 100,  # Maximum allowed
                 'apikey': self.api_key
             }
             
@@ -161,22 +161,13 @@ class NewsMonitoringService:
             return None
 
 
-    def update_ticker_profiles(self, processed_tickers: List[str]) -> None:
+    def update_ticker_profiles(self, processed_tickers: Dict[str, int]) -> None:
         """
         Update ticker profiles with latest news count and last news date
         """
-        try:
-            ticker_stats = {}
-            
+        try:            
             # Aggregate stats for each ticker
             for ticker in processed_tickers:
-                if ticker not in ticker_stats:
-                    ticker_stats[ticker] = {
-                        'latest_news_count': 0,
-                        }
-                    
-                ticker_stats[ticker]['latest_news_count'] += 1
-
                 try:
                     ticker_ref = self.db.collection('tickers').document(ticker)
                     ticker_doc = ticker_ref.get()
@@ -185,7 +176,7 @@ class NewsMonitoringService:
                         # Update existing profile
                         ticker_ref.update({
                             'last_news_update': datetime.now(),
-                            'latest_news_count': firestore.Increment(ticker_stats[ticker]['latest_news_count']),
+                            'latest_news_count': firestore.Increment(processed_tickers[ticker]),
                         })
                     else:
                         # Create new ticker profile
@@ -193,7 +184,7 @@ class NewsMonitoringService:
                             'ticker': ticker,
                             'created_at': datetime.now(),
                             'last_news_update': datetime.now(),
-                            'latest_news_count': ticker_stats[ticker]['latest_news_count'],
+                            'latest_news_count': processed_tickers[ticker],
                             'total_analysis_count': 0,
                             'last_analysis_date': None,
                             'current_price': None,
@@ -207,6 +198,44 @@ class NewsMonitoringService:
                     
         except Exception as e:
             logger.error(f"Error updating ticker profiles: {e}")
+
+    def update_topic_profiles(self, processed_topics: Dict[str, int]) -> None:
+        """
+        Update topic profiles with latest news count and last news date
+        """
+        try:            
+            # Aggregate stats for each topic
+            for topic in processed_topics:
+                try:
+                    topic_ref = self.db.collection('topics').document(topic)
+                    topic_doc = topic_ref.get()
+
+                    if topic_doc.exists:
+                        # Update existing profile
+                        topic_ref.update({
+                            'last_news_update': datetime.now(),
+                            'latest_news_count': firestore.Increment(processed_topics[topic]),
+                        })
+                    else:
+                        # Create new topic profile
+                        topic_ref.set({
+                            'topic': topic,
+                            'created_at': datetime.now(),
+                            'last_news_update': datetime.now(),
+                            'latest_news_count': processed_topics[topic],
+                            'total_analysis_count': 0,
+                            'last_analysis_date': None,
+                            'current_price': None,
+                            'description': None
+                        })
+
+                    logger.info(f"Updated topic profile for {topic}")
+
+                except Exception as e:
+                    logger.error(f"Error updating topic profile for {topic}: {e}")
+
+        except Exception as e:
+            logger.error(f"Error updating topic profiles: {e}")
 
 
     def process_news_batch(self) -> Dict:
@@ -233,21 +262,32 @@ class NewsMonitoringService:
                 }
             
             # Process and save each news item
-            processed_tickers = []
-            processed_topics = []
+            processed_tickers = {}
+            processed_topics = {}
             success_count = 0
             
             for news_item in feed:
                 result, tickers, topics = self.save_news_item(news_item)
                 success_count += result
-                processed_tickers.extend(tickers)
-                processed_topics.extend(topics)
+                for ticker in tickers:
+                    if ticker in processed_tickers:
+                        processed_tickers[ticker] += 1
+                    else:
+                        processed_tickers[ticker] = 1
+                for topic in topics:
+                    if topic in processed_topics:
+                        processed_topics[topic] += 1
+                    else:
+                        processed_topics[topic] = 1
 
             # Update ticker profiles
-            processed_tickers = list(set(processed_tickers))
             if processed_tickers:
                 self.update_ticker_profiles(processed_tickers)
-            
+
+            # Update topic profiles
+            if processed_topics:
+                self.update_topic_profiles(processed_topics)
+
             return {
                 'success': True,
                 'processed_count': success_count,
