@@ -427,9 +427,24 @@ class FinancialDataTool:
                     retrieved_data = [GlobalUSInflationDataModel(**item) for item in data['data']]
                     return retrieved_data
                 else:
+                    print("ERROR: No data field in historical inflation document.")
                     return {'error': 'No data field in document', 'function': 'INFLATION'}
             else:
-                return {'error': 'Document not found', 'function': 'INFLATION'}
+                print("WARNING: Inflation document does not exist in Firestore. Searching for historical last known values.")
+                doc_ref = self.db.collection('global_us_data').document('inflation')
+                doc = doc_ref.get()
+                
+                if doc.exists:
+                    data = doc.to_dict()
+                    if 'data' in data:
+                        retrieved_data = [GlobalUSInflationDataModel(**item) for item in data['data']]
+                        return retrieved_data
+                    else:
+                        print("ERROR: No data field in historical inflation document.")
+                        return {'error': 'No data field in document', 'function': 'INFLATION'}
+                else:
+                    print("ERROR: No historical inflation document found in Firestore.")
+                    return {'error': 'Document not found', 'function': 'INFLATION'}
 
         except Exception as e:
             print(f"Error fetching inflation data from Firestore: {e}")
@@ -451,9 +466,24 @@ class FinancialDataTool:
                     retrieved_data = [GlobalUSCPIDataModel(**item) for item in data['data']]
                     return retrieved_data
                 else:
+                    print("ERROR: No data field in historical CPI document.")
                     return {'error': 'No data field in document', 'function': 'CPI'}
             else:
-                return {'error': 'Document not found', 'function': 'CPI'}
+                print("WARNING: CPI document does not exist in Firestore. Searching for historical last known values.")
+                doc_ref = self.db.collection('global_us_data').document('cpi')
+                doc = doc_ref.get()
+                
+                if doc.exists:
+                    data = doc.to_dict()
+                    if 'data' in data:
+                        retrieved_data = [GlobalUSCPIDataModel(**item) for item in data['data']]
+                        return retrieved_data
+                    else:
+                        print("ERROR: No data field in historical CPI document.")
+                        return {'error': 'No data field in document', 'function': 'CPI'}
+                else:
+                    print("ERROR: No historical CPI document found in Firestore.")
+                    return {'error': 'Document not found', 'function': 'CPI'}
 
         except Exception as e:
             print(f"Error fetching CPI data from Firestore: {e}")
@@ -475,9 +505,24 @@ class FinancialDataTool:
                     retrieved_data = [GlobalUSFederalFundsRateDataModel(**item) for item in data['data']]
                     return retrieved_data
                 else:
+                    print("ERROR: No data field in historical Federal Funds Rate document.")
                     return {'error': 'No data field in document', 'function': 'FEDERAL_FUNDS_RATE'}
             else:
-                return {'error': 'Document not found', 'function': 'FEDERAL_FUNDS_RATE'}
+                print("WARNING: Federal Funds Rate document does not exist in Firestore. Searching for historical last known values.")
+                doc_ref = self.db.collection('global_us_data').document('federal_funds_rate')
+                doc = doc_ref.get()
+                
+                if doc.exists:
+                    data = doc.to_dict()
+                    if 'data' in data:
+                        retrieved_data = [GlobalUSFederalFundsRateDataModel(**item) for item in data['data']]
+                        return retrieved_data
+                    else:
+                        print("ERROR: No data field in historical Federal Funds Rate document.")
+                        return {'error': 'No data field in document', 'function': 'FEDERAL_FUNDS_RATE'}
+                else:
+                    print("ERROR: No historical Federal Funds Rate document found in Firestore.")
+                    return {'error': 'Document not found', 'function': 'FEDERAL_FUNDS_RATE'}
             
         except Exception as e:
             print(f"Error fetching Federal Funds Rate data from Firestore: {e}")
@@ -499,9 +544,24 @@ class FinancialDataTool:
                     retrieved_data = [GlobalUSRetailSalesDataModel(**item) for item in data['data']]
                     return retrieved_data
                 else:
+                    print("ERROR: No data field in historical Retail Sales document.")
                     return {'error': 'No data field in document', 'function': 'RETAIL_SALES'}
             else:
-                return {'error': 'Document not found', 'function': 'RETAIL_SALES'}
+                print("WARNING: Retail Sales document does not exist in Firestore. Searching for historical last known values.")
+                doc_ref = self.db.collection('global_us_data').document('retail_sales')
+                doc = doc_ref.get()
+                
+                if doc.exists:
+                    data = doc.to_dict()
+                    if 'data' in data:
+                        retrieved_data = [GlobalUSRetailSalesDataModel(**item) for item in data['data']]
+                        return retrieved_data
+                    else:
+                        print("ERROR: No data field in historical Retail Sales document.")
+                        return {'error': 'No data field in document', 'function': 'RETAIL_SALES'}
+                else:
+                    print("ERROR: No historical Retail Sales document found in Firestore.")
+                    return {'error': 'Document not found', 'function': 'RETAIL_SALES'}
             
         except Exception as e:
             print(f"Error fetching retail sales data from Firestore: {e}")
@@ -523,9 +583,24 @@ class FinancialDataTool:
                     retrieved_data = [GlobalUSUnemploymentDataModel(**item) for item in data['data']]
                     return retrieved_data
                 else:
+                    print("ERROR: No data field in historical Unemployment document.")
                     return {'error': 'No data field in document', 'function': 'UNEMPLOYMENT'}
             else:
-                return {'error': 'Document not found', 'function': 'UNEMPLOYMENT'}
+                print("WARNING: Unemployment document does not exist in Firestore. Searching for historical last known values.")
+                doc_ref = self.db.collection('global_us_data').document('unemployment')
+                doc = doc_ref.get()
+                
+                if doc.exists:
+                    data = doc.to_dict()
+                    if 'data' in data:
+                        retrieved_data = [GlobalUSUnemploymentDataModel(**item) for item in data['data']]
+                        return retrieved_data
+                    else:
+                        print("ERROR: No data field in historical Unemployment document.")
+                        return {'error': 'No data field in document', 'function': 'UNEMPLOYMENT'}
+                else:
+                    print("ERROR: No historical Unemployment document found in Firestore.")
+                    return {'error': 'Document not found', 'function': 'UNEMPLOYMENT'}
 
         except Exception as e:
             print(f"Error fetching unemployment data from Firestore: {e}")
@@ -949,7 +1024,6 @@ class FinancialDataTool:
                     # If the price date is before the split effective date, apply the adjustment
                     if price_point.date < split.effective_date:
                         cumulative_adjustment *= split.split_factor
-                        print(f"  Applying {split.split_factor}:1 split to {price_point.date} (factor: {cumulative_adjustment})")
                 
                 # Apply cumulative adjustment to all price fields
                 if cumulative_adjustment > 1.0:
@@ -961,7 +1035,6 @@ class FinancialDataTool:
                         close=round(price_point.close / cumulative_adjustment, 4),
                         volume=int(price_point.volume * cumulative_adjustment)  # Volume increases proportionally
                     )
-                    print(f"  Adjusted {price_point.date}: ${price_point.close:.2f} → ${adjusted_price.close:.2f} (factor: {cumulative_adjustment})")
                 else:
                     # No adjustment needed (price is after all splits)
                     adjusted_price = price_point
