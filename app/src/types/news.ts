@@ -21,8 +21,8 @@ export interface NewsItem {
   ticker_sentiment?: Array<{
     ticker: string;
     relevance_score: string;
-    ticker_sentiment_score: string;
-    ticker_sentiment_label: string;
+    sentiment_score: string;
+    sentiment_label: string;
   }>;
   content_hash?: string;
   created_at?: Date | any; // Firestore timestamp or Date

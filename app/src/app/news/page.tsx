@@ -494,12 +494,12 @@ export default function NewsPage() {
                       <div className="flex flex-wrap gap-2">
                         {newsItem.ticker_sentiment.map((tickerData, idx) => {
                           const relevancyScore = parseFloat(tickerData.relevance_score);
-                          const sentimentScore = parseFloat(tickerData.ticker_sentiment_score);
+                          const sentimentScore = parseFloat(tickerData.sentiment_score);
                           const relevancyPercent = (relevancyScore * 100).toFixed(0);
                           
                           // Color based on sentiment
-                          const sentimentColor = tickerData.ticker_sentiment_label?.toLowerCase().includes('bullish') ? 'bg-green-100 border-green-300 text-green-800' :
-                                               tickerData.ticker_sentiment_label?.toLowerCase().includes('bearish') ? 'bg-red-100 border-red-300 text-red-800' :
+                          const sentimentColor = tickerData.sentiment_label?.toLowerCase().includes('bullish') ? 'bg-green-100 border-green-300 text-green-800' :
+                                               tickerData.sentiment_label?.toLowerCase().includes('bearish') ? 'bg-red-100 border-red-300 text-red-800' :
                                                'bg-gray-100 border-gray-300 text-gray-800';
                           
                           // Sentiment icon
@@ -510,7 +510,7 @@ export default function NewsPage() {
                           };
                           
                           const isClickable = !filters.topic && ALLOWED_TICKERS.includes(tickerData.ticker);
-                          const baseTooltip = `${tickerData.ticker} - Sentiment: ${tickerData.ticker_sentiment_label} (${sentimentScore.toFixed(2)}) | Relevancy: ${relevancyPercent}%`;
+                          const baseTooltip = `${tickerData.ticker} - Sentiment: ${tickerData.sentiment_label} (${sentimentScore.toFixed(2)}) | Relevancy: ${relevancyPercent}%`;
                           const tooltipText = isClickable ? 
                             `${baseTooltip} - Click to filter by this ticker` :
                             filters.topic ? 
@@ -523,7 +523,7 @@ export default function NewsPage() {
                               className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border transition-opacity ${sentimentColor}`}
                               title={tooltipText}
                             >
-                              {getSentimentIconSmall(tickerData.ticker_sentiment_label)}
+                              {getSentimentIconSmall(tickerData.sentiment_label)}
                               <span className="ml-1">{tickerData.ticker}</span>
                               <span className="ml-2 text-xs opacity-75">
                                 - rel. {relevancyPercent}% | sent. {sentimentScore >= 0 ? '+' : ''}{sentimentScore.toFixed(2)}
