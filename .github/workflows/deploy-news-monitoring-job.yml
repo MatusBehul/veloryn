@@ -1,0 +1,84 @@
+name: Deploy News Monitoring Job
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'test'
+        type: choice
+        options:
+        - test
+        - prod
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+
+env:
+  FUNCTION_NAME: news-monitoring-job
+  RUNTIME: python311
+
+jobs:
+  deploy:
+    name: Deploy News Monitoring Job
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || inputs.environment || 'test' }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+      with:
+        project_id: ${{ vars.GOOGLE_CLOUD_PROJECT }}
+
+    - name: Create Pub/Sub topics
+      run: |
+        echo "📋 Creating Pub/Sub topics..."
+
+        # Create news-monitoring-topic
+        echo "Creating news-monitoring-topic..."
+        if gcloud pubsub topics describe news-monitoring-topic --project=${{ vars.GOOGLE_CLOUD_PROJECT }} &>/dev/null; then
+          echo "✅ Topic news-monitoring-topic already exists"
+        else
+          gcloud pubsub topics create news-monitoring-topic --project=${{ vars.GOOGLE_CLOUD_PROJECT }} || {
+            echo "❌ Failed to create news-monitoring-topic"
+            exit 1
+          }
+          echo "✅ Created topic: news-monitoring-topic"
+        fi
+
+    - name: Deploy Cloud Function
+      run: |
+        cd news_monitoring_cloud_function
+
+        echo "🚀 Deploying News Monitoring Job..."
+        echo "Function name: ${{ env.FUNCTION_NAME }}"
+        echo "Project: ${{ vars.GOOGLE_CLOUD_PROJECT }}"
+        
+        gcloud functions deploy ${{ env.FUNCTION_NAME }} \
+          --gen2 \
+          --runtime ${{ env.RUNTIME }} \
+          --region ${{ vars.GOOGLE_CLOUD_LOCATION }} \
+          --source . \
+          --entry-point news_monitoring_trigger \
+          --trigger-topic news-monitoring-topic \
+          --memory 1GiB \
+          --timeout 540s \
+          --max-instances 1 \
+          --set-env-vars="GCP_PROJECT=${{ vars.GOOGLE_CLOUD_PROJECT }},ALPHAVANTAGE_API_KEY=${{ secrets.ALPHAVANTAGE_API_KEY }}" \
+          --no-allow-unauthenticated

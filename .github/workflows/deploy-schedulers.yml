@@ -194,3 +194,42 @@ jobs:
           
           echo "✅ Created global data collector job"
         fi
+
+    - name: News monitoring job
+      run: |
+        echo "📅 Creating/updating news monitoring job..."
+
+        JOB_NAME="news-monitoring-job"
+
+        # Check if job already exists
+        if gcloud scheduler jobs describe "$JOB_NAME" --location=${{ vars.GOOGLE_CLOUD_LOCATION }} --project=${{ vars.GOOGLE_CLOUD_PROJECT }} &>/dev/null; then
+          echo "Job $JOB_NAME already exists, updating..."
+          
+          gcloud scheduler jobs update pubsub "$JOB_NAME" \
+            --location=${{ vars.GOOGLE_CLOUD_LOCATION }} \
+            --schedule="*/30 * * * *" \
+            --time-zone="UTC" \
+            --topic="news-monitoring-topic" \
+            --message-body='{"trigger":"check"}' \
+            --description="Triggers news monitoring job to fetch and process news articles" \
+            --project=${{ vars.GOOGLE_CLOUD_PROJECT }} || {
+              echo "❌ Failed to update news monitoring job"
+            }
+          
+          echo "✅ Updated news monitoring job"
+        else
+          echo "Job $JOB_NAME does not exist, creating..."
+          
+          gcloud scheduler jobs create pubsub "$JOB_NAME" \
+            --location=${{ vars.GOOGLE_CLOUD_LOCATION }} \
+            --schedule="*/30 * * * *" \
+            --time-zone="UTC" \
+            --topic="news-monitoring-topic" \
+            --message-body='{"trigger":"check"}' \
+            --description="Triggers news monitoring job to fetch and process news articles" \
+            --project=${{ vars.GOOGLE_CLOUD_PROJECT }} || {
+              echo "❌ Failed to create news monitoring job"
+            }
+          
+          echo "✅ Created news monitoring job"
+        fi
