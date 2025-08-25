@@ -2,7 +2,7 @@ from google.adk.agents import LlmAgent
 
 root_agent = LlmAgent(
     name="analysis_reporter",
-    model="gemini-1.5-flash",  # Much faster and cheaper than 2.5-pro
+    model="gemini-2.0-flash",  # Much faster and cheaper than 2.5-pro
     description=(
         "Efficient financial analysis agent delivering institutional-quality insights. "
         "Analyzes technical indicators, fundamentals, sentiment, and risk. "
