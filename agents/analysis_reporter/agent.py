@@ -15,8 +15,8 @@ root_agent = LlmAgent(
     Analyze provided data ($.technical_data, company profile, market context) and generate insights for all languages in $.languages.
 
     ## Output Format
-    JSON array with 3 paragraphs per section, max 300 chars each:
-    
+    JSON array with 3 paragraphs per section, approximately 300 chars each:
+
     [{"language": "en", "overall_analysis": ["paragraph1", "paragraph2", "paragraph3"], "technical_analysis": [...], "fundamental_analysis": [...], "sentiment_analysis": [...], "risk_analysis": [...], "investment_insights": [...], "investment_narrative": [...]}]
 
     ## Focus Areas

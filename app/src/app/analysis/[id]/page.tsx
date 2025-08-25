@@ -6,6 +6,7 @@ import { useSubscription } from '@/hooks/useSubscription';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { NewsCarousel } from '@/components/NewsCarousel';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { ArrowLeft, Calendar, TrendingUp, AlertCircle, Download, Share, Mail, DollarSign, BarChart3, Activity, Target, Shield, Info, Building, Zap, Brain, PieChart } from 'lucide-react';
@@ -36,6 +37,9 @@ interface AnalysisData {
   hourly_prices?: any;
   income_statement_data?: any;
   monthly_prices?: any;
+  news_sentiment?: {
+    data?: any[];
+  };
   splits_data?: any;
   technical_analysis_results?: any;
   weekly_prices?: any;
@@ -577,7 +581,17 @@ Educational use only - Not financial advice
           </Card>
         )}
 
-        {/* 4. Technical Analysis Text */}
+        {/* 4. News & Sentiment Analysis */}
+        {analysis?.news_sentiment?.data && analysis.news_sentiment.data.length > 0 && (
+          <div className="mb-8">
+            <NewsCarousel 
+              news={analysis.news_sentiment.data} 
+              ticker={analysis.ticker}
+            />
+          </div>
+        )}
+
+        {/* 5. Technical Analysis Text */}
         {analysis?.analysis_overview?.analysis_data?.[user?.preferredLanguage || 'en']?.technical_analysis && (
           <Card className="mb-8">
             <CardHeader>
@@ -594,7 +608,7 @@ Educational use only - Not financial advice
           </Card>
         )}
 
-        {/* 5. Technical Indicators */}
+        {/* 6. Technical Indicators */}
         {analysis.technical_analysis_results && (
           <Card className="mb-8">
             <CardHeader>
@@ -847,7 +861,7 @@ Educational use only - Not financial advice
           </Card>
         )}
 
-        {/* 6. Fundamental Analysis Text */}
+        {/* 7. Fundamental Analysis Text */}
         {analysis?.analysis_overview?.analysis_data?.[user?.preferredLanguage || 'en']?.fundamental_analysis && (
           <Card className="mb-8">
             <CardHeader>
@@ -864,7 +878,7 @@ Educational use only - Not financial advice
           </Card>
         )}
 
-        {/* 7. Fundamental Analysis Charts */}
+        {/* 8. Fundamental Analysis Charts */}
         {(analysis.income_statement_data?.data || analysis.balance_sheet_data?.data || analysis.company_overview?.data?.[0]) && (
           <Card className="mb-8">
             <CardHeader>
@@ -1093,7 +1107,7 @@ Educational use only - Not financial advice
           </Card>
         )}
 
-        {/* 10. Sentiment Analysis */}
+        {/* 9. Sentiment Analysis */}
         {analysis?.analysis_overview?.analysis_data?.[user?.preferredLanguage || 'en']?.sentiment_analysis && (
           <Card className="mb-8">
             <CardHeader>
@@ -1112,7 +1126,7 @@ Educational use only - Not financial advice
           </Card>
         )}
 
-        {/* 11. Investment Insights - Last Section */}
+        {/* 10. Investment Insights - Last Section */}
         {analysis?.analysis_overview?.analysis_data?.[user?.preferredLanguage || 'en']?.investment_insights && (
           <Card className="mb-8">
             <CardHeader>

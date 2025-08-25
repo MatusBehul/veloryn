@@ -432,6 +432,15 @@ export const ES_TRANSLATIONS = {
     analysisDetailSentimentAnalysis: 'Análisis de sentimiento',
     analysisDetailInvestmentInsights: 'Ideas de inversión',
 
+    // Sección de Noticias y Sentimiento
+    analysisDetailNewsAndSentiment: 'Noticias del mercado y sentimiento',
+    analysisDetailNewsNotAvailable: 'No hay noticias disponibles',
+    analysisDetailNewsOverallSentiment: 'Sentimiento general',
+    analysisDetailNewsTopics: 'Temas',
+    analysisDetailNewsAffectedTickers: 'Acciones afectadas',
+    analysisDetailNewsRelevance: 'Rel',
+    analysisDetailNewsCurrent: '(Actual)',
+
     // Página de Precios
     pricingTitle: 'Precios simples y transparentes',
     pricingSubtitle: 'Elija el plan que se ajuste a sus necesidades. Comience gratis y mejore a medida que crezca.',

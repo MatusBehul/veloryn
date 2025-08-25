@@ -432,6 +432,15 @@ export const EN_TRANSLATIONS = {
     analysisDetailSentimentAnalysis: 'Sentiment Analysis',
     analysisDetailInvestmentInsights: 'Investment Insights',
 
+    // News & Sentiment section
+    analysisDetailNewsAndSentiment: 'Market News & Sentiment',
+    analysisDetailNewsNotAvailable: 'No news available',
+    analysisDetailNewsOverallSentiment: 'Overall Sentiment',
+    analysisDetailNewsTopics: 'Topics',
+    analysisDetailNewsAffectedTickers: 'Affected Tickers',
+    analysisDetailNewsRelevance: 'Rel',
+    analysisDetailNewsCurrent: '(Current)',
+
     // Pricing page translations
     pricingTitle: 'Simple, Transparent Pricing',
     pricingSubtitle: 'Choose the plan that fits your needs. Start for free and upgrade as you grow.',

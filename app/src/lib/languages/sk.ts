@@ -432,6 +432,15 @@ export const SK_TRANSLATIONS = {
     analysisDetailSentimentAnalysis: 'Sentiment analýza',
     analysisDetailInvestmentInsights: 'Investičné poznatky',
 
+    // Sekcia Správy a Sentiment
+    analysisDetailNewsAndSentiment: 'Trhové správy a sentiment',
+    analysisDetailNewsNotAvailable: 'Žiadne správy nie sú k dispozícii',
+    analysisDetailNewsOverallSentiment: 'Celkový sentiment',
+    analysisDetailNewsTopics: 'Témy',
+    analysisDetailNewsAffectedTickers: 'Ovplyvnené akcie',
+    analysisDetailNewsRelevance: 'Rel',
+    analysisDetailNewsCurrent: '(Aktuálne)',
+
     // Stránka Cenník
     pricingTitle: 'Jednoduchý, transparentný cenník',
     pricingSubtitle: 'Vyberte si plán, ktorý vám vyhovuje. Začnite zdarma a postupne prejdite vyššie.',
