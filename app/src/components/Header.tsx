@@ -49,11 +49,16 @@ export function Header() {
 
   return (
     <header className="bg-white border-b border-gray-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 xl:px-8">
+        <div className="flex justify-between items-center h-14 sm:h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center flex-shrink-0">
-            <VelorynLogo size="md" />
+            <div className="sm:hidden">
+              <VelorynLogo size="sm" />
+            </div>
+            <div className="hidden sm:block">
+              <VelorynLogo size="md" />
+            </div>
           </Link>
 
           {/* Desktop Navigation */}
@@ -160,6 +165,12 @@ export function Header() {
                   {t('pricing')}
                 </Link>
                 <Link
+                  href="/news"
+                  className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                >
+                  {t('news')}
+                </Link>
+                <Link
                   href="/contact"
                   className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
                 >
@@ -260,6 +271,12 @@ export function Header() {
                 >
                   {t('pricing')}
                 </Link>
+                <Link
+                  href="/news"
+                  className="text-gray-700 hover:text-gray-900 px-2 py-2 rounded-md text-sm font-medium"
+                >
+                  {t('news')}
+                </Link>
                 <div className="flex items-center space-x-2 border-l border-gray-200 pl-2">
                   <LanguageSelector variant="dropdown" />
                   <Link href="/login">
@@ -273,15 +290,15 @@ export function Header() {
           </nav>
 
           {/* Mobile menu button and essential items */}
-          <div className="flex lg:hidden items-center space-x-2">
+          <div className="flex lg:hidden items-center space-x-1 sm:space-x-2">
             {/* Language selector for mobile */}
             <LanguageSelector variant="dropdown" />
             
             {/* Subscription status for authenticated users */}
             {user && hasActiveSubscription && (
-              <div className="flex items-center space-x-1 px-2 py-1 bg-green-50 rounded-md">
+              <div className="flex items-center space-x-1 px-1 sm:px-2 py-1 bg-green-50 rounded-md">
                 <Crown className="h-3 w-3 text-green-600" />
-                <span className="text-xs font-medium text-green-700">{subscriptionTier.toUpperCase()}</span>
+                <span className="text-xs font-medium text-green-700 hidden xs:inline">{subscriptionTier.toUpperCase()}</span>
               </div>
             )}
             
@@ -290,7 +307,7 @@ export function Header() {
               variant="ghost"
               size="sm"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-2"
+              className="p-1 sm:p-2"
             >
               {isMobileMenuOpen ? (
                 <X className="h-5 w-5" />
@@ -304,11 +321,11 @@ export function Header() {
         {/* Mobile Navigation Menu */}
         {isMobileMenuOpen && (
           <div className="lg:hidden border-t border-gray-200 bg-white">
-            <div className="px-2 pt-2 pb-3 space-y-1">
+            <div className="px-1 sm:px-2 pt-2 pb-3 space-y-1">
               {user ? (
                 <>
                   {/* User info */}
-                  <div className="px-3 py-2 border-b border-gray-200 mb-2">
+                  <div className="px-2 sm:px-3 py-2 border-b border-gray-200 mb-2">
                     <div className="flex items-center space-x-2">
                       <User className="h-4 w-4 text-gray-400" />
                       <span className="text-sm text-gray-700 truncate">{user.email}</span>
@@ -317,7 +334,7 @@ export function Header() {
 
                   <Link
                     href="/dashboard"
-                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+                    className="block px-2 sm:px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {t('dashboard')}
@@ -327,7 +344,7 @@ export function Header() {
                     <>
                       <Link
                         href="/analysis"
-                        className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+                        className="block px-2 sm:px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
                         {t('analysis')}
@@ -335,7 +352,7 @@ export function Header() {
 
                       <Link
                         href="/news"
-                        className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+                        className="block px-2 sm:px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
                         {t('news')}
@@ -345,7 +362,7 @@ export function Header() {
 
                   <Link
                     href="/settings"
-                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+                    className="block px-2 sm:px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {t('settings')}
@@ -353,14 +370,14 @@ export function Header() {
 
                   <Link
                     href="/pricing"
-                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+                    className="block px-2 sm:px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {t('pricing')}
                   </Link>
 
                   {/* Action buttons */}
-                  <div className="px-3 py-2 space-y-2 border-t border-gray-200 mt-2 pt-2">
+                  <div className="px-2 sm:px-3 py-2 space-y-2 border-t border-gray-200 mt-2 pt-2">
                     {hasActiveSubscription ? (
                       <Button
                         variant="outline"
@@ -406,21 +423,28 @@ export function Header() {
                 <>
                   <Link
                     href="/pricing"
-                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+                    className="block px-2 sm:px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {t('pricing')}
                   </Link>
                   <Link
+                    href="/news"
+                    className="block px-2 sm:px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {t('news')}
+                  </Link>
+                  <Link
                     href="/contact"
-                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+                    className="block px-2 sm:px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {t('contact')}
                   </Link>
                   
                   {/* Login button */}
-                  <div className="px-3 py-2 border-t border-gray-200 mt-2 pt-2">
+                  <div className="px-2 sm:px-3 py-2 border-t border-gray-200 mt-2 pt-2">
                     <div className="text-center text-sm text-gray-600 mb-2">{t('starting_at_price')}</div>
                     <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
                       <Button variant="outline" size="sm" className="w-full">
