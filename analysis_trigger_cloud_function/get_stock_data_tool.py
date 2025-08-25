@@ -135,7 +135,7 @@ class FinancialDataTool:
                 url = f"{self.apis['alpha_vantage']['base_url']}"
                 params = {
                     'function': 'NEWS_SENTIMENT',
-                    'symbol': symbol,
+                    'tickers': symbol,
                     'apikey': self.apis['alpha_vantage']['api_key']
                 }
 
