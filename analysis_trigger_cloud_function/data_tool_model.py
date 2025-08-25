@@ -9,7 +9,7 @@ class StockDividendDataModel(BaseModel):
     declaration_date: str | None = None
     record_date: str | None = None
     payment_date: str | None = None
-    open: float | str | None = None
+    amount: float | str | None = None
 
 
 class StockRealtimeDataModel(BaseModel):

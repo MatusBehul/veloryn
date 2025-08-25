@@ -1067,7 +1067,7 @@ Educational use only - Not financial advice
         )}
 
         {/* Dividend Information */}
-        {/* {analysis.dividend_data?.data && analysis.dividend_data.data.length > 0 && (
+        {analysis.dividend_data?.data && analysis.dividend_data.data.length > 0 && (
           <Card className="mb-8">
             <CardHeader>
               <CardTitle className="flex items-center">
@@ -1084,14 +1084,14 @@ Educational use only - Not financial advice
                       {dividend.ex_dividend_date ? new Date(dividend.ex_dividend_date).toLocaleDateString() : 'N/A'}
                     </p>
                     <p className="text-lg font-semibold text-green-600">
-                      {formatCurrency(dividend.open)}
+                      {formatCurrency(dividend.amount)}
                     </p>
                   </div>
                 ))}
               </div>
             </CardContent>
           </Card>
-        )} */}
+        )}
 
         {/* 10. Sentiment Analysis */}
         {analysis?.analysis_overview?.analysis_data?.[user?.preferredLanguage || 'en']?.sentiment_analysis && (

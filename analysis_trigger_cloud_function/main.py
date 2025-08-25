@@ -7,7 +7,8 @@ import json
 import time
 import logging
 import traceback
-from datetime import datetime, timezone
+import random
+from datetime import datetime, timezone, timedelta
 from typing import Dict, Any, Optional
 import asyncio
 import aiohttp
@@ -118,8 +119,8 @@ class FinancialAnalysisTrigger:
                 'status_code': getattr(e, 'status', 500)
             }
 
-    async def call_cloud_run_service(self, payload: Dict[str, Any], max_retries: int = 3, base_delay: float = 1.0) -> Dict[str, Any]:
-        """Call the Cloud Run service with the analysis payload, with retry mechanism for transient errors."""
+    async def call_cloud_run_service(self, payload: Dict[str, Any], max_retries: int = 5, base_delay: float = 2.0) -> Dict[str, Any]:
+        """Call the Cloud Run service with the analysis payload, with retry mechanism for transient errors and rate limits."""
         if not CLOUD_RUN_URL:
             raise ValueError("CLOUD_RUN_URL environment variable not set")
 
@@ -203,10 +204,24 @@ class FinancialAnalysisTrigger:
             except aiohttp.ClientResponseError as e:
                 logger.error(traceback.format_exc())
                 logger.error(f"HTTP error calling Cloud Run service: {e.status} {e.message} (attempt {attempt+1})")
-                # Retry only on 5xx errors
-                if 500 <= e.status < 600:
+                
+                # Retry on 5xx errors and 429 (Rate Limit) errors
+                if 500 <= e.status < 600 or e.status == 429:
                     last_error = f"HTTP {e.status}: {e.message}"
                     last_status = e.status
+                    
+                    # For 429 errors, add extra delay beyond normal exponential backoff
+                    if e.status == 429:
+                        logger.warning(f"Rate limit hit (429) for {payload['session_id']}, will use extended backoff")
+                        # Record the rate limit event for tracking
+                        try:
+                            await self.record_rate_limit_event(
+                                payload.get('session_id', 'unknown').split('_')[1] if '_' in payload.get('session_id', '') else 'unknown',
+                                payload['session_id'], 
+                                f"HTTP {e.status}: {e.message}"
+                            )
+                        except Exception as record_error:
+                            logger.error(f"Failed to record rate limit event: {record_error}")
                 else:
                     return {
                         'success': False,
@@ -223,8 +238,24 @@ class FinancialAnalysisTrigger:
             # If we reach here, we want to retry
             attempt += 1
             if attempt < max_retries:
+                # Base exponential backoff
                 delay = base_delay * (2 ** (attempt - 1))
-                logger.info(f"Retrying Cloud Run call in {delay:.1f}s (attempt {attempt+1} of {max_retries})...")
+                
+                # For 429 rate limit errors, use much longer delays
+                if last_status == 429:
+                    # Progressive delays for rate limiting: 30s, 60s, 120s
+                    rate_limit_delays = [30, 60, 120]
+                    base_delay = rate_limit_delays[min(attempt - 1, len(rate_limit_delays) - 1)]
+                    # Add jitter to prevent thundering herd
+                    jitter = random.uniform(0.8, 1.2)
+                    delay = int(base_delay * jitter)
+                    logger.warning(f"Rate limit detected, using extended delay of {delay}s (attempt {attempt+1} of {max_retries})")
+                else:
+                    # Add small jitter to regular delays too
+                    jitter = random.uniform(0.8, 1.2)
+                    delay = delay * jitter
+                    logger.info(f"Retrying Cloud Run call in {delay:.1f}s (attempt {attempt+1} of {max_retries})...")
+                
                 await asyncio.sleep(delay)
 
         # If all retries failed
@@ -859,6 +890,119 @@ class FinancialAnalysisTrigger:
             'prompt_tokens': prompt_tokens,
             'response_tokens': response_tokens
         }
+    
+    async def check_recent_rate_limits(self) -> Dict[str, Any]:
+        """Check for recent rate limiting events and return delay recommendation"""
+        try:
+            # Look for recent 429 errors in the last 10 minutes
+            ten_minutes_ago = datetime.now(timezone.utc) - timedelta(minutes=10)
+            
+            # Query performance metrics for recent 429 errors
+            rate_limit_query = self.db.collection(PERFORMANCE_COLLECTION).where(
+                'status_code', '==', 429
+            ).where(
+                'timestamp', '>=', ten_minutes_ago
+            ).order_by('timestamp', direction=firestore.Query.DESCENDING).limit(5)
+            
+            recent_rate_limits = list(rate_limit_query.stream())
+            
+            if not recent_rate_limits:
+                return {'should_delay': False, 'delay_seconds': 0}
+            
+            # Count recent rate limits
+            rate_limit_count = len(recent_rate_limits)
+            latest_rate_limit = recent_rate_limits[0].to_dict()
+            latest_timestamp = latest_rate_limit['timestamp']
+            
+            # Calculate time since last rate limit
+            time_since_last = datetime.now(timezone.utc) - latest_timestamp
+            minutes_since = time_since_last.total_seconds() / 60
+            
+            logger.warning(f"Found {rate_limit_count} recent rate limits, latest was {minutes_since:.1f} minutes ago")
+            
+            # Progressive backoff based on recent rate limit frequency
+            if rate_limit_count >= 3 and minutes_since < 5:
+                # Multiple recent rate limits, wait longer
+                base_delay = 180  # 3 minutes
+            elif rate_limit_count >= 2 and minutes_since < 3:
+                # Some recent rate limits, moderate delay
+                base_delay = 60   # 1 minute
+            elif minutes_since < 2:
+                # Very recent rate limit, short delay
+                base_delay = 30   # 30 seconds
+            else:
+                # Old enough, proceed with minimal delay
+                base_delay = 10   # 10 seconds
+            
+            # Add jitter to prevent thundering herd (±20% random variation)
+            jitter = random.uniform(0.8, 1.2)
+            delay_seconds = int(base_delay * jitter)
+            
+            return {
+                'should_delay': True,
+                'delay_seconds': delay_seconds,
+                'recent_count': rate_limit_count,
+                'minutes_since_last': minutes_since
+            }
+            
+        except Exception as e:
+            logger.warning(f"Error checking recent rate limits: {e}")
+            # If we can't check, be conservative and add a small delay
+            return {'should_delay': True, 'delay_seconds': 15}
+
+    async def record_rate_limit_event(self, ticker: str, session_id: str, error_details: str) -> None:
+        """Record a rate limit event for tracking and analysis"""
+        try:
+            doc_id = f"rate_limit_{ticker}_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}"
+            
+            rate_limit_doc = {
+                'ticker': ticker.upper(),
+                'session_id': session_id,
+                'error_details': error_details,
+                'timestamp': datetime.now(timezone.utc),
+                'event_type': 'rate_limit_429',
+                'created_at': datetime.now(timezone.utc)
+            }
+            
+            # Store in a dedicated collection for rate limit tracking
+            self.db.collection('rate_limit_events').document(doc_id).set(rate_limit_doc)
+            logger.warning(f"Recorded rate limit event: {doc_id}")
+            
+        except Exception as e:
+            logger.error(f"Error recording rate limit event: {e}")
+
+    async def check_circuit_breaker(self) -> Dict[str, Any]:
+        """Check if we should temporarily stop processing due to excessive rate limits"""
+        try:
+            # Look for rate limit events in the last 30 minutes
+            thirty_minutes_ago = datetime.now(timezone.utc) - timedelta(minutes=30)
+            
+            # Query rate limit events
+            circuit_query = self.db.collection('rate_limit_events').where(
+                'timestamp', '>=', thirty_minutes_ago
+            ).order_by('timestamp', direction=firestore.Query.DESCENDING).limit(10)
+            
+            recent_events = list(circuit_query.stream())
+            
+            if len(recent_events) >= 5:
+                # Too many rate limits in 30 minutes - activate circuit breaker
+                latest_event = recent_events[0].to_dict()
+                time_since_latest = datetime.now(timezone.utc) - latest_event['timestamp']
+                minutes_since = time_since_latest.total_seconds() / 60
+                
+                # Circuit breaker: wait at least 15 minutes after latest rate limit
+                if minutes_since < 15:
+                    return {
+                        'circuit_open': True,
+                        'wait_minutes': 15 - minutes_since,
+                        'recent_rate_limits': len(recent_events)
+                    }
+            
+            return {'circuit_open': False}
+            
+        except Exception as e:
+            logger.warning(f"Error checking circuit breaker: {e}")
+            return {'circuit_open': False}
 
 async def process_financial_analysis(ticker: str, day_input: str = None, user_id: str = "cloud_function") -> Dict[str, Any]:
     """Main function to process financial analysis"""
@@ -866,6 +1010,33 @@ async def process_financial_analysis(ticker: str, day_input: str = None, user_id
     
     async with FinancialAnalysisTrigger() as analyzer:
         try:
+            # Check circuit breaker status
+            circuit_status = await analyzer.check_circuit_breaker()
+            if circuit_status['circuit_open']:
+                wait_minutes = circuit_status['wait_minutes']
+                logger.error(f"Circuit breaker active for {ticker} - too many recent rate limits. Wait {wait_minutes:.1f} more minutes.")
+                return {
+                    'success': False,
+                    'ticker': ticker,
+                    'error': f'Circuit breaker active - too many rate limits. Try again in {wait_minutes:.1f} minutes.',
+                    'execution_time': time.time() - function_start_time,
+                    'circuit_breaker': True
+                }
+            
+            # Check for recent rate limiting before proceeding
+            rate_limit_check = await analyzer.check_recent_rate_limits()
+            if rate_limit_check['should_delay']:
+                delay_seconds = rate_limit_check['delay_seconds']
+                logger.warning(f"Recent rate limits detected, delaying analysis for {ticker} by {delay_seconds}s")
+                await asyncio.sleep(delay_seconds)
+            
+            # Check circuit breaker status
+            circuit_status = await analyzer.check_circuit_breaker()
+            if circuit_status['circuit_open']:
+                wait_minutes = circuit_status['wait_minutes']
+                logger.warning(f"Circuit breaker active for {ticker}, waiting {wait_minutes} minutes")
+                await asyncio.sleep(wait_minutes * 60)  # Convert to seconds
+            
             # Generate payload
             if day_input:
                 analyzer.day_input = day_input
