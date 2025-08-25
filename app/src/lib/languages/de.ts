@@ -7,6 +7,7 @@ export const DE_TRANSLATIONS = {
     // Navigation & Kopfzeile
     dashboard: 'Dashboard',
     analysis: 'Analyse',
+    news: 'Nachrichten [EN]',
     settings: 'Einstellungen',
     pricing: 'Preise',
     contact: 'Kontakt',

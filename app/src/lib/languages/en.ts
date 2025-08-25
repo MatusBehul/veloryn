@@ -7,6 +7,7 @@ export const EN_TRANSLATIONS = {
     // Navigation & Header
     dashboard: 'Dashboard',
     analysis: 'Analysis',
+    news: 'News',
     settings: 'Settings',
     pricing: 'Pricing',
     contact: 'Contact',

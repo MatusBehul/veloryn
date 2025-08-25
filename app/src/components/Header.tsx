@@ -75,12 +75,21 @@ export function Header() {
                 </Link>
                 
                 {hasActiveSubscription && (
-                  <Link
-                    href="/analysis"
-                    className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
-                  >
-                    {t('analysis')}
-                  </Link>
+                  <>
+                    <Link
+                      href="/analysis"
+                      className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                    >
+                      {t('analysis')}
+                    </Link>
+                    
+                    <Link
+                      href="/news"
+                      className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                    >
+                      {t('news')}
+                    </Link>
+                  </>
                 )}
 
                 <Link
@@ -181,12 +190,21 @@ export function Header() {
                 </Link>
                 
                 {hasActiveSubscription && (
-                  <Link
-                    href="/analysis"
-                    className="text-gray-700 hover:text-gray-900 px-2 py-2 rounded-md text-sm font-medium"
-                  >
-                    {t('analysis')}
-                  </Link>
+                  <>
+                    <Link
+                      href="/analysis"
+                      className="text-gray-700 hover:text-gray-900 px-2 py-2 rounded-md text-sm font-medium"
+                    >
+                      {t('analysis')}
+                    </Link>
+                    
+                    <Link
+                      href="/news"
+                      className="text-gray-700 hover:text-gray-900 px-2 py-2 rounded-md text-sm font-medium"
+                    >
+                      {t('news')}
+                    </Link>
+                  </>
                 )}
                 
                 {/* Simplified actions for tablet */}
@@ -306,13 +324,23 @@ export function Header() {
                   </Link>
 
                   {hasActiveSubscription && (
-                    <Link
-                      href="/analysis"
-                      className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      {t('analysis')}
-                    </Link>
+                    <>
+                      <Link
+                        href="/analysis"
+                        className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {t('analysis')}
+                      </Link>
+
+                      <Link
+                        href="/news"
+                        className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {t('news')}
+                      </Link>
+                    </>
                   )}
 
                   <Link

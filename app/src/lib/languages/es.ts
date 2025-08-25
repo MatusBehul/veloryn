@@ -7,6 +7,7 @@ export const ES_TRANSLATIONS = {
     // Navegación y encabezado
     dashboard: 'Panel',
     analysis: 'Análisis',
+    news: 'Noticias [EN]',
     settings: 'Configuración',
     pricing: 'Precios',
     contact: 'Contacto',

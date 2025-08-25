@@ -7,6 +7,7 @@ export const CZ_TRANSLATIONS = {
     // Navigace a hlavička
     dashboard: 'Panel',
     analysis: 'Analýza',
+    news: 'Zprávy [EN]',
     settings: 'Nastavení',
     pricing: 'Ceník',
     contact: 'Kontakt',

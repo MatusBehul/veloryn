@@ -7,6 +7,7 @@ export const IT_TRANSLATIONS = {
     // Navigazione e intestazione
     dashboard: 'Dashboard',
     analysis: 'Analisi',
+    news: 'Notizie [EN]',
     settings: 'Impostazioni',
     pricing: 'Prezzi',
     contact: 'Contatti',

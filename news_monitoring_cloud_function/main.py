@@ -117,8 +117,8 @@ class NewsMonitoringService:
                 ticker_sentiment.append({
                     'ticker': ticker.get('ticker', ''),
                     'relevance_score': ticker.get('relevance_score'),
-                    'sentiment_score': ticker.get('sentiment_score'),
-                    'sentiment_label': ticker.get('sentiment_label')
+                    'sentiment_score': ticker.get('ticker_sentiment_score'),
+                    'sentiment_label': ticker.get('ticker_sentiment_label')
                 })
             
             normalized_item = {
