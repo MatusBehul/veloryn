@@ -68,7 +68,6 @@ jobs:
           --region=${{ vars.GOOGLE_CLOUD_LOCATION }} \
           --service_name=${{ env.SERVICE_NAME }} \
           --with_ui \
-          --max-instances=10 \
           analysis_reporter/
 
     - name: Get service URL

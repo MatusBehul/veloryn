@@ -129,9 +129,9 @@ jobs:
           
           gcloud scheduler jobs update pubsub "$JOB_NAME" \
             --location=${{ vars.GOOGLE_CLOUD_LOCATION }} \
-            --schedule="0 8 * * *" \
+            --schedule="0 6 * * *" \
             --time-zone="UTC" \
-            --topic="daily-checker-trigger" \
+            --topic="new-analysis-checker-trigger" \
             --message-body='{"trigger":"daily-check"}' \
             --description="Triggers daily analysis checker to send emails for new analyses" \
             --project=${{ vars.GOOGLE_CLOUD_PROJECT }} || {
@@ -144,9 +144,9 @@ jobs:
           
           gcloud scheduler jobs create pubsub "$JOB_NAME" \
             --location=${{ vars.GOOGLE_CLOUD_LOCATION }} \
-            --schedule="0 8 * * *" \
+            --schedule="0 6 * * *" \
             --time-zone="UTC" \
-            --topic="daily-checker-trigger" \
+            --topic="new-analysis-checker-trigger" \
             --message-body='{"trigger":"daily-check"}' \
             --description="Triggers daily analysis checker to send emails for new analyses" \
             --project=${{ vars.GOOGLE_CLOUD_PROJECT }} || {
