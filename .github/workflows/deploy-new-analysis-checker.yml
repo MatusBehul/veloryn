@@ -1,4 +1,4 @@
-name: Deploy Hourly Analysis Checker
+name: Deploy New Analysis Checker
 
 on:
   workflow_dispatch:
@@ -18,12 +18,12 @@ on:
         type: string
 
 env:
-  FUNCTION_NAME: hourly-analysis-checker
+  FUNCTION_NAME: new-analysis-checker
   RUNTIME: python311
 
 jobs:
   deploy:
-    name: Deploy Hourly Checker
+    name: Deploy New Analysis Checker
     runs-on: ubuntu-latest
     environment: ${{ github.event.inputs.environment || inputs.environment || 'test' }}
     
@@ -50,23 +50,23 @@ jobs:
       run: |
         echo "📋 Creating Pub/Sub topics..."
         
-        # Create hourly-checker-trigger topic
-        echo "Creating hourly-checker-trigger topic..."
-        if gcloud pubsub topics describe hourly-checker-trigger --project=${{ vars.GOOGLE_CLOUD_PROJECT }} &>/dev/null; then
-          echo "✅ Topic hourly-checker-trigger already exists"
+        # Create new-analysis-checker-trigger topic
+        echo "Creating new-analysis-checker-trigger topic..."
+        if gcloud pubsub topics describe new-analysis-checker-trigger --project=${{ vars.GOOGLE_CLOUD_PROJECT }} &>/dev/null; then
+          echo "✅ Topic new-analysis-checker-trigger already exists"
         else
-          gcloud pubsub topics create hourly-checker-trigger --project=${{ vars.GOOGLE_CLOUD_PROJECT }} || {
-            echo "❌ Failed to create hourly-checker-trigger topic"
+          gcloud pubsub topics create new-analysis-checker-trigger --project=${{ vars.GOOGLE_CLOUD_PROJECT }} || {
+            echo "❌ Failed to create new-analysis-checker-trigger topic"
             exit 1
           }
-          echo "✅ Created topic: hourly-checker-trigger"
+          echo "✅ Created topic: new-analysis-checker-trigger"
         fi
 
     - name: Deploy Cloud Function
       run: |
-        cd hourly_analysis_checker
+        cd new_analysis_checker
         
-        echo "🚀 Deploying Hourly Analysis Checker..."
+        echo "🚀 Deploying New Analysis Checker..."
         echo "Function name: ${{ env.FUNCTION_NAME }}"
         echo "Project: ${{ vars.GOOGLE_CLOUD_PROJECT }}"
         
@@ -76,9 +76,9 @@ jobs:
           --region ${{ vars.GOOGLE_CLOUD_LOCATION }} \
           --source . \
           --entry-point check_new_analyses \
-          --trigger-topic hourly-checker-trigger \
+          --trigger-topic new-analysis-checker-trigger \
           --memory 1GiB \
           --timeout 540s \
           --max-instances 1 \
-          --set-env-vars="LANGUAGES=${{ vars.LANGUAGES }},GCP_PROJECT=${{ vars.GOOGLE_CLOUD_PROJECT }},EMAIL_PUBSUB_TOPIC=hourly-checker-trigger,ANALYSIS_BATCH_SIZE=50,LOOKBACK_HOURS=1" \
+          --set-env-vars="LANGUAGES=${{ vars.LANGUAGES }},GCP_PROJECT=${{ vars.GOOGLE_CLOUD_PROJECT }},EMAIL_PUBSUB_TOPIC=email-analysis-requests,ANALYSIS_BATCH_SIZE=50,LOOKBACK_HOURS=1" \
           --no-allow-unauthenticated

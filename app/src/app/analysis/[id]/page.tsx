@@ -443,7 +443,7 @@ Educational use only - Not financial advice
         )}
 
         {/* 1. Overall Analysis - First Section */}
-        {analysis?.analysis_overview?.analysis_data?.[user?.preferredLanguage || 'en'].overall_analysis && (
+        {analysis?.analysis_overview?.analysis_data?.[user?.preferredLanguage || 'en']?.overall_analysis && (
           <Card className="mb-8">
             <CardHeader>
               <CardTitle className="flex items-center">
@@ -453,7 +453,7 @@ Educational use only - Not financial advice
             </CardHeader>
             <CardContent>
               <div className="prose max-w-none">
-                {renderAnalysisSection(analysis.analysis_overview.analysis_data[user?.preferredLanguage || 'en'].overall_analysis)}
+                {renderAnalysisSection(analysis.analysis_overview.analysis_data?.[user?.preferredLanguage || 'en']?.overall_analysis)}
               </div>
             </CardContent>
           </Card>
@@ -570,7 +570,7 @@ Educational use only - Not financial advice
             <CardContent>
               <div className="bg-blue-50 p-6 rounded-lg">
                 <div className="prose max-w-none">
-                  {renderAnalysisSection(analysis.analysis_overview.analysis_data[user?.preferredLanguage || 'en'].investment_narrative)}
+                  {renderAnalysisSection(analysis.analysis_overview.analysis_data?.[user?.preferredLanguage || 'en']?.investment_narrative)}
                 </div>
               </div>
             </CardContent>
@@ -588,7 +588,7 @@ Educational use only - Not financial advice
             </CardHeader>
             <CardContent>
               <div className="prose max-w-none">
-                {renderAnalysisSection(analysis.analysis_overview.analysis_data[user?.preferredLanguage || 'en'].technical_analysis)}
+                {renderAnalysisSection(analysis.analysis_overview.analysis_data?.[user?.preferredLanguage || 'en']?.technical_analysis)}
               </div>
             </CardContent>
           </Card>
@@ -858,7 +858,7 @@ Educational use only - Not financial advice
             </CardHeader>
             <CardContent>
               <div className="prose max-w-none">
-                {renderAnalysisSection(analysis.analysis_overview.analysis_data[user?.preferredLanguage || 'en'].fundamental_analysis)}
+                {renderAnalysisSection(analysis.analysis_overview.analysis_data?.[user?.preferredLanguage || 'en']?.fundamental_analysis)}
               </div>
             </CardContent>
           </Card>
@@ -1007,7 +1007,7 @@ Educational use only - Not financial advice
             <CardContent>
               <div className="bg-red-50 p-6 rounded-lg">
                 <div className="prose max-w-none">
-                  {renderAnalysisSection(analysis.analysis_overview.analysis_data[user?.preferredLanguage || 'en'].risk_analysis)}
+                  {renderAnalysisSection(analysis.analysis_overview.analysis_data?.[user?.preferredLanguage || 'en']?.risk_analysis)}
                 </div>
               </div>
             </CardContent>
@@ -1105,7 +1105,7 @@ Educational use only - Not financial advice
             <CardContent>
               <div className="bg-yellow-50 p-6 rounded-lg">
                 <div className="prose max-w-none">
-                  {renderAnalysisSection(analysis.analysis_overview.analysis_data[user?.preferredLanguage || 'en'].sentiment_analysis)}
+                  {renderAnalysisSection(analysis.analysis_overview.analysis_data?.[user?.preferredLanguage || 'en']?.sentiment_analysis)}
                 </div>
               </div>
             </CardContent>
@@ -1124,7 +1124,7 @@ Educational use only - Not financial advice
             <CardContent>
               <div className="bg-purple-50 p-6 rounded-lg">
                 <div className="prose max-w-none">
-                  {renderAnalysisSection(analysis.analysis_overview.analysis_data[user?.preferredLanguage || 'en'].investment_insights)}
+                  {renderAnalysisSection(analysis.analysis_overview.analysis_data?.[user?.preferredLanguage || 'en']?.investment_insights)}
                 </div>
               </div>
             </CardContent>

@@ -53,8 +53,23 @@ jobs:
         
         echo "Function URL: $FUNCTION_URL"
         
-        for ticker in "${TICKERS[@]}"; do
-          echo "Processing ticker: $ticker"
+        # Starting time: 7:00 AM, increment by 5 minutes for each ticker
+        BASE_HOUR=7
+        BASE_MINUTE=0
+        
+        for i in "${!TICKERS[@]}"; do
+          ticker="${TICKERS[$i]}"
+          echo "Processing ticker: $ticker (index: $i)"
+          
+          # Calculate the schedule time for this ticker (5 minutes apart)
+          SCHEDULE_MINUTE=$((BASE_MINUTE + i * 5))
+          SCHEDULE_HOUR=$((BASE_HOUR + SCHEDULE_MINUTE / 60))
+          SCHEDULE_MINUTE=$((SCHEDULE_MINUTE % 60))
+          
+          # Format the cron schedule
+          CRON_SCHEDULE="$SCHEDULE_MINUTE $SCHEDULE_HOUR * * 1-5"
+          
+          echo "Ticker $ticker will run at: $SCHEDULE_HOUR:$(printf '%02d' $SCHEDULE_MINUTE) (schedule: $CRON_SCHEDULE)"
           
           # Replace dots with dashes for job names (Cloud Scheduler doesn't allow dots)
           JOB_NAME=$(echo "$ticker" | sed 's/\./-/g')
@@ -68,13 +83,13 @@ jobs:
             
             gcloud scheduler jobs update http "$FULL_JOB_NAME" \
               --location=${{ vars.GOOGLE_CLOUD_LOCATION }} \
-              --schedule="0 7 * * 1-5" \
+              --schedule="$CRON_SCHEDULE" \
               --time-zone="Europe/Prague" \
               --uri="$FUNCTION_URL" \
               --http-method=POST \
               --headers="Content-Type=application/json" \
               --message-body="{\"ticker\": \"$ticker\"}" \
-              --description="Daily financial analysis for $ticker" \
+              --description="Daily financial analysis for $ticker (runs at $SCHEDULE_HOUR:$(printf '%02d' $SCHEDULE_MINUTE))" \
               --attempt-deadline="540s" \
               --project=${{ vars.GOOGLE_CLOUD_PROJECT }} || {
                 echo "❌ Failed to update job $FULL_JOB_NAME"
@@ -87,13 +102,13 @@ jobs:
             
             gcloud scheduler jobs create http "$FULL_JOB_NAME" \
               --location=${{ vars.GOOGLE_CLOUD_LOCATION }} \
-              --schedule="0 7 * * 1-5" \
+              --schedule="$CRON_SCHEDULE" \
               --time-zone="Europe/Prague" \
               --uri="$FUNCTION_URL" \
               --http-method=POST \
               --headers="Content-Type=application/json" \
               --message-body="{\"ticker\": \"$ticker\"}" \
-              --description="Daily financial analysis for $ticker" \
+              --description="Daily financial analysis for $ticker (runs at $SCHEDULE_HOUR:$(printf '%02d' $SCHEDULE_MINUTE))" \
               --attempt-deadline="540s" \
               --project=${{ vars.GOOGLE_CLOUD_PROJECT }} || {
                 echo "❌ Failed to create job $FULL_JOB_NAME"
@@ -104,11 +119,11 @@ jobs:
           fi
         done
 
-    - name: Create or update hourly analysis checker job
+    - name: Create or update daily analysis checker job
       run: |
-        echo "📅 Creating/updating hourly analysis checker job..."
-        
-        JOB_NAME="hourly-analysis-checker"
+        echo "📅 Creating/updating daily analysis checker job..."
+
+        JOB_NAME="daily-analysis-checker"
         
         # Check if job already exists
         if gcloud scheduler jobs describe "$JOB_NAME" --location=${{ vars.GOOGLE_CLOUD_LOCATION }} --project=${{ vars.GOOGLE_CLOUD_PROJECT }} &>/dev/null; then
@@ -116,31 +131,31 @@ jobs:
           
           gcloud scheduler jobs update pubsub "$JOB_NAME" \
             --location=${{ vars.GOOGLE_CLOUD_LOCATION }} \
-            --schedule="0 * * * *" \
+            --schedule="0 8 * * *" \
             --time-zone="UTC" \
-            --topic="hourly-checker-trigger" \
-            --message-body='{"trigger":"hourly-check"}' \
-            --description="Triggers hourly analysis checker to send emails for new analyses" \
+            --topic="daily-checker-trigger" \
+            --message-body='{"trigger":"daily-check"}' \
+            --description="Triggers daily analysis checker to send emails for new analyses" \
             --project=${{ vars.GOOGLE_CLOUD_PROJECT }} || {
-              echo "❌ Failed to update hourly checker job"
+              echo "❌ Failed to update daily checker job"
             }
           
-          echo "✅ Updated hourly analysis checker job"
+          echo "✅ Updated daily analysis checker job"
         else
           echo "Job $JOB_NAME does not exist, creating..."
           
           gcloud scheduler jobs create pubsub "$JOB_NAME" \
             --location=${{ vars.GOOGLE_CLOUD_LOCATION }} \
-            --schedule="0 * * * *" \
+            --schedule="0 8 * * *" \
             --time-zone="UTC" \
-            --topic="hourly-checker-trigger" \
-            --message-body='{"trigger":"hourly-check"}' \
-            --description="Triggers hourly analysis checker to send emails for new analyses" \
+            --topic="daily-checker-trigger" \
+            --message-body='{"trigger":"daily-check"}' \
+            --description="Triggers daily analysis checker to send emails for new analyses" \
             --project=${{ vars.GOOGLE_CLOUD_PROJECT }} || {
-              echo "❌ Failed to create hourly checker job"
+              echo "❌ Failed to create daily checker job"
             }
           
-          echo "✅ Created hourly analysis checker job"
+          echo "✅ Created daily analysis checker job"
         fi
 
     - name: Create or update global data collector job
