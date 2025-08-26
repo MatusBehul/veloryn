@@ -53,8 +53,8 @@ W, H  = 1080, 1920               # portrait
 FPS   = 30                       # lower FPS => faster (24 is cinematic)
 DUR_FALLBACK = 5.0              # if no TTS
 
-INTRO_SEC = 0.6
-OUTRO_SEC = 0.6
+INTRO_SEC = 1
+OUTRO_SEC = 3
 AUDIO_SAMPLERATE = 44100
 EPS = 1e-3
 
