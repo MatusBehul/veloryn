@@ -1,4 +1,9 @@
-requests==2.32.4
-google-cloud-storage==2.19.0
-google-cloud-firestore==2.16.0
-python-dotenv==1.1.1
+moviepy
+imageio-ffmpeg
+pillow
+numpy
+pandas
+functions-framework
+google-cloud-storage
+requests
+matplotlib
