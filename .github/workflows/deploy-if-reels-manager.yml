@@ -76,6 +76,7 @@ jobs:
             --source=. \
             --entry-point=render_reel \
             --trigger-topic=make-ig-reel \
-            --memory=2Gi \
+            --memory=4Gi \
+            --timeout 3600s \
             --project="${{ vars.GOOGLE_CLOUD_PROJECT }}" \
             --set-env-vars=GCS_BUCKET=${{ vars.GOOGLE_CLOUD_STAGE_BUCKET }},ELEVENLABS_API_KEY=${{ secrets.ELEVENLABS_API_KEY }}
