@@ -9,57 +9,27 @@ With Pydantic model schema, the output will be automatically validated and struc
 from data_tool_model import ComprehensiveStockDataModel
 
 
-DAILY_TICKER_ANALYSIS_PROMPT = """Provide a comprehensive financial analysis for ticker {ticker} for day {day_input}.
-You do not calculate anything, I will provide you with all the data you need.
-YOU CANNOT FABULATE OR MAKE UP DATA. ALL DATA MUST BE REAL AND CURRENT.
-
-**Analysis Requirements:**
-4. **Sentiment Analysis**: Overall sentiment, scores, news/social sentiment, analyst ratings, fear/greed index
-5. **Risk Analysis**: Risk level, volatility metrics, beta, Sharpe ratio, max drawdown, VaR, key risks
-6. **Events Calendar**: Earnings, dividends, recent news, upcoming events, corporate actions
-7. **Investment Insights**: Action, confidence, target price, stop loss, time horizon, detailed reasoning
-8. **Investment Narrative**: 3 compelling paragraphs (~1000 words total) explaining the investment opportunity
-
-**Critical Data Requirements:**
-- All numerical values must be real current data, not placeholders
-- Comments for technical indicators should provide actionable insights
+DAILY_TICKER_ANALYSIS_PROMPT = """Analyze ticker {ticker} for day {day_input} using the provided comprehensive data.
 
 **Analysis Context:**
 - Analysis date: {day_input}
+- Ticker: {ticker}
+- Use the technical indicators, financial data, and market context provided
 - Focus on actionable investment insights
 - Balance opportunity identification with risk assessment
 - Consider broader market context and sector trends
-- Provide clear, evidence-based insights
 
-**Use your specialized skills:**
-Comment on:
-- $.technical_data.technical_analysis_results.daily
-- $.technical_data.technical_analysis_results.hourly
-- $.technical_data.technical_analysis_results.weekly
-- $.technical_data.technical_analysis_results.monthly
-- overall company profile, financial health and global market context
-- include analysis of sentiment, risk, and investment insights
+**Key Data Areas to Analyze:**
+- Technical indicators (RSI, MACD, moving averages, support/resistance)
+- Financial metrics (earnings, revenue, growth prospects, valuation)
+- Sentiment indicators (news sentiment, analyst ratings)
+- Risk metrics (volatility, beta, correlation)
+- Investment recommendations (action, price targets, timing)
 
-**Data you need:**
-```python {raw_analysis_data}```
+**Data provided:**
+{raw_analysis_data}
 
-**Output Format:**
-```json 
-[
-   {{
-      "language": "string",
-      "overall_analysis": ["string"],
-      "technical_analysis": ["string"],
-      "fundamental_analysis": ["string"],
-      "sentiment_analysis": ["string"],
-      "risk_analysis": ["string"],
-      "investment_insights": ["string"],
-      "investment_narrative": ["string"]
-   }}
-]
-```
-
-Ensure the analysis is thorough, current, and provides clear investment guidance."""
+Generate your comprehensive financial analysis based on this data."""
 
 
 def generate_daily_analysis_prompt(raw_analysis_data: ComprehensiveStockDataModel) -> str:
