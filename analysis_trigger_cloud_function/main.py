@@ -752,7 +752,7 @@ class FinancialAnalysisTrigger:
             message_data = {
                 "title": title,
                 "subtitle": subtitle,
-                "tts": subtitle,
+                "tts": promo_reels_tts_text,
                 "captions": promo_reels_summary,
                 "data": hourly_prices
             }
@@ -1344,7 +1344,7 @@ async def process_financial_analysis(ticker: str, day_input: str = None, user_id
                     if isinstance(analysis, dict) and analysis.get("language") == "en":
                         if str(analysis.get("promote_flag")).lower() == 'true':
                             promote_flag = True
-                            tts_text = analysis.get("promo_reels_tts_text", "").split("#")[0].strip()
+                            tts_text = analysis.get("promo_reels_tts_text", "").split("#")[0].strip() + ". Read more on our page!..."
                             summary_text = analysis.get("promo_reels_summary", "").strip()
                             break
                 if promote_flag:
