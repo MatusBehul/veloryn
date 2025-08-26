@@ -80,10 +80,25 @@ class FinancialAnalysisTrigger:
         if not CLOUD_RUN_URL:
             raise ValueError("CLOUD_RUN_URL environment variable not set")
         
+        # Get authentication token
+        auth_token = self._get_access_token()
+        if not auth_token:
+            logger.error("Failed to obtain authentication token")
+            return {
+                'success': False,
+                'error': 'Authentication token not available',
+                'status_code': 401
+            }
+        
         headers = {
             'Content-Type': 'application/json',
-            'Authorization': f'Bearer {self._get_access_token()}'
+            'Authorization': f'Bearer {auth_token}'
         }
+        
+        # Log authentication details for debugging (without exposing the token)
+        logger.info(f"Creating session with token length: {len(auth_token)}")
+        logger.info(f"Token prefix: {auth_token[:20]}...")
+        logger.info(f"Target URL: {CLOUD_RUN_URL}")
         
         session_payload = {
             "state": {
@@ -133,7 +148,7 @@ class FinancialAnalysisTrigger:
         )
 
         if not session_result['success']:
-            logger.error("Session success FALSE, creation failed.")
+            logger.error(f"Session creation failed: {session_result.get('error', 'Unknown error')}")
             return {
                 'success': False,
                 'error': f"Failed to create session: {session_result.get('error', 'Unknown error')}",
@@ -141,9 +156,20 @@ class FinancialAnalysisTrigger:
                 'status_code': session_result.get('status_code', 500)
             }
 
+        # Get authentication token for the main request
+        auth_token = self._get_access_token()
+        if not auth_token:
+            logger.error("Failed to obtain authentication token for main request")
+            return {
+                'success': False,
+                'error': 'Authentication token not available for main request',
+                'response_time': time.time() - start_time,
+                'status_code': 401
+            }
+
         headers = {
             'Content-Type': 'application/json',
-            'Authorization': f'Bearer {self._get_access_token()}'
+            'Authorization': f'Bearer {auth_token}'
         }
 
         attempt = 0
@@ -268,16 +294,34 @@ class FinancialAnalysisTrigger:
         }
     
     def _get_access_token(self) -> str:
-        """Get access token for Cloud Run authentication"""
+        """Get access token for Cloud Run authentication with correct audience"""
         try:
             from google.auth import default
             from google.auth.transport.requests import Request
+            import google.oauth2.id_token
             
+            # For Cloud Run services, we need an identity token, not an access token
+            # The audience should be the URL of the Cloud Run service
+            if CLOUD_RUN_URL:
+                try:
+                    # Get identity token with the Cloud Run service URL as audience
+                    request = Request()
+                    token = google.oauth2.id_token.fetch_id_token(request, CLOUD_RUN_URL)
+                    logger.info("Successfully obtained identity token for Cloud Run authentication")
+                    return token
+                except Exception as id_token_error:
+                    logger.warning(f"Failed to get identity token: {id_token_error}")
+                    # Fallback to access token method
+                    
+            # Fallback to access token method (may not work for Cloud Run)
             credentials, _ = default()
             credentials.refresh(Request())
+            logger.warning("Using access token instead of identity token - this may cause 401 errors")
             return credentials.token
+            
         except Exception as e:
-            logger.error(f"Error getting access token: {str(e)}")
+            logger.error(f"Error getting authentication token: {str(e)}")
+            logger.error(traceback.format_exc())
             return ""
     
     def _extract_analysis_from_adk_response(self, adk_response: Dict[str, Any]) -> Dict[str, Any]:
@@ -660,6 +704,38 @@ class FinancialAnalysisTrigger:
             logger.error(f"Error validating analysis data: {e}")
             return {"error": f"Validation failed: {str(e)}", "raw_data": data}
     
+    async def validate_cloud_run_access(self) -> Dict[str, Any]:
+        """Validate that we can access the Cloud Run service"""
+        try:
+            if not CLOUD_RUN_URL:
+                return {'valid': False, 'error': 'CLOUD_RUN_URL not set'}
+            
+            auth_token = self._get_access_token()
+            if not auth_token:
+                return {'valid': False, 'error': 'No authentication token available'}
+            
+            headers = {
+                'Authorization': f'Bearer {auth_token}'
+            }
+            
+            # Try a simple GET request to the service root
+            async with self.session.get(
+                CLOUD_RUN_URL,
+                headers=headers,
+                timeout=10
+            ) as response:
+                if response.status == 200:
+                    return {'valid': True, 'status_code': response.status}
+                elif response.status == 401:
+                    return {'valid': False, 'error': 'Authentication failed (401)', 'status_code': 401}
+                elif response.status == 403:
+                    return {'valid': False, 'error': 'Authorization failed (403) - check service account permissions', 'status_code': 403}
+                else:
+                    return {'valid': True, 'status_code': response.status, 'note': 'Service accessible but returned non-200 status'}
+                    
+        except Exception as e:
+            return {'valid': False, 'error': f'Validation failed: {str(e)}'}
+    
     def _fix_common_json_errors(self, json_str: str) -> str:
         """Attempt to fix common JSON syntax errors"""
         import re
@@ -1040,6 +1116,24 @@ async def process_financial_analysis(ticker: str, day_input: str = None, user_id
             # Generate payload
             if day_input:
                 analyzer.day_input = day_input
+            
+            # Validate Cloud Run access before proceeding
+            logger.info(f"Validating Cloud Run access for {ticker}...")
+            access_validation = await analyzer.validate_cloud_run_access()
+            if not access_validation['valid']:
+                error_msg = access_validation['error']
+                status_code = access_validation.get('status_code', 500)
+                logger.error(f"Cloud Run access validation failed for {ticker}: {error_msg}")
+                return {
+                    'success': False,
+                    'ticker': ticker,
+                    'error': f'Cloud Run authentication failed: {error_msg}',
+                    'execution_time': time.time() - function_start_time,
+                    'status_code': status_code,
+                    'validation_failed': True
+                }
+            else:
+                logger.info(f"Cloud Run access validated successfully for {ticker}")
             
 
             raw_analysis_data = await get_stock_data_tool.analyze_symbol(ticker)
