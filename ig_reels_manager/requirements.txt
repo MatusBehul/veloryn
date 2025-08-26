@@ -7,3 +7,4 @@ functions-framework
 google-cloud-storage
 requests
 matplotlib
+moviepy==1.0.3
