@@ -34,12 +34,12 @@ os.environ["IMAGEIO_FFMPEG_EXE"] = imageio_ffmpeg.get_ffmpeg_exe()
 from google.cloud import storage
 
 # ---- Functions Framework
-import functions_framework
+# import functions_framework
 
 # =============== CONFIG ===============
 W, H  = 1080, 1920               # portrait
-FPS   = 24                       # lower FPS => faster (24 is cinematic)
-DUR_FALLBACK = 24.0              # if no TTS
+FPS   = 30                       # lower FPS => faster (24 is cinematic)
+DUR_FALLBACK = 5.0              # if no TTS
 
 INTRO_SEC = 0.6
 OUTRO_SEC = 0.6
@@ -85,9 +85,9 @@ def pick_font(candidates, size):
             except Exception: pass
     return ImageFont.load_default()
 
-FONT_TITLE = pick_font(FONT_BOLD_CANDIDATES, int(H * 0.06))   # ~115px on 1920h
-FONT_NUM   = pick_font(FONT_BOLD_CANDIDATES, int(H * 0.05))   # ~96px
-FONT_BODY  = pick_font(FONT_REG_CANDIDATES,  int(H * 0.035))  # ~67px
+FONT_TITLE = pick_font(FONT_BOLD_CANDIDATES, 72)
+FONT_NUM   = pick_font(FONT_BOLD_CANDIDATES, 64)
+FONT_BODY  = pick_font(FONT_REG_CANDIDATES, 48)
 
 def lerp(a, b, u): return a + (b - a) * u
 def ease(u): return u*u*(3 - 2*u)  # smoothstep
@@ -155,9 +155,9 @@ def render_chart_static(df: pd.DataFrame) -> dict:
         ticks = np.linspace(0, len(x)-1, min(6, len(x)), dtype=int)
         ax.set_xticks(ticks)
         labels = [pd.to_datetime(x[i]).strftime("%m-%d\n%H:%M") for i in ticks]
-        ax.set_xticklabels(labels, rotation=0, ha="center", fontsize=int(H * 0.015))
+        ax.set_xticklabels(labels, rotation=0, ha="center", fontsize=16)
 
-    ax.tick_params(axis='y', labelsize=int(H * 0.018))
+    ax.tick_params(axis='y', labelsize=18)
     ax.grid(True, alpha=GRID_ALPHA, linewidth=0.8)
 
     # neon strokes
@@ -257,9 +257,9 @@ def make_chart_clip_fast(df: pd.DataFrame, title: str, subtitle: str, duration: 
 
         card_img = card_base.copy()
         cd2 = ImageDraw.Draw(card_img)
-        cd2.text((40, 30), "Price", font=FONT_BODY, fill=(160,160,170))
-        cd2.text((250, 20), price_txt, font=FONT_NUM, fill=(245,245,245))
-        cd2.text((card_w - 60, 50), pct_txt, font=FONT_NUM, fill=pct_color, anchor="rm")
+        cd2.text((40, 40), "Price", font=FONT_BODY, fill=(160,160,170))
+        cd2.text((200, 30), price_txt, font=FONT_NUM, fill=(245,245,245))
+        cd2.text((card_w - 40, 60), pct_txt, font=FONT_NUM, fill=pct_color, anchor="rm")
         pil.alpha_composite(card_img, (card_x, card_y))
 
         return np.array(pil.convert("RGB"))
@@ -310,12 +310,13 @@ def render_reel(cloud_event):
     try:
         payload_raw = base64.b64decode(cloud_event.data["message"]["data"]).decode("utf-8")
         payload = json.loads(payload_raw)
+        # payload = cloud_event
     except Exception:
         logging.exception("Failed to parse Pub/Sub data")
         raise
 
     title     = payload.get("title") or "Last 24h"
-    subtitle  = payload.get("subtitle", "")
+    subtitle  = payload.get("subtitle", "Previous trading hours")
     tts_text  = payload.get("tts", "")
     voice_id  = payload.get("voice_id")
     desired_duration = float(payload.get("duration", DUR_FALLBACK))
@@ -328,6 +329,7 @@ def render_reel(cloud_event):
     if tts_text:
         try:
             audio_path = TMP_DIR / "tts.mp3"
+            raise Exception("TTS disabled for testing")  # --- IGNORE ---
             tts_duration = eleven_tts_to_file(tts_text, audio_path, voice_id=voice_id)
         except Exception:
             logging.exception("TTS failed; continuing without audio.")
@@ -337,9 +339,9 @@ def render_reel(cloud_event):
     chart_duration = float(tts_duration) if tts_duration else desired_duration
 
     # Build video timeline (FAST path)
-    intro = make_slate(title, subtitle or "Previous trading hours", seconds=INTRO_SEC)
+    intro = make_slate(title, subtitle, seconds=INTRO_SEC)
     chart = make_chart_clip_fast(df, title, subtitle, duration=chart_duration)
-    outro = make_slate("Follow for daily updates", "", seconds=OUTRO_SEC)
+    outro = make_slate("Follow for daily updates", "veloryn.wadby.cloud", seconds=OUTRO_SEC)
 
     final = concatenate_videoclips([intro, chart, outro], method="compose")
 
@@ -375,3 +377,8 @@ def render_reel(cloud_event):
         pass
 
     return
+
+
+# if __name__ == "__main__":
+#     render_reel(
+#     )
