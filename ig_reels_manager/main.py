@@ -34,7 +34,7 @@ os.environ["IMAGEIO_FFMPEG_EXE"] = imageio_ffmpeg.get_ffmpeg_exe()
 from google.cloud import storage
 
 # ---- Functions Framework
-# import functions_framework
+import functions_framework
 
 # =============== CONFIG ===============
 W, H  = 1080, 1920               # portrait
