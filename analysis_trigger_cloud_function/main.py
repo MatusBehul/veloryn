@@ -739,57 +739,19 @@ class FinancialAnalysisTrigger:
         except Exception as e:
             return {'valid': False, 'error': f'Validation failed: {str(e)}'}
     
-    def publish_instagram_promotion(self, ticker: str, analysis_data: Dict[str, Any], hourly_prices: list) -> Dict[str, Any]:
+    def publish_instagram_promotion(self, ticker: str, promo_reels_tts_text: str, promo_reels_summary: str, hourly_prices: list) -> Dict[str, Any]:
         """Publish message to Pub/Sub for Instagram Reel creation"""
         try:
-            # Extract promotion data from analysis
-            en_analysis = analysis_data.get('analysis', {})
-            
-            # Handle different analysis data structures
-            if isinstance(en_analysis, list) and len(en_analysis) > 0:
-                # Array format: [{"language": "en", ...}, ...]
-                en_data = None
-                for item in en_analysis:
-                    if isinstance(item, dict) and item.get('language') == 'en':
-                        en_data = item
-                        break
-                
-                if not en_data:
-                    logger.warning(f"No English analysis found for {ticker}")
-                    return {'success': False, 'error': 'No English analysis found'}
-            
-            elif isinstance(en_analysis, dict):
-                # Direct dict format or nested structure
-                if 'en' in en_analysis:
-                    en_data = en_analysis['en']
-                elif 'language' in en_analysis and en_analysis.get('language') == 'en':
-                    en_data = en_analysis
-                else:
-                    # Assume it's the English analysis directly
-                    en_data = en_analysis
+            if promo_reels_tts_text and promo_reels_summary and hourly_prices:
+                pass
             else:
-                logger.warning(f"Unexpected analysis structure for {ticker}: {type(en_analysis)}")
-                return {'success': False, 'error': 'Unexpected analysis structure'}
-            
-            # Check for promote flag
-            promote_flag = en_data.get('promote_flag', False)
-            if not promote_flag:
-                logger.info(f"No promotion flag set for {ticker}")
-                return {'success': True, 'promoted': False, 'reason': 'No promotion flag'}
-            
-            # Extract required fields
-            tts_text = en_data.get('promo_reels_tts_text')
-            summary = en_data.get('promo_reels_summary')
-            
-            if not tts_text or not summary:
-                logger.warning(f"Missing TTS text or summary for {ticker} promotion")
-                return {'success': False, 'error': 'Missing TTS text or summary'}
+                raise ValueError("Missing required fields for Instagram promotion")
             
             # Prepare message payload
             message_data = {
                 "title": ticker.upper(),
-                "tts": tts_text,
-                "captions": summary,
+                "tts": promo_reels_tts_text,
+                "captions": promo_reels_summary,
                 "data": hourly_prices
             }
             
@@ -1373,12 +1335,13 @@ async def process_financial_analysis(ticker: str, day_input: str = None, user_id
             # Check for Instagram promotion flag and publish to Pub/Sub if needed
             promotion_result = {'promoted': False}
             try:
-                if not error_detected and result_to_save.get('success'):
+                if str(result_to_save.get('data', {}).get('analysis', {}).get("en", {}).get("promote_flag")).lower() == 'true':
                     # Get hourly prices for the promotion
                     hourly_prices = [item.model_dump() for item in raw_analysis_data.company_data.hourly_prices]
                     promotion_result = analyzer.publish_instagram_promotion(
                         ticker, 
-                        result_to_save.get('data', {}), 
+                        result_to_save.get('data', {}).get('analysis', {}).get("en", {}).get("promo_reels_tts_text"),
+                        result_to_save.get('data', {}).get('analysis', {}).get("en", {}).get("promo_reels_summary"),
                         hourly_prices
                     )
                     
