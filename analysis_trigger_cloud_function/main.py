@@ -739,10 +739,10 @@ class FinancialAnalysisTrigger:
         except Exception as e:
             return {'valid': False, 'error': f'Validation failed: {str(e)}'}
     
-    def publish_instagram_promotion(self, ticker: str, promo_reels_tts_text: str, promo_reels_summary: str, hourly_prices: list) -> Dict[str, Any]:
+    def publish_instagram_promotion(self, title: str, subtitle, promo_reels_tts_text: str, promo_reels_summary: str, hourly_prices: list) -> Dict[str, Any]:
         """Publish message to Pub/Sub for Instagram Reel creation"""
         try:
-            print(f"Publishing Instagram promotion for {ticker}")
+            print(f"Publishing Instagram promotion for {title}, {subtitle}")
             if promo_reels_tts_text and promo_reels_summary and hourly_prices:
                 pass
             else:
@@ -750,8 +750,9 @@ class FinancialAnalysisTrigger:
             
             # Prepare message payload
             message_data = {
-                "title": ticker.upper(),
-                "tts": promo_reels_tts_text,
+                "title": title,
+                "subtitle": subtitle,
+                "tts": subtitle,
                 "captions": promo_reels_summary,
                 "data": hourly_prices
             }
@@ -764,7 +765,7 @@ class FinancialAnalysisTrigger:
             future = publisher.publish(topic_path, message_bytes)
             message_id = future.result()
             
-            logger.info(f"Published Instagram promotion for {ticker} to Pub/Sub: message_id={message_id}")
+            logger.info(f"Published Instagram promotion for {title}, {subtitle}, to Pub/Sub: message_id={message_id}")
             return {
                 'success': True, 
                 'promoted': True, 
@@ -773,7 +774,7 @@ class FinancialAnalysisTrigger:
             }
             
         except Exception as e:
-            logger.error(f"Error publishing Instagram promotion for {ticker}: {str(e)}")
+            logger.error(f"Error publishing Instagram promotion for {title}, {subtitle}: {str(e)}")
             logger.error(traceback.format_exc())
             return {'success': False, 'error': str(e)}
     
@@ -1349,8 +1350,10 @@ async def process_financial_analysis(ticker: str, day_input: str = None, user_id
                 if promote_flag:
                     # Get hourly prices for the promotion
                     hourly_prices = [item.model_dump() for item in raw_analysis_data.company_data.hourly_prices]
+                    subtitle = f"{raw_analysis_data.company_data.hourly_prices[-1].date} - {raw_analysis_data.company_data.hourly_prices[0].date}"
                     promotion_result = analyzer.publish_instagram_promotion(
-                        ticker,
+                        raw_analysis_data.company_data.overview.Name,
+                        subtitle,
                         tts_text,
                         summary_text,
                         hourly_prices
