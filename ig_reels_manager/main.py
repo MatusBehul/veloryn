@@ -4,6 +4,7 @@
 import os, math, functools, json, base64, logging, re
 from typing import Dict, List, Any, Optional
 from pathlib import Path
+from uuid import uuid4
 
 import numpy as np
 import pandas as pd
@@ -351,7 +352,7 @@ def render_reel(cloud_event):
         final = final.set_audio(final_audio)
 
     # Write & upload
-    out_local = TMP_DIR / "stylish_reel.mp4"
+    out_local = TMP_DIR / f"{title}_{uuid4()}.mp4"
     final.write_videofile(
         str(out_local),
         fps=FPS,
