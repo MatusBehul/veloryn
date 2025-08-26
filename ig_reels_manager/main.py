@@ -329,7 +329,7 @@ def render_reel(cloud_event):
     if tts_text:
         try:
             audio_path = TMP_DIR / "tts.mp3"
-            raise Exception("TTS disabled for testing")  # --- IGNORE ---
+            # raise Exception("TTS disabled for testing")  # --- IGNORE ---
             tts_duration = eleven_tts_to_file(tts_text, audio_path, voice_id=voice_id)
         except Exception:
             logging.exception("TTS failed; continuing without audio.")
