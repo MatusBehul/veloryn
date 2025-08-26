@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # cloud_function_reel.py — FAST IG-style reel for GCP Cloud Functions (2nd gen)
 
-import os, math, functools, json, base64, logging, re
+import os, functools, json, base64, logging
 from typing import Dict, List, Any, Optional
 from pathlib import Path
 from uuid import uuid4
@@ -36,6 +36,17 @@ from google.cloud import storage
 # ---- Functions Framework
 import functions_framework
 
+# IG integration
+import time
+import requests
+from typing import Optional
+
+GRAPH_BASE = "https://graph.facebook.com/v23.0"  # use latest available for you
+
+IG_USER_ID = os.environ.get("IG_USER_ID", "17841476999950783")         # e.g. "17841400000000000"
+IG_ACCESS_TOKEN = os.environ.get("IG_ACCESS_TOKEN")  # long-lived token recommended
+
+
 # =============== CONFIG ===============
 W, H  = 1080, 1920               # portrait
 FPS   = 30                       # lower FPS => faster (24 is cinematic)
@@ -54,7 +65,7 @@ LINE_WIDTH = 5
 GRID_ALPHA = 0.12
 ORB_BASE_RADIUS = 8
 
-AX_RECT = (0.08, 0.22, 0.84, 0.62)  # (left, bottom, width, height) in fig coords
+AX_RECT = (0.12, 0.22, 0.76, 0.62)  # (left, bottom, width, height) in fig coords - added side padding
 
 FONT_DIR = Path(__file__).parent / "fonts"
 
@@ -67,7 +78,7 @@ FONT_REG_CANDIDATES = [
 
 ELEVEN_API_KEY = os.getenv("ELEVENLABS_API_KEY", "")
 DEFAULT_VOICE_ID = os.getenv("ELEVEN_VOICE_ID", "nPczCjzI2devNBz1zQrb") # Brian
-DEFAULT_BUCKET = os.getenv("GCS_BUCKET", "")
+DEFAULT_BUCKET = "veloryn-ig-reels"
 
 TMP_DIR = Path("/tmp")
 TMP_DIR.mkdir(exist_ok=True)
@@ -231,20 +242,9 @@ def make_chart_clip_fast(df: pd.DataFrame, title: str, subtitle: str, duration: 
         # HUD + dot via PIL
         pil = Image.fromarray(frame).convert("RGBA")
         draw = ImageDraw.Draw(pil)
-        draw.text((W//2, 80), title, font=FONT_TITLE, fill=(240,240,240), anchor="mm")
+        draw.text((W//2, 150), title, font=FONT_TITLE, fill=(240,240,240), anchor="mm")
         if subtitle:
-            draw.text((W//2, 150), subtitle, font=FONT_BODY, fill=(220,220,220), anchor="mm")
-
-        # # pulsing orb
-        # pulse = 1.0 + 0.5 * math.sin(u * 10 * math.pi)
-        # orb_r = int(ORB_BASE_RADIUS * pulse)
-        # orb = Image.new("RGBA", (orb_r*6, orb_r*6), (0,0,0,0))
-        # od = ImageDraw.Draw(orb)
-        # # halo
-        # od.ellipse([0,0,orb_r*6-1,orb_r*6-1], fill=(0,0,0,64))
-        # # core
-        # od.ellipse([orb_r*2, orb_r*2, orb_r*4-1, orb_r*4-1], fill=(LINE_CORE[0], LINE_CORE[1], LINE_CORE[2], 255))
-        # pil.alpha_composite(orb, (x_px - orb_r*3, y_px - orb_r*3))
+            draw.text((W//2, 230), subtitle, font=FONT_BODY, fill=(220,220,220), anchor="mm")
 
         # price + % change card
         start = float(df["close"].iloc[0])
@@ -293,6 +293,132 @@ def eleven_tts_to_file(text: str, out_path: Path, voice_id: Optional[str] = None
     clip.close()
     return dur
 
+
+def create_video_container(
+    ig_user_id: str,
+    access_token: str,
+    video_url: str,
+    caption: str = "",
+    media_type: str = "REELS",   # "REELS" for Reels, "VIDEO" for regular video posts
+    share_to_feed: bool = True,  # only relevant for Reels
+    thumb_offset_ms: Optional[int] = None
+) -> str:
+    """
+    Returns the container (creation) ID.
+    """
+    url = f"{GRAPH_BASE}/{ig_user_id}/media"
+    payload = {
+        "access_token": access_token,
+        "caption": caption,
+        "video_url": video_url,
+        "media_type": media_type,
+    }
+    # 'share_to_feed' is used to also show the Reel on the main feed
+    if media_type == "REELS":
+        payload["share_to_feed"] = "true" if share_to_feed else "false"
+    if thumb_offset_ms is not None:
+        payload["thumb_offset"] = thumb_offset_ms  # choose thumbnail frame (ms)
+
+    r = requests.post(url, data=payload, timeout=60)
+    print(r.status_code, r.text)
+    r.raise_for_status()
+    data = r.json()
+    if "id" not in data:
+        raise RuntimeError(f"Unexpected create response: {data}")
+    return data["id"]
+
+def wait_until_finished(container_id: str, access_token: str, timeout_sec: int = 600, poll_sec: int = 5) -> None:
+    """
+    Polls the container's status until it's FINISHED or times out.
+    """
+    url = f"{GRAPH_BASE}/{container_id}"
+    params = {"fields": "status_code", "access_token": access_token}
+    deadline = time.time() + timeout_sec
+    last_status = None
+
+    while time.time() < deadline:
+        r = requests.get(url, params=params, timeout=30)
+        r.raise_for_status()
+        status = r.json().get("status_code")
+        if status != last_status:
+            print(f"Container {container_id} status: {status}")
+            last_status = status
+        if status == "FINISHED":
+            return
+        elif status in {"ERROR", "EXPIRED"}:
+            raise RuntimeError(f"Container processing failed with status {status}")
+        time.sleep(poll_sec)
+
+    raise TimeoutError(f"Timed out waiting for container {container_id} to finish processing.")
+
+PUBLISH_MAX_ATTEMPTS = 6        # ~1m total with backoff
+INITIAL_BACKOFF_SEC = 2
+
+def publish_media(ig_user_id: str, access_token: str, creation_id: str) -> str:
+    """
+    Publishes the processed container and returns the new media ID.
+    Retries on transient 5xx / code 1 errors and treats 'already published' as success.
+    """
+    url = f"https://graph.facebook.com/v21.0/{ig_user_id}/media_publish"
+    payload = {"creation_id": creation_id, "access_token": access_token}
+
+    # Small grace delay after FINISHED often helps avoid immediate 500s
+    time.sleep(3)
+
+    backoff = INITIAL_BACKOFF_SEC
+    for attempt in range(1, PUBLISH_MAX_ATTEMPTS + 1):
+        r = requests.post(url, data=payload, timeout=60)
+        if r.ok:
+            data = r.json()
+            mid = data.get("id")
+            if mid:
+                return mid
+            raise RuntimeError(f"Publish succeeded but no media id in response: {data}")
+
+        # Inspect error payload
+        try:
+            err = r.json().get("error", {})
+        except Exception:
+            err = {}
+        
+        print(f"Publish attempt {attempt} failed: {r.status_code} {r.text} (error: {err})")
+        code = err.get("code")
+        subcode = err.get("error_subcode")
+        msg = err.get("message")
+
+        # If creation_id was already used/published, treat as success by discovering the media
+        # (Meta returns specific subcodes; handle generically by checking for keywords)
+        if isinstance(msg, str) and "already" in msg.lower() and "publish" in msg.lower():
+            media_id = try_find_recent_media_from_caption_or_created(ig_user_id, access_token)
+            if media_id:
+                return media_id
+
+        # Retry on typical transient cases: 500s, code 1, or network-y statuses
+        if r.status_code >= 500 or code == 1:
+            if attempt < PUBLISH_MAX_ATTEMPTS:
+                time.sleep(backoff)
+                backoff *= 2
+                continue
+
+        raise RuntimeError(f"Publish failed (attempt {attempt}): {r.status_code} {r.text}")
+
+    # If we exit the loop without returning or raising, fail explicitly
+    raise RuntimeError("Publish failed after retries.")
+
+def try_find_recent_media_from_caption_or_created(ig_user_id: str, access_token: str) -> str | None:
+    """
+    Best-effort: fetch recent media and return the newest ID.
+    If publish actually succeeded despite the error, it should appear here quickly.
+    """
+    url = f"https://graph.facebook.com/v21.0/{ig_user_id}/media"
+    params = {"fields": "id,caption,media_type,timestamp", "access_token": access_token, "limit": 5}
+    r = requests.get(url, params=params, timeout=30)
+    if not r.ok:
+        return None
+    items = r.json().get("data", [])
+    return items[0]["id"] if items else None
+
+
 # =============== HANDLER ===============
 @functions_framework.cloud_event
 def render_reel(cloud_event):
@@ -318,6 +444,7 @@ def render_reel(cloud_event):
     title     = payload.get("title") or "Last 24h"
     subtitle  = payload.get("subtitle", "Previous trading hours")
     tts_text  = payload.get("tts", "")
+    captions  = payload.get("captions", "")
     voice_id  = payload.get("voice_id")
     desired_duration = float(payload.get("duration", DUR_FALLBACK))
 
@@ -354,7 +481,8 @@ def render_reel(cloud_event):
         final = final.set_audio(final_audio)
 
     # Write & upload
-    out_local = TMP_DIR / f"{title}_{uuid4()}.mp4"
+    video_name = f"{title}_{uuid4()}.mp4"
+    out_local = TMP_DIR / video_name
     final.write_videofile(
         str(out_local),
         fps=FPS,
@@ -375,6 +503,36 @@ def render_reel(cloud_event):
         if audio_path: audio_path.unlink(missing_ok=True)
     except Exception:
         pass
+
+    VIDEO_URL = f"https://storage.googleapis.com/{DEFAULT_BUCKET}/{video_name}"  # must be publicly accessible
+    CAPTION = f"""{captions}
+
+Get more at -> veloryn.wadby.cloud <- starting at €2/month.
+
+This system provides AI-generated analysis for educational and informational purposes only. All output is NOT financial advice, NOT offers to buy or sell securities, and NOT guaranteed for accuracy, completeness, or profitability. Users must conduct independent research and consult qualified financial advisors before making investment decisions. Past performance does not guarantee future results.
+"""
+
+    MEDIA_TYPE = "REELS"
+    SHARE_TO_FEED = True   
+    
+    print("Creating container...")
+    creation_id = create_video_container(
+        ig_user_id=IG_USER_ID,
+        access_token=IG_ACCESS_TOKEN,
+        video_url=VIDEO_URL,
+        caption=CAPTION,
+        media_type=MEDIA_TYPE,
+        share_to_feed=SHARE_TO_FEED,
+        thumb_offset_ms=None,  # e.g., 1500 for 1.5s as thumbnail
+    )
+    print(f"Created container: {creation_id}")
+
+    print("Waiting for processing to finish...")
+    wait_until_finished(creation_id, IG_ACCESS_TOKEN, timeout_sec=900, poll_sec=5)
+
+    print("Publishing...")
+    media_id = publish_media(IG_USER_ID, IG_ACCESS_TOKEN, creation_id)
+    print(f"Done! Media ID: {media_id}")
 
     return
 
