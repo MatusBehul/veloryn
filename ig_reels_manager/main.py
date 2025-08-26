@@ -235,16 +235,16 @@ def make_chart_clip_fast(df: pd.DataFrame, title: str, subtitle: str, duration: 
         if subtitle:
             draw.text((W//2, 150), subtitle, font=FONT_BODY, fill=(220,220,220), anchor="mm")
 
-        # pulsing orb
-        pulse = 1.0 + 0.5 * math.sin(u * 10 * math.pi)
-        orb_r = int(ORB_BASE_RADIUS * pulse)
-        orb = Image.new("RGBA", (orb_r*6, orb_r*6), (0,0,0,0))
-        od = ImageDraw.Draw(orb)
-        # halo
-        od.ellipse([0,0,orb_r*6-1,orb_r*6-1], fill=(0,0,0,64))
-        # core
-        od.ellipse([orb_r*2, orb_r*2, orb_r*4-1, orb_r*4-1], fill=(LINE_CORE[0], LINE_CORE[1], LINE_CORE[2], 255))
-        pil.alpha_composite(orb, (x_px - orb_r*3, y_px - orb_r*3))
+        # # pulsing orb
+        # pulse = 1.0 + 0.5 * math.sin(u * 10 * math.pi)
+        # orb_r = int(ORB_BASE_RADIUS * pulse)
+        # orb = Image.new("RGBA", (orb_r*6, orb_r*6), (0,0,0,0))
+        # od = ImageDraw.Draw(orb)
+        # # halo
+        # od.ellipse([0,0,orb_r*6-1,orb_r*6-1], fill=(0,0,0,64))
+        # # core
+        # od.ellipse([orb_r*2, orb_r*2, orb_r*4-1, orb_r*4-1], fill=(LINE_CORE[0], LINE_CORE[1], LINE_CORE[2], 255))
+        # pil.alpha_composite(orb, (x_px - orb_r*3, y_px - orb_r*3))
 
         # price + % change card
         start = float(df["close"].iloc[0])
