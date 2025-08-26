@@ -52,8 +52,8 @@ root_agent = LlmAgent(
                 "Detailed investment narrative paragraph 2...",
                 "Detailed investment narrative paragraph 3..."
             ],
-            "promo_reels_summary": "Short summary for social media reels (max 100 characters) summarizing news and price trend points. Keep in mind NOT to provide financial advice. Provide some insights! With hashtags (like 10-20).",
-            "promo_reels_tts_text": "Short script for TTS narration in social media reels (max 280 characters) summarizing news and price trend points. Keep in mind NOT to provide financial advice. Provide some insights!",
+            "promo_reels_summary": "Short summary for social media reels (max 300 characters) summarizing news and price trend points. Keep in mind NOT to provide financial advice. Provide some insights! With 20 relevant hashtags.",
+            "promo_reels_tts_text": "Short script for TTS narration in social media reels (max 280 characters) summarizing news and price and trend points. Dont be vague. Keep in mind NOT to provide financial advice. Provide some insights!",
             "promote_flag": true  // Set to true if the analysis is suitable for promotional reels, otherwise false. Suitable for positive, high-conviction analyses only.
         }
     ]
