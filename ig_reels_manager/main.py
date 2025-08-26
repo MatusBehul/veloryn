@@ -56,13 +56,13 @@ ORB_BASE_RADIUS = 8
 
 AX_RECT = (0.08, 0.22, 0.84, 0.62)  # (left, bottom, width, height) in fig coords
 
+FONT_DIR = Path(__file__).parent / "fonts"
+
 FONT_BOLD_CANDIDATES = [
-    "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
-    "/System/Library/Fonts/Supplemental/Arial Bold.ttf",
+    str(FONT_DIR / "DejaVuSans-Bold.ttf"),
 ]
 FONT_REG_CANDIDATES = [
-    "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
-    "/System/Library/Fonts/Supplemental/Arial.ttf",
+    str(FONT_DIR / "DejaVuSans.ttf"),
 ]
 
 ELEVEN_API_KEY = os.getenv("ELEVENLABS_API_KEY", "")
@@ -83,7 +83,7 @@ def pick_font(candidates, size):
         if os.path.exists(p):
             try: return ImageFont.truetype(p, size)
             except Exception: pass
-    return ImageFont.load_default()
+    return ImageFont.load_default(size)
 
 FONT_TITLE = pick_font(FONT_BOLD_CANDIDATES, 72)
 FONT_NUM   = pick_font(FONT_BOLD_CANDIDATES, 64)
