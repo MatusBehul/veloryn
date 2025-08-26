@@ -45,7 +45,8 @@ GRAPH_BASE = "https://graph.facebook.com/v23.0"  # use latest available for you
 
 IG_USER_ID = os.environ.get("IG_USER_ID", "17841476999950783")         # e.g. "17841400000000000"
 IG_ACCESS_TOKEN = os.environ.get("IG_ACCESS_TOKEN")  # long-lived token recommended
-
+if not IG_ACCESS_TOKEN:
+    logging.warning("IG_ACCESS_TOKEN not set; IG publishing will fail.")
 
 # =============== CONFIG ===============
 W, H  = 1080, 1920               # portrait
