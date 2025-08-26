@@ -74,7 +74,7 @@ jobs:
             --runtime=python311 \
             --region=${{ vars.GOOGLE_CLOUD_LOCATION }} \
             --source=. \
-            --entry-point=entrypoint \
+            --entry-point=render_reel \
             --trigger-topic=make-ig-reel \
             --memory=2Gi \
             --project="${{ vars.GOOGLE_CLOUD_PROJECT }}" \
