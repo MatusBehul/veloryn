@@ -742,6 +742,7 @@ class FinancialAnalysisTrigger:
     def publish_instagram_promotion(self, ticker: str, promo_reels_tts_text: str, promo_reels_summary: str, hourly_prices: list) -> Dict[str, Any]:
         """Publish message to Pub/Sub for Instagram Reel creation"""
         try:
+            print(f"Publishing Instagram promotion for {ticker}")
             if promo_reels_tts_text and promo_reels_summary and hourly_prices:
                 pass
             else:
@@ -1335,13 +1336,23 @@ async def process_financial_analysis(ticker: str, day_input: str = None, user_id
             # Check for Instagram promotion flag and publish to Pub/Sub if needed
             promotion_result = {'promoted': False}
             try:
-                if str(result_to_save.get('data', {}).get('analysis', {}).get("en", {}).get("promote_flag")).lower() == 'true':
+                promote_flag = False
+                tts_text = ""
+                summary_text = ""
+                for analysis in result_to_save.get('data', {}).get('analysis', {}).get("analysis", []):
+                    if isinstance(analysis, dict) and analysis.get("language") == "en":
+                        if str(analysis.get("promote_flag")).lower() == 'true':
+                            promote_flag = True
+                            tts_text = analysis.get("promo_reels_tts_text", "")
+                            summary_text = analysis.get("promo_reels_summary", "")
+                            break
+                if promote_flag:
                     # Get hourly prices for the promotion
                     hourly_prices = [item.model_dump() for item in raw_analysis_data.company_data.hourly_prices]
                     promotion_result = analyzer.publish_instagram_promotion(
-                        ticker, 
-                        result_to_save.get('data', {}).get('analysis', {}).get("en", {}).get("promo_reels_tts_text"),
-                        result_to_save.get('data', {}).get('analysis', {}).get("en", {}).get("promo_reels_summary"),
+                        ticker,
+                        tts_text,
+                        summary_text,
                         hourly_prices
                     )
                     
