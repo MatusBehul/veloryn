@@ -65,7 +65,7 @@ FONT_REG_CANDIDATES = [
 ]
 
 ELEVEN_API_KEY = os.getenv("ELEVENLABS_API_KEY", "")
-DEFAULT_VOICE_ID = os.getenv("ELEVEN_VOICE_ID", "EXAVITQu4vr4xnSDxMaL")
+DEFAULT_VOICE_ID = os.getenv("ELEVEN_VOICE_ID", "nPczCjzI2devNBz1zQrb") # Brian
 DEFAULT_BUCKET = os.getenv("GCS_BUCKET", "")
 
 TMP_DIR = Path("/tmp")
@@ -84,9 +84,9 @@ def pick_font(candidates, size):
             except Exception: pass
     return ImageFont.load_default()
 
-FONT_TITLE = pick_font(FONT_BOLD_CANDIDATES, 72)
-FONT_NUM   = pick_font(FONT_BOLD_CANDIDATES, 64)
-FONT_BODY  = pick_font(FONT_REG_CANDIDATES, 48)
+FONT_TITLE = pick_font(FONT_BOLD_CANDIDATES, int(H * 0.06))   # ~115px on 1920h
+FONT_NUM   = pick_font(FONT_BOLD_CANDIDATES, int(H * 0.05))   # ~96px
+FONT_BODY  = pick_font(FONT_REG_CANDIDATES,  int(H * 0.035))  # ~67px
 
 def lerp(a, b, u): return a + (b - a) * u
 def ease(u): return u*u*(3 - 2*u)  # smoothstep
@@ -154,9 +154,9 @@ def render_chart_static(df: pd.DataFrame) -> dict:
         ticks = np.linspace(0, len(x)-1, min(6, len(x)), dtype=int)
         ax.set_xticks(ticks)
         labels = [pd.to_datetime(x[i]).strftime("%m-%d\n%H:%M") for i in ticks]
-        ax.set_xticklabels(labels, rotation=0, ha="center", fontsize=16)
+        ax.set_xticklabels(labels, rotation=0, ha="center", fontsize=int(H * 0.015))
 
-    ax.tick_params(axis='y', labelsize=18)
+    ax.tick_params(axis='y', labelsize=int(H * 0.018))
     ax.grid(True, alpha=GRID_ALPHA, linewidth=0.8)
 
     # neon strokes
@@ -256,9 +256,9 @@ def make_chart_clip_fast(df: pd.DataFrame, title: str, subtitle: str, duration: 
 
         card_img = card_base.copy()
         cd2 = ImageDraw.Draw(card_img)
-        cd2.text((40, 40), "Price", font=FONT_BODY, fill=(160,160,170))
-        cd2.text((200, 30), price_txt, font=FONT_NUM, fill=(245,245,245))
-        cd2.text((card_w - 40, 60), pct_txt, font=FONT_NUM, fill=pct_color, anchor="rm")
+        cd2.text((40, 30), "Price", font=FONT_BODY, fill=(160,160,170))
+        cd2.text((250, 20), price_txt, font=FONT_NUM, fill=(245,245,245))
+        cd2.text((card_w - 60, 50), pct_txt, font=FONT_NUM, fill=pct_color, anchor="rm")
         pil.alpha_composite(card_img, (card_x, card_y))
 
         return np.array(pil.convert("RGB"))
