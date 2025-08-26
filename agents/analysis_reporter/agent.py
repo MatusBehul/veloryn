@@ -53,7 +53,7 @@ root_agent = LlmAgent(
                 "Detailed investment narrative paragraph 3..."
             ],
             "promo_reels_summary": [
-                "Short summary for social media reels (max 280 characters) summarizing news and price trend points."
+                "Short summary for social media reels (max 280 characters) summarizing news and price trend points. This will be used as text for Test-To-Speech generation."
             ]
         }
     ]
