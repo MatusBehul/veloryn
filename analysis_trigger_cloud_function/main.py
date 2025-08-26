@@ -9,11 +9,11 @@ import logging
 import traceback
 import random
 from datetime import datetime, timezone, timedelta
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 import asyncio
 import aiohttp
 from google.cloud import firestore
-from google.cloud import functions_v1
+from google.cloud import pubsub_v1
 from get_stock_data_tool import get_stock_data_tool
 import functions_framework
 from data_tool_model import ComprehensiveStockDataModel
@@ -26,6 +26,7 @@ logger = logging.getLogger(__name__)
 CLOUD_RUN_URL = os.environ.get('CLOUD_RUN_URL')
 PROJECT_ID = os.environ.get('GCP_PROJECT')
 AGENT_APP_NAME = os.environ.get('AGENT_APP_NAME', 'analysis_reporter')
+PUBSUB_TOPIC = os.environ.get('PUBSUB_TOPIC', 'make-ig-reel')
 
 # Firestore collections
 ANALYSIS_COLLECTION = 'financial_analysis'
@@ -35,6 +36,8 @@ COSTS_COLLECTION = 'cost_tracking'
 
 # Initialize Firestore client
 db = firestore.Client(project=PROJECT_ID)
+# Initialize Pub/Sub publisher client
+publisher = pubsub_v1.PublisherClient()
 
 class FinancialAnalysisTrigger:
     """Main class for handling financial analysis triggers"""
@@ -736,6 +739,81 @@ class FinancialAnalysisTrigger:
         except Exception as e:
             return {'valid': False, 'error': f'Validation failed: {str(e)}'}
     
+    def publish_instagram_promotion(self, ticker: str, analysis_data: Dict[str, Any], hourly_prices: list) -> Dict[str, Any]:
+        """Publish message to Pub/Sub for Instagram Reel creation"""
+        try:
+            # Extract promotion data from analysis
+            en_analysis = analysis_data.get('analysis', {})
+            
+            # Handle different analysis data structures
+            if isinstance(en_analysis, list) and len(en_analysis) > 0:
+                # Array format: [{"language": "en", ...}, ...]
+                en_data = None
+                for item in en_analysis:
+                    if isinstance(item, dict) and item.get('language') == 'en':
+                        en_data = item
+                        break
+                
+                if not en_data:
+                    logger.warning(f"No English analysis found for {ticker}")
+                    return {'success': False, 'error': 'No English analysis found'}
+            
+            elif isinstance(en_analysis, dict):
+                # Direct dict format or nested structure
+                if 'en' in en_analysis:
+                    en_data = en_analysis['en']
+                elif 'language' in en_analysis and en_analysis.get('language') == 'en':
+                    en_data = en_analysis
+                else:
+                    # Assume it's the English analysis directly
+                    en_data = en_analysis
+            else:
+                logger.warning(f"Unexpected analysis structure for {ticker}: {type(en_analysis)}")
+                return {'success': False, 'error': 'Unexpected analysis structure'}
+            
+            # Check for promote flag
+            promote_flag = en_data.get('promote_flag', False)
+            if not promote_flag:
+                logger.info(f"No promotion flag set for {ticker}")
+                return {'success': True, 'promoted': False, 'reason': 'No promotion flag'}
+            
+            # Extract required fields
+            tts_text = en_data.get('promo_reels_tts_text')
+            summary = en_data.get('promo_reels_summary')
+            
+            if not tts_text or not summary:
+                logger.warning(f"Missing TTS text or summary for {ticker} promotion")
+                return {'success': False, 'error': 'Missing TTS text or summary'}
+            
+            # Prepare message payload
+            message_data = {
+                "title": ticker.upper(),
+                "tts": tts_text,
+                "captions": summary,
+                "data": hourly_prices
+            }
+            
+            # Publish to Pub/Sub
+            topic_path = publisher.topic_path(PROJECT_ID, PUBSUB_TOPIC)
+            message_json = json.dumps(message_data)
+            message_bytes = message_json.encode('utf-8')
+            
+            future = publisher.publish(topic_path, message_bytes)
+            message_id = future.result()
+            
+            logger.info(f"Published Instagram promotion for {ticker} to Pub/Sub: message_id={message_id}")
+            return {
+                'success': True, 
+                'promoted': True, 
+                'message_id': message_id,
+                'topic': PUBSUB_TOPIC
+            }
+            
+        except Exception as e:
+            logger.error(f"Error publishing Instagram promotion for {ticker}: {str(e)}")
+            logger.error(traceback.format_exc())
+            return {'success': False, 'error': str(e)}
+    
     def _fix_common_json_errors(self, json_str: str) -> str:
         """Attempt to fix common JSON syntax errors"""
         import re
@@ -1292,6 +1370,27 @@ async def process_financial_analysis(ticker: str, day_input: str = None, user_id
             # Save cost tracking
             analyzer.save_cost_tracking(ticker, result_to_save, session_id)
 
+            # Check for Instagram promotion flag and publish to Pub/Sub if needed
+            promotion_result = {'promoted': False}
+            try:
+                if not error_detected and result_to_save.get('success'):
+                    # Get hourly prices for the promotion
+                    hourly_prices = [item.model_dump() for item in raw_analysis_data.company_data.hourly_prices]
+                    promotion_result = analyzer.publish_instagram_promotion(
+                        ticker, 
+                        result_to_save.get('data', {}), 
+                        hourly_prices
+                    )
+                    
+                    if promotion_result.get('promoted'):
+                        logger.info(f"Instagram promotion triggered for {ticker}")
+                    else:
+                        logger.info(f"No Instagram promotion for {ticker}: {promotion_result.get('reason', 'Unknown')}")
+                        
+            except Exception as e:
+                logger.error(f"Error handling Instagram promotion for {ticker}: {str(e)}")
+                promotion_result = {'promoted': False, 'error': str(e)}
+
             logger.info(f"Completed financial analysis for {ticker}")
 
             return {
@@ -1300,7 +1399,8 @@ async def process_financial_analysis(ticker: str, day_input: str = None, user_id
                 'session_id': session_id,
                 'result_document_id': result_doc_id,
                 'execution_time': function_execution_time,
-                'analysis_success': not error_detected
+                'analysis_success': not error_detected,
+                'promotion': promotion_result
             }
 
         except Exception as e:
