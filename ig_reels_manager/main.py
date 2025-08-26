@@ -101,24 +101,20 @@ def gradient_bg():
         arr[y, :, :] = (1-a)*top + a*bot
     return arr
 
-def parse_gs_uri(uri: str) -> tuple[str, str]:
-    m = re.match(r"^gs://([^/]+)/(.+)$", uri)
-    if not m:
-        raise ValueError(f"Invalid GCS URI: {uri}")
-    return m.group(1), m.group(2)
 
-def upload_to_gcs(local_path: Path, gs_uri: Optional[str]) -> str:
+def upload_to_gcs(local_path: Path) -> str:
     client = storage.Client()
-    if gs_uri:
-        bucket_name, blob_name = parse_gs_uri(gs_uri)
-    else:
-        if not DEFAULT_BUCKET:
-            raise ValueError("No output_uri and GCS_BUCKET unset.")
-        bucket_name = DEFAULT_BUCKET
-        blob_name = local_path.name
+
+    if not DEFAULT_BUCKET:
+        raise ValueError("No output_uri provided and GCS_BUCKET env var is not set.")
+    bucket_name = DEFAULT_BUCKET.replace("gs://", "", 1).rstrip("/")
+    blob_name = local_path.name  # default object key
+
     bucket = client.bucket(bucket_name)
     blob = bucket.blob(blob_name)
-    blob.upload_from_filename(str(local_path))
+    # content_type helps with correct serving headers
+    blob.upload_from_filename(str(local_path), content_type="video/mp4")
+
     return f"gs://{bucket_name}/{blob_name}"
 
 # =============== DATA ===============
@@ -306,7 +302,6 @@ def render_reel(cloud_event):
       data: [{date, close}, ...],
       tts?: str,
       voice_id?: str,
-      output_uri?: "gs://bucket/path.mp4",
       subtitle?: str,
       duration?: float   # used only if no TTS
     }
@@ -322,7 +317,6 @@ def render_reel(cloud_event):
     subtitle  = payload.get("subtitle", "")
     tts_text  = payload.get("tts", "")
     voice_id  = payload.get("voice_id")
-    output_uri= payload.get("output_uri")
     desired_duration = float(payload.get("duration", DUR_FALLBACK))
 
     df = load_df(payload["data"])
@@ -369,7 +363,7 @@ def render_reel(cloud_event):
         ffmpeg_params=["-movflags", "+faststart"]
     )
 
-    gs_path = upload_to_gcs(out_local, output_uri)
+    gs_path = upload_to_gcs(out_local)
     logging.info(f"Uploaded to {gs_path}")
 
     # Cleanup
