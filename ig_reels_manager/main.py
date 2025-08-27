@@ -54,7 +54,7 @@ FPS   = 30                       # lower FPS => faster (24 is cinematic)
 DUR_FALLBACK = 5.0              # if no TTS
 
 INTRO_SEC = 1
-OUTRO_SEC = 3
+OUTRO_SEC = 5
 AUDIO_SAMPLERATE = 44100
 EPS = 1e-3
 
@@ -66,7 +66,7 @@ LINE_WIDTH = 5
 GRID_ALPHA = 0.12
 ORB_BASE_RADIUS = 8
 
-AX_RECT = (0.12, 0.22, 0.76, 0.62)  # (left, bottom, width, height) in fig coords - added side padding
+AX_RECT = (0.2, 0.3, 0.76, 0.5)  # (left, bottom, width, height) in fig coords - added side padding
 
 FONT_DIR = Path(__file__).parent / "fonts"
 
