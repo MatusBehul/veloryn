@@ -7,6 +7,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { NewsCarousel } from '@/components/NewsCarousel';
+import { EnhancedAnalysisText } from '@/components/EnhancedAnalysisText';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { ArrowLeft, Calendar, TrendingUp, AlertCircle, Download, Share, Mail, DollarSign, BarChart3, Activity, Target, Shield, Info, Building, Zap, Brain, PieChart } from 'lucide-react';
@@ -52,7 +53,7 @@ export default function AnalysisDetailPage() {
   const { id } = useParams();
   const { user, firebaseUser, loading: authLoading } = useAuth();
   const { hasActiveSubscription } = useSubscription();
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const [analysis, setAnalysis] = useState<AnalysisData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -131,53 +132,9 @@ export default function AnalysisDetailPage() {
     );
   };
 
-  // Helper function to render analysis text sections
+  // Helper function to render analysis text sections - now enhanced with glossary
   const renderAnalysisSection = (content: any) => {
-    if (!content) return null;
-    
-    if (Array.isArray(content)) {
-      return content.map((item: any, index: number) => (
-        <div key={index} className="mb-4">
-          {renderSingleItem(item)}
-        </div>
-      ));
-    } else {
-      return renderSingleItem(content);
-    }
-  };
-
-  // Helper function to render a single item (string or object)
-  const renderSingleItem = (item: any) => {
-    if (!item) return null;
-
-    if (typeof item === 'string') {
-      return (
-        <p className="text-gray-700 leading-relaxed">
-          {formatTextWithBold(item)}
-        </p>
-      );
-    }
-
-    if (typeof item === 'object') {
-      return (
-        <div className="bg-gray-50 p-4 rounded-lg border">
-          {Object.entries(item).map(([key, value]) => (
-            <div key={key} className="mb-2 last:mb-0">
-              <span className="font-semibold text-gray-900">{key}: </span>
-              <span className="text-gray-700">
-                {typeof value === 'string' ? formatTextWithBold(value) : String(value)}
-              </span>
-            </div>
-          ))}
-        </div>
-      );
-    }
-
-    return (
-      <p className="text-gray-700 leading-relaxed">
-        {String(item)}
-      </p>
-    );
+    return <EnhancedAnalysisText content={content} language={language} />;
   };
 
   const handleShare = async () => {
@@ -640,7 +597,7 @@ Educational use only - Not financial advice
                   <div className="space-y-8">
                     {/* Key Indicators Comparison Table */}
                     <div>
-                      <h4 className="font-medium text-gray-900 mb-4">{t('analysisDetailKeyIndicators')}</h4>
+                      <h4 className="font-medium text-gray-900 mb-4">{t('analysisDetailKeyIndicators')} {'>'} <Link href="/glossary" className='text-blue-500'> {t('glossary')}</Link></h4>
                       <div className="overflow-x-auto">
                         <table className="min-w-full bg-white border border-gray-200 rounded-lg">
                           <thead className="bg-gray-50">
@@ -687,9 +644,9 @@ Educational use only - Not financial advice
                       analysis.technical_analysis_results.weekly?.moving_averages || 
                       analysis.technical_analysis_results.monthly?.moving_averages) && (
                       <div>
-                        <h4 className="font-medium text-gray-900 mb-4">{t('analysisDetailMovingAverages')}</h4>
+                        <h4 className="font-medium text-gray-900 mb-4">{t('analysisDetailMovingAverages')} {'>'} <Link href="/glossary" className='text-blue-500'>{t('glossary')}</Link></h4>
                         <div className="overflow-x-auto">
-                          <table className="min-w-full bg-white border border-gray-200 rounded-lg">
+                          <table className="min-w-full min-h-full bg-white border border-gray-200 rounded-lg">
                             <thead className="bg-gray-50">
                               <tr>
                                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r">
@@ -732,7 +689,7 @@ Educational use only - Not financial advice
                       analysis.technical_analysis_results.weekly?.bollinger_bands || 
                       analysis.technical_analysis_results.monthly?.bollinger_bands) && (
                       <div>
-                        <h4 className="font-medium text-gray-900 mb-4">{t('analysisDetailBollingerBands')}</h4>
+                        <h4 className="font-medium text-gray-900 mb-4">{t('analysisDetailBollingerBands')} {'>'} <Link href="/glossary" className='text-blue-500'>{t('glossary')}</Link></h4>
                         <div className="overflow-x-auto">
                           <table className="min-w-full bg-white border border-gray-200 rounded-lg">
                             <thead className="bg-gray-50">

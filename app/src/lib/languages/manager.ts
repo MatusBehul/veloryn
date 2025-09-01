@@ -4,6 +4,7 @@ import { IT_TRANSLATIONS } from './it';
 import { ES_TRANSLATIONS } from './es';
 import { SK_TRANSLATIONS } from './sk';
 import { CZ_TRANSLATIONS } from './cz';
+import { FR_TRANSLATIONS } from './fr';
 // Language configuration for multi-language support
 
 export interface Language {
@@ -55,6 +56,13 @@ export const SUPPORTED_LANGUAGES: Language[] = [
     name: 'Italian',
     nativeName: 'Italiano',
     flag: '🇮🇹',
+    direction: 'ltr'
+  },
+  {
+    code: 'fr',
+    name: 'French',
+    nativeName: 'Français',
+    flag: '🇫🇷',
     direction: 'ltr'
   }
 ];
@@ -113,6 +121,8 @@ export function getUITranslation(key: UITranslationKey, languageCode: string = D
       return SK_TRANSLATIONS[key] || fallback;
     case 'cz':
       return CZ_TRANSLATIONS[key] || fallback;
+    case 'fr':
+      return FR_TRANSLATIONS[key] || fallback;
     // Future cases for other languages can be added here
     default:
       return fallback;

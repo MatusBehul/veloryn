@@ -97,6 +97,13 @@ export function Header() {
                     </Link>
                     
                     <Link
+                      href="/glossary"
+                      className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                    >
+                      Glossary
+                    </Link>
+                    
+                    <Link
                       href="/news"
                       className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
                     >
@@ -215,6 +222,13 @@ export function Header() {
                       className="text-gray-700 hover:text-gray-900 px-2 py-2 rounded-md text-sm font-medium"
                     >
                       {t('analysis')}
+                    </Link>
+                    
+                    <Link
+                      href="/glossary"
+                      className="text-gray-700 hover:text-gray-900 px-2 py-2 rounded-md text-sm font-medium"
+                    >
+                      Glossary
                     </Link>
                     
                     <Link
@@ -356,6 +370,14 @@ export function Header() {
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
                         {t('analysis')}
+                      </Link>
+
+                      <Link
+                        href="/glossary"
+                        className="block px-2 sm:px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        Glossary
                       </Link>
 
                       <Link
