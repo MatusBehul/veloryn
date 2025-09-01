@@ -87,6 +87,7 @@ jobs:
               --time-zone="Europe/Prague" \
               --uri="$FUNCTION_URL" \
               --http-method=POST \
+              --headers="Content-Type=application/json" \
               --message-body="{\"ticker\": \"$ticker\"}" \
               --description="Daily financial analysis for $ticker (runs at $SCHEDULE_HOUR:$(printf '%02d' $SCHEDULE_MINUTE))" \
               --attempt-deadline="540s" \
@@ -105,6 +106,7 @@ jobs:
               --time-zone="Europe/Prague" \
               --uri="$FUNCTION_URL" \
               --http-method=POST \
+              --headers="Content-Type=application/json" \
               --message-body="{\"ticker\": \"$ticker\"}" \
               --description="Daily financial analysis for $ticker (runs at $SCHEDULE_HOUR:$(printf '%02d' $SCHEDULE_MINUTE))" \
               --attempt-deadline="540s" \
