@@ -84,6 +84,7 @@ export const SK_TRANSLATIONS = {
     ultimate_tier: 'Ultimate',
     
     // Stránka cenníka
+    immediate_access_to_the_service: 'Kúpou tohto členského plánu žiadate o okamžitý prístup k Službe a výslovne súhlasíte s tým, že plnenie sa začína okamžite po zaplatení.',
     month: 'mesiac',
     simple_transparent_pricing: 'Jednoduchý, transparentný cenník',
     access_institutional_analysis: 'Prístup k finančnej analýze inštitucionálnej kvality už od 2 €/mesiac. Možnosť zrušiť kedykoľvek.',
@@ -269,7 +270,7 @@ export const SK_TRANSLATIONS = {
     manageFavoriteTickersAndDailyUpdates: 'Spravujte svoje obľúbené tickery a denné preferencie',
     favoriteTickersSection: 'Obľúbené tickery',
     addStockTickersDescription: 'Pridajte akciové tickery, ktoré chcete sledovať. Pre každý môžete povoliť denné aktualizácie.',
-    enterTickerSymbol: 'Zadajte symbol tickeru (napr. AAPL, GOOGL)',
+    enterTickerSymbol: 'Zadajte symbol tickeru (napr. AAPL, GOOG)',
     settingsAdd: 'Pridať',
     loadingFavoriteTickers: 'Načítavam obľúbené tickery...',
     noFavoriteTickersYetSettings: 'Zatiaľ žiadne obľúbené tickery',

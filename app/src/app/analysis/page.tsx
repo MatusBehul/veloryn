@@ -193,7 +193,7 @@ export default function AnalysisPage() {
     });
   };
 
-  const availableTickers = ['AAPL', 'TSLA', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'META', 'NFLX'];
+  const availableTickers = ['AAPL', 'TSLA', 'MSFT', 'GOOG', 'AMZN', 'NVDA', 'META', 'NFLX'];
 
   // // Helper function to get analysis title
   // const getAnalysisTitle = (analysis: FinancialAnalysis): string => {

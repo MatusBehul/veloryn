@@ -84,6 +84,7 @@ export const IT_TRANSLATIONS = {
     ultimate_tier: 'Ultimate',
     
     // Pagina Prezzi
+    immediate_access_to_the_service: 'Acquistando questo piano di abbonamento richiede l’accesso immediato al Servizio e accetta espressamente che l’esecuzione inizi immediatamente dopo il pagamento.',
     month: 'mese',
     simple_transparent_pricing: 'Prezzi semplici e trasparenti',
     access_institutional_analysis: 'Accedi ad analisi finanziarie di livello istituzionale a partire da soli 2 €/mese. Cancella in qualsiasi momento.',
@@ -269,7 +270,7 @@ export const IT_TRANSLATIONS = {
     manageFavoriteTickersAndDailyUpdates: 'Gestisci i tuoi ticker preferiti e le preferenze di aggiornamento giornaliero',
     favoriteTickersSection: 'Ticker preferiti',
     addStockTickersDescription: 'Aggiungi ticker azionari da seguire. Puoi abilitare aggiornamenti giornalieri per ciascun ticker.',
-    enterTickerSymbol: 'Inserisci simbolo ticker (es., AAPL, GOOGL)',
+    enterTickerSymbol: 'Inserisci simbolo ticker (es., AAPL, GOOG)',
     settingsAdd: 'Aggiungi',
     loadingFavoriteTickers: 'Caricamento ticker preferiti...',
     noFavoriteTickersYetSettings: 'Ancora nessun ticker preferito',

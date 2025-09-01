@@ -87,22 +87,32 @@ export default function PricingPage() {
                   {t('current_plan')}
                 </Button>
               ) : hasActiveSubscription ? (
-                <Button 
-                  className="w-full" 
-                  variant="outline"
-                  onClick={() => handleSubscribe('price_standard')}
-                  disabled={loading}
-                >
-                  {subscriptionTier === 'premium' ? t('downgrade_to_standard') : t('subscribe_now')}
-                </Button>
+                <div>
+                  <Button 
+                    className="w-full" 
+                    variant="outline"
+                    onClick={() => handleSubscribe('price_standard')}
+                    disabled={loading}
+                  >
+                    {subscriptionTier === 'premium' ? t('downgrade_to_standard') : t('subscribe_now')}
+                  </Button>
+                  <p className="text-xs text-gray-500 pt-2">
+                    {t('immediate_access_to_the_service')}
+                  </p>
+                </div>
               ) : (
-                <Button 
-                  className="w-full" 
-                  onClick={() => handleSubscribe('price_standard')}
-                  loading={loading}
-                >
-                  {t('subscribe_now')}
-                </Button>
+                <div>
+                  <Button 
+                    className="w-full" 
+                    onClick={() => handleSubscribe('price_standard')}
+                    loading={loading}
+                  >
+                    {t('subscribe_now')}
+                  </Button>
+                  <p className="text-xs text-gray-500 pt-2">
+                    {t('immediate_access_to_the_service')}
+                  </p>
+                </div>
               )}
             </CardContent>
           </Card>
@@ -150,21 +160,31 @@ export default function PricingPage() {
                   {t('current_plan')}
                 </Button>
               ) : hasActiveSubscription ? (
-                <Button 
-                  className="w-full" 
-                  onClick={() => handleSubscribe('price_premium')}
-                  loading={loading}
-                >
-                  {subscriptionTier === 'standard' ? t('upgrade_to_premium') : t('subscribe_now')}
-                </Button>
+                <div>
+                  <Button 
+                    className="w-full" 
+                    onClick={() => handleSubscribe('price_premium')}
+                    loading={loading}
+                  >
+                    {subscriptionTier === 'standard' ? t('upgrade_to_premium') : t('subscribe_now')}
+                  </Button>
+                  <p className="text-xs text-gray-500 pt-2">
+                    {t('immediate_access_to_the_service')}
+                  </p>
+                </div>
               ) : (
-                <Button 
-                  className="w-full" 
-                  onClick={() => handleSubscribe('price_premium')}
-                  loading={loading}
-                >
-                  {t('subscribe_now')}
-                </Button>
+                <div>
+                  <Button 
+                    className="w-full" 
+                    onClick={() => handleSubscribe('price_premium')}
+                    loading={loading}
+                  >
+                    {t('subscribe_now')}
+                  </Button>
+                  <p className="text-xs text-gray-500 pt-2">
+                    {t('immediate_access_to_the_service')}
+                  </p>
+                </div>
               )}
             </CardContent>
           </Card>

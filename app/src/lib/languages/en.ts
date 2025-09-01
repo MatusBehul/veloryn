@@ -3,7 +3,7 @@ export const EN_TRANSLATIONS = {
     // Disclaimer
     shared_red_page_disclaimer_title: '⚠️ Important Disclaimer',
     shared_red_page_disclaimer_text: 'This system provides AI-generated analysis for educational and informational purposes only. All output is NOT financial advice, NOT offers to buy or sell securities, and NOT guaranteed for accuracy, completeness, or profitability. Users must conduct independent research and consult qualified financial advisors before making investment decisions.',
-
+    
     // Navigation & Header
     dashboard: 'Dashboard',
     analysis: 'Analysis',
@@ -84,6 +84,7 @@ export const EN_TRANSLATIONS = {
     ultimate_tier: 'Ultimate',
     
     // Pricing Page
+    immediate_access_to_the_service: 'By purchasing this membership plan you request immediate access to the Service and explicitly agree that performance begins immediately after payment.',
     month: 'month',
     simple_transparent_pricing: 'Simple, Transparent Pricing',
     access_institutional_analysis: 'Access institutional-quality financial analysis starting at just €2/month. Cancel anytime.',
@@ -269,7 +270,7 @@ export const EN_TRANSLATIONS = {
     manageFavoriteTickersAndDailyUpdates: 'Manage your favorite tickers and daily update preferences',
     favoriteTickersSection: 'Favorite Tickers',
     addStockTickersDescription: 'Add stock tickers you want to follow. You can enable daily analysis updates for each ticker.',
-    enterTickerSymbol: 'Enter ticker symbol (e.g., AAPL, GOOGL)',
+    enterTickerSymbol: 'Enter ticker symbol (e.g., AAPL, GOOG)',
     settingsAdd: 'Add',
     loadingFavoriteTickers: 'Loading your favorite tickers...',
     noFavoriteTickersYetSettings: 'No favorite tickers yet',

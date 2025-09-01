@@ -41,6 +41,27 @@ export default function TermsPage() {
           </CardContent>
         </Card>
 
+        {/* Company Information */}
+        <Card className="mb-8">
+          <CardContent className="py-6">
+            <div className="flex items-center space-x-3 mb-4">
+              <FileText className="h-6 w-6 text-gray-600" />
+              <h2 className="text-xl font-semibold text-gray-900">0. Company Information</h2>
+            </div>
+            
+            <div className="space-y-4 text-gray-600">
+              <p>
+                William Wadby s.r.o.
+                Registered: Tupeho 34, Bratislava 831 01, Slovakia
+                Company ID (IČO): 53583671
+                VAT ID (IČ DPH): SK2121421643
+                Registered in the Obchodný register Okresného súdu Bratislava III, oddiel: Sro, vložka č. 150525/B
+                Contact: info@wadby.me
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Acceptance of Terms */}
         <Card className="mb-8">
           <CardContent className="py-6">
@@ -237,6 +258,53 @@ export default function TermsPage() {
                   <li>• One free trial per user; additional trials require our approval</li>
                 </ul>
               </div>
+              
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-2">Auto-Renewal</h3>
+                <ul className="text-gray-600 space-y-1 ml-4">
+                  <li>• All subscriptions automatically renew at the end of each billing cycle until canceled.</li>
+                  <li>• Renewal charges are billed using the payment method on file.</li>
+                  <li>• We will notify you at least 30 days in advance of any price change; new prices apply to the following billing cycle.</li>
+                </ul>
+              </div>
+              
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-2">Prices and Taxes</h3>
+                <ul className="text-gray-600 space-y-1 ml-4">
+                  <li>• All prices are shown inclusive of VAT as indicated at checkout.</li>
+                  <li>• For EU customers, VAT is applied according to your Member State under the One-Stop Shop (OSS) scheme.</li>
+                  <li>• For non-EU customers, local taxes may apply and will be displayed at checkout.</li>
+                </ul>
+              </div>
+              
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-2">Payment Authentication</h3>
+                <ul className="text-gray-600 space-y-1 ml-4">
+                  <li>• Payments are processed by Stripe.</li>
+                  <li>• You may be required to complete Strong Customer Authentication (SCA) (e.g., 3-D Secure) when paying with EU/EEA cards.</li>
+                  <li>• By saving a payment method, you authorize Stripe to charge recurring subscription fees on your behalf.</li>
+                </ul>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Right of Withdrawal (EU Consumers Only) */}
+        <Card className="mb-8">
+          <CardContent className="py-6">
+            <div className="flex items-center space-x-3 mb-4">
+              <AlertTriangle className="h-6 w-6 text-gray-600" />
+              <h2 className="text-xl font-semibold text-gray-900">4A. Right of Withdrawal</h2>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <ul className="text-gray-600 space-y-1 ml-4">
+                  <li>• If you are an EU consumer, you have 14 days from the date of subscription to withdraw without giving any reason.</li>
+                  <li>• To exercise this right, email info@wadby.me with your withdrawal request.</li>
+                  <li>• However, if you request immediate access to the Service and explicitly agree that performance begins before the withdrawal period ends, you acknowledge that you lose your withdrawal right once digital content has been fully delivered.</li>
+                </ul>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -418,27 +486,13 @@ export default function TermsPage() {
               <h2 className="text-xl font-semibold text-gray-900">8. Privacy and Data Protection</h2>
             </div>
             
-            <div className="space-y-4 text-gray-600">
-              <p>
-                Your privacy is important to us. Our Privacy Policy, which is incorporated into these Terms 
-                by reference, explains how we collect, use, and protect your personal information.
-              </p>
-              
+            <div className="space-y-4 text-gray-600">              
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Key Privacy Commitments</h3>
                 <ul className="text-gray-600 space-y-1 ml-4">
-                  <li>• We comply with GDPR, CCPA, and other applicable privacy laws</li>
-                  <li>• We use industry-standard encryption to protect your data</li>
-                  <li>• We never sell your personal information to third parties</li>
-                  <li>• You have rights to access, correct, and delete your data</li>
-                  <li>• We provide clear notice of any material changes to our privacy practices</li>
+                  <li>• We process your personal data as described in our <Link href="/privacy" className="text-blue-600 underline"> Privacy Policy</Link>.</li>
+                  <li>• This includes identifying William Wadby s.r.o. and Veloryn platform as the controller, naming our processors (Stripe, Google Cloud Platform), explaining international transfers, your GDPR rights (access, deletion, rectification, portability), and your right to lodge a complaint with the Slovak Data Protection Authority (Úrad na ochranu osobných údajov SR).</li>
                 </ul>
               </div>
-              
-              <p>
-                For complete details about our privacy practices, please review our 
-                <Link href="/privacy" className="text-blue-600 underline"> Privacy Policy</Link>.
-              </p>
             </div>
           </CardContent>
         </Card>
@@ -501,8 +555,7 @@ export default function TermsPage() {
               <div>
                 <h3 className="font-semibold text-gray-900 mb-2">Applicable Law</h3>
                 <p className="text-gray-600">
-                  These Terms are governed by and construed in accordance with the laws of the European Union 
-                  and the jurisdiction where Veloryn is incorporated, without regard to conflict of law principles.
+                  These Terms and any disputes arising out of or in connection with them are governed by the laws of the Slovak Republic. Consumers residing in the EU retain any mandatory protections provided by their national consumer laws. Exclusive jurisdiction lies with the courts of Bratislava I, unless otherwise required by EU consumer protection law.
                 </p>
               </div>
               
@@ -526,6 +579,13 @@ export default function TermsPage() {
                   <li>• You consent to the personal jurisdiction of such courts</li>
                   <li>• EU residents may have additional rights under European law</li>
                   <li>• Consumer protection laws may provide additional remedies</li>
+                </ul>
+              </div>
+              
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-2">Online Dispute Resolution (EU)</h3>
+                <ul className="text-gray-600 space-y-1 ml-4">
+                  <li>• Consumers may also submit complaints through the EU Online Dispute Resolution (ODR) platform at https://ec.europa.eu/consumers/odr/ .</li>
                 </ul>
               </div>
             </div>
@@ -608,6 +668,25 @@ export default function TermsPage() {
                   For urgent legal matters or compliance issues, please email info@wadby.me 
                   with "URGENT" in the subject line.
                 </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Accessibility */}
+        <Card className="mb-8 border-green-200 bg-green-50">
+          <CardContent className="py-6">
+            <div className="flex items-center space-x-3 mb-4">
+              <Users className="h-6 w-6 text-green-600" />
+              <h2 className="text-xl font-semibold text-green-900">13. Accessibility</h2>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <h3 className="font-semibold text-green-900 mb-2">Accessibility</h3>
+                <div className="text-green-800 space-y-2">
+                  <p>William Wadby, s.r.o. and Veloryn platform is committed to meeting the requirements of the European Accessibility Act (Directive (EU) 2019/882). Our services are designed to be accessible in line with WCAG 2.1 AA standards. See our Accessibility Statement for details, known limitations, and how to contact us with accessibility feedback.</p>
+                </div>
               </div>
             </div>
           </CardContent>

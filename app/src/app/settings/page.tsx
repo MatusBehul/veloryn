@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import Link from 'next/link';
-import { ArrowLeft, Plus, X, Bell, Star } from 'lucide-react';
+import { ArrowLeft, Plus, X, Bell, Star, Cookie, Settings, Shield } from 'lucide-react';
 
 export default function SettingsPage() {
   const { user } = useAuth();
@@ -221,6 +221,65 @@ export default function SettingsPage() {
                 ))}
               </div>
             )}
+          </CardContent>
+        </Card>
+
+        {/* Cookie Management Section */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Cookie className="h-5 w-5 text-blue-500" />
+              <span>Cookie & Privacy Settings</span>
+            </CardTitle>
+            <p className="text-sm text-gray-600">
+              Manage your cookie preferences and view privacy settings
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg">
+                <Shield className="h-5 w-5 text-green-600 mt-0.5" />
+                <div className="flex-1">
+                  <h4 className="font-semibold text-gray-900 mb-1">Cookie Preferences</h4>
+                  <p className="text-sm text-gray-600 mb-3">
+                    Control which cookies we use and how your data is processed. 
+                    Your preferences are synced across all your devices.
+                  </p>
+                  <div className="space-y-2">
+                    <Link 
+                      href="/cookies" 
+                      className="inline-flex items-center text-sm text-blue-600 hover:text-blue-800 underline"
+                    >
+                      View Cookie Policy
+                    </Link>
+                    <br />
+                    <Link 
+                      href="/cookie-management" 
+                      className="inline-flex items-center text-sm text-blue-600 hover:text-blue-800 underline"
+                    >
+                      <Settings className="h-4 w-4 mr-1" />
+                      Cookie Management Dashboard
+                    </Link>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg">
+                <Shield className="h-5 w-5 text-purple-600 mt-0.5" />
+                <div className="flex-1">
+                  <h4 className="font-semibold text-gray-900 mb-1">Accessibility</h4>
+                  <p className="text-sm text-gray-600 mb-3">
+                    Learn about our commitment to accessibility and how to report issues.
+                  </p>
+                  <Link 
+                    href="/accessibility" 
+                    className="inline-flex items-center text-sm text-purple-600 hover:text-purple-800 underline"
+                  >
+                    View Accessibility Statement
+                  </Link>
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
 

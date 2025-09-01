@@ -84,6 +84,7 @@ export const CZ_TRANSLATIONS = {
     ultimate_tier: 'Ultimate',
     
     // Stránka ceníku
+    immediate_access_to_the_service: 'Nákupem tohoto členského plánu požadujete okamžitý přístup ke Službě a výslovně souhlasíte s tím, že plnění začíná okamžitě po zaplacení.',
     month: 'měsíc',
     simple_transparent_pricing: 'Jednoduchý a transparentní ceník',
     access_institutional_analysis: 'Získejte přístup k finančním analýzám institucionální kvality již od 2 €/měsíc. Zrušení kdykoli.',
@@ -269,7 +270,7 @@ export const CZ_TRANSLATIONS = {
     manageFavoriteTickersAndDailyUpdates: 'Spravujte své oblíbené tickery a denní aktualizace',
     favoriteTickersSection: 'Oblíbené tickery',
     addStockTickersDescription: 'Přidejte akciové tickery, které chcete sledovat. Pro každý ticker můžete povolit denní aktualizace.',
-    enterTickerSymbol: 'Zadejte symbol tickeru (např. AAPL, GOOGL)',
+    enterTickerSymbol: 'Zadejte symbol tickeru (např. AAPL, GOOG)',
     settingsAdd: 'Přidat',
     loadingFavoriteTickers: 'Načítání oblíbených tickerů...',
     noFavoriteTickersYetSettings: 'Zatím žádné oblíbené tickery',

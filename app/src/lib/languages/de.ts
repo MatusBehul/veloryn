@@ -84,6 +84,7 @@ export const DE_TRANSLATIONS = {
     ultimate_tier: 'Ultimate',
     
     // Preisseite (kurzer Block)
+    immediate_access_to_the_service: 'Mit dem Kauf dieses Mitgliedschaftsplans verlangen Sie den sofortigen Zugang zum Dienst und stimmen ausdrücklich zu, dass die Leistung unmittelbar nach der Zahlung beginnt.',
     month: 'Monat',
     simple_transparent_pricing: 'Einfache, transparente Preise',
     access_institutional_analysis: 'Erhalten Sie institutionelle Finanzanalysen ab nur 2 €/Monat. Jederzeit kündbar.',
@@ -269,7 +270,7 @@ export const DE_TRANSLATIONS = {
     manageFavoriteTickersAndDailyUpdates: 'Lieblingsticker und tägliche Updates verwalten',
     favoriteTickersSection: 'Lieblingsticker',
     addStockTickersDescription: 'Fügen Sie Aktienticker hinzu, die Sie verfolgen möchten. Sie können tägliche Updates pro Ticker aktivieren.',
-    enterTickerSymbol: 'Ticker-Symbol eingeben (z. B. AAPL, GOOGL)',
+    enterTickerSymbol: 'Ticker-Symbol eingeben (z. B. AAPL, GOOG)',
     settingsAdd: 'Hinzufügen',
     loadingFavoriteTickers: 'Lieblingsticker werden geladen...',
     noFavoriteTickersYetSettings: 'Noch keine Lieblingsticker',

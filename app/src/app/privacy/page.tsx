@@ -21,18 +21,23 @@ export default function PrivacyPage() {
           </p>
         </div>
 
-        {/* Overview */}
-        <Card className="mb-8 border-blue-200 bg-blue-50">
+        {/* Controller “Who we are” */}
+        <Card className="mb-8">
           <CardContent className="py-6">
-            <div className="flex items-start space-x-4">
-              <Shield className="h-8 w-8 text-blue-600 mt-1" />
-              <div>
-                <h2 className="text-xl font-semibold text-blue-900 mb-2">Your Privacy Matters</h2>
-                <p className="text-blue-800">
-                  At Veloryn, we are committed to protecting your privacy and 
-                  being transparent about how we collect, use, and protect your personal information.
-                </p>
-              </div>
+            <div className="flex items-center space-x-3 mb-4">
+              <Database className="h-6 w-6 text-gray-600" />
+              <h2 className="text-xl font-semibold text-gray-900">Controller “Who we are”</h2>
+            </div>
+            
+            <div className="space-y-4 text-gray-600">
+              <p>
+                William Wadby s.r.o.
+                Registered: Tupeho 34, Bratislava 831 01, Slovakia
+                Company ID (IČO): 53583671
+                VAT ID (IČ DPH): SK2121421643
+                Registered in the Obchodný register Okresného súdu Bratislava III, oddiel: Sro, vložka č. 150525/B
+                Contact: info@wadby.me
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -115,9 +120,23 @@ export default function PrivacyPage() {
                   <li>• Send important account and subscription updates</li>
                   <li>• Provide customer support and technical assistance</li>
                   <li>• Share relevant educational content (with your consent)</li>
+                  <li>• You can withdraw marketing consent at any time via the unsubscribe link or in your account settings.</li>
                 </ul>
               </div>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Legal bases mapping */}
+        <Card className="mb-8">
+          <CardContent className="py-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">Legal Bases for Processing (EU/UK)</h2>
+            <p className="text-gray-600 mb-3">We process personal data only where a lawful basis applies:</p>
+            <ul className="text-gray-600 ml-4 space-y-1">
+              <li>• <strong>Contract:</strong> account creation, authentication, providing the service, billing, transactional emails.</li>
+              <li>• <strong>Legitimate interests:</strong> security, fraud prevention, service analytics/quality, product improvement (you may object at any time).</li>
+              <li>• <strong>Consent:</strong> optional educational/marketing emails; you can withdraw consent at any time.</li>
+            </ul>
           </CardContent>
         </Card>
 
@@ -174,14 +193,18 @@ export default function PrivacyPage() {
             
             <div className="space-y-4">
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Limited Third-Party Integration</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">Processors and Recipients</h3>
                 <p className="text-gray-600 mb-2">
-                  We share your information only with trusted service providers essential to our operations:
+                  We use trusted processors under data processing agreements:
                 </p>
                 <ul className="text-gray-600 space-y-1 ml-4">
-                  <li>• <strong>Firebase/Google Cloud:</strong> Secure hosting and authentication</li>
-                  <li>• <strong>Stripe:</strong> Payment processing (they handle payment data separately)</li>
+                  <li>• <strong>Stripe</strong> (payments, SCA, billing). We do not store full card details.</li>
+                  <li>• <strong>Google Cloud Platform / Firebase</strong> (hosting, databases, authentication, logs).</li>
                 </ul>
+                <p className="text-gray-600 mt-2">
+                  Where processing involves countries outside the EEA/UK, we rely on <strong>Standard Contractual Clauses</strong> or equivalent safeguards. 
+                  A copy or summary of safeguards is available on request.
+                </p>
               </div>
               
               <div>
@@ -190,7 +213,6 @@ export default function PrivacyPage() {
                   <li>• All third parties are bound by strict data protection agreements</li>
                   <li>• Data is encrypted in transit and at rest</li>
                   <li>• We never sell or rent your personal information</li>
-                  <li>• Financial analysis requests are anonymized before processing</li>
                 </ul>
               </div>
               
@@ -240,9 +262,9 @@ export default function PrivacyPage() {
               <div>
                 <h3 className="font-semibold text-gray-900 mb-2">Breach Notification</h3>
                 <p className="text-gray-600">
-                  In the unlikely event of a data breach affecting your personal information, 
-                  we will notify you within 72 hours via email and provide details about 
-                  the incident and any steps you should take.
+                  In the unlikely event of a personal data breach posing a high risk to your rights and freedoms, 
+                  we will inform affected users <strong>without undue delay</strong> and provide information on the nature of the breach, 
+                  our measures, and recommended steps, in accordance with applicable law.
                 </p>
               </div>
             </div>
@@ -274,7 +296,7 @@ export default function PrivacyPage() {
               <div>
                 <h3 className="font-semibold text-gray-900 mb-2">How to Exercise Your Rights</h3>
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <p className="text-blue-800 font-medium mb-2">Contact Our Data Protection Officer</p>
+                  <p className="text-blue-800 font-medium mb-2">Contact Us About Your Data</p>
                   <div className="text-blue-700 space-y-1">
                     <p>Email: <strong>info@wadby.me</strong></p>
                     <p>Response Time: Within 30 days</p>
@@ -334,6 +356,10 @@ export default function PrivacyPage() {
                   EU/UK residents have the right to lodge a complaint with their local data 
                   protection authority if they believe their data rights have been violated.
                 </p>
+                <p className="text-gray-600">
+                  You can lodge a complaint with your local authority or with the Slovak Data Protection Authority:
+                  <br/>Úrad na ochranu osobných údajov SR – <a className="text-blue-600 underline" href="https://dataprotection.gov.sk/uoou/">dataprotection.gov.sk/uoou/</a>
+                </p>
               </div>
             </div>
           </CardContent>
@@ -366,6 +392,10 @@ export default function PrivacyPage() {
                   to review, delete, or refuse further collection of their child's information.
                 </p>
               </div>
+
+              <p className="text-gray-600">
+                We do not knowingly process personal data of children under 16 without appropriate consent as required by law.
+              </p>
             </div>
           </CardContent>
         </Card>

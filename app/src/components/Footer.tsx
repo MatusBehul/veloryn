@@ -1,12 +1,14 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { VelorynLogo } from '@/components/VelorynLogo';
+import { CookieSettingsModal } from '@/components/CookieSettingsModal';
 import { useTranslation } from '@/hooks/useTranslation';
 
 export function Footer() {
   const { t } = useTranslation();
+  const [showCookieSettings, setShowCookieSettings] = useState(false);
   
   return (
     <footer className="bg-slate-900 text-white">
@@ -51,6 +53,24 @@ export function Footer() {
                   {t('terms_of_service')}
                 </Link>
               </li>
+              <li>
+                <Link href="/cookies" className="text-slate-300 hover:text-white">
+                  Cookie Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/accessibility" className="text-slate-300 hover:text-white">
+                  Accessibility
+                </Link>
+              </li>
+              <li>
+                <button 
+                  onClick={() => setShowCookieSettings(true)}
+                  className="text-slate-300 hover:text-white text-left"
+                >
+                  Cookie Settings
+                </button>
+              </li>
             </ul>
           </div>
         </div>
@@ -66,6 +86,11 @@ export function Footer() {
           </div>
         </div>
       </div>
+      
+      <CookieSettingsModal 
+        isOpen={showCookieSettings} 
+        onClose={() => setShowCookieSettings(false)} 
+      />
     </footer>
   );
 }
