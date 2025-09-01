@@ -774,11 +774,12 @@ class FinancialAnalysisTrigger:
                 'Authorization': f'Bearer {auth_token}'
             }
             
-            # Try a simple GET request to the service root
+            # Try a simple GET request to the service root with longer timeout
+            timeout = aiohttp.ClientTimeout(total=30)  # 30 seconds timeout
             async with self.session.get(
                 CLOUD_RUN_URL,
                 headers=headers,
-                timeout=10
+                timeout=timeout
             ) as response:
                 if response.status == 200:
                     return {'valid': True, 'status_code': response.status}
@@ -789,8 +790,15 @@ class FinancialAnalysisTrigger:
                 else:
                     return {'valid': True, 'status_code': response.status, 'note': 'Service accessible but returned non-200 status'}
                     
+        except asyncio.TimeoutError:
+            logger.error(f"Timeout validating Cloud Run access to {CLOUD_RUN_URL}")
+            return {'valid': False, 'error': 'Validation timeout - Cloud Run service may be slow to respond'}
+        except aiohttp.ClientError as e:
+            logger.error(f"Client error validating Cloud Run access: {str(e)}")
+            return {'valid': False, 'error': f'Network error: {str(e)}'}
         except Exception as e:
-            print(traceback.format_exc())
+            logger.error(f"Unexpected error validating Cloud Run access: {str(e)}")
+            logger.error(traceback.format_exc())
             return {'valid': False, 'error': f'Validation failed: {str(e)}'}
     
     def publish_instagram_promotion(self, title: str, subtitle, promo_reels_tts_text: str, promo_reels_summary: str, hourly_prices: list) -> Dict[str, Any]:
