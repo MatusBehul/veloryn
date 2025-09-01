@@ -201,7 +201,7 @@ class FinancialAnalysisTrigger:
                 'status_code': getattr(e, 'status', 500)
             }
 
-    async def call_cloud_run_service(self, payload: Dict[str, Any], max_retries: int = 5, base_delay: float = 2.0) -> Dict[str, Any]:
+    async def call_cloud_run_service(self, payload: Dict[str, Any], max_retries: int = 5, base_delay: float = 2.0, session_exists: bool = False) -> Dict[str, Any]:
         """Call the Cloud Run service with the analysis payload, with retry mechanism for transient errors and rate limits."""
         if not CLOUD_RUN_URL:
             raise ValueError("CLOUD_RUN_URL environment variable not set")
@@ -209,19 +209,20 @@ class FinancialAnalysisTrigger:
         start_time = time.time()
 
         # First, create the session
-        session_result = await self.create_session(
-            payload['user_id'],
-            payload['session_id']
-        )
+        if not session_exists:
+            session_result = await self.create_session(
+                payload['user_id'],
+                payload['session_id']
+            )
 
-        if not session_result['success']:
-            logger.error(f"Session creation failed: {session_result.get('error', 'Unknown error')}")
-            return {
-                'success': False,
-                'error': f"Failed to create session: {session_result.get('error', 'Unknown error')}",
-                'response_time': time.time() - start_time,
-                'status_code': session_result.get('status_code', 500)
-            }
+            if not session_result['success']:
+                logger.error(f"Session creation failed: {session_result.get('error', 'Unknown error')}")
+                return {
+                    'success': False,
+                    'error': f"Failed to create session: {session_result.get('error', 'Unknown error')}",
+                    'response_time': time.time() - start_time,
+                    'status_code': session_result.get('status_code', 500)
+                }
 
         # Get authentication token for the main request
         auth_token = self._get_access_token()
@@ -369,13 +370,15 @@ class FinancialAnalysisTrigger:
         """Call Cloud Run service with additional retry logic for validation errors"""
         validation_attempt = 0
         
+        session_exists = False  # Track if session was created in previous attempts
         while validation_attempt < MAX_RETRIES:
             try:
                 # Call the main Cloud Run service
-                result = await self.call_cloud_run_service(payload)
-                print(f"Cloud Run call result:")
-                print(result)
-                
+                result = await self.call_cloud_run_service(payload, session_exists=session_exists)
+                session_exists = True
+                print(f"Cloud Run call result ['data']['analysis']:")
+                print(json.dumps(result['data']['analysis']))
+
                 if not result['success']:
                     # If the Cloud Run call itself failed, return the error
                     return result
