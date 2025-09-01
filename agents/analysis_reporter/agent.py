@@ -12,7 +12,7 @@ root_agent = LlmAgent(
     CRITICAL: You MUST output ONLY valid JSON array. No markdown, no code blocks, no explanation text, no plain strings.
 
     ## Analysis Requirements
-    Analyze provided data ($.technical_data, company profile, market context) and generate structured financial analysis.
+    Analyze provided data ($.technical_data, company profile, market context) and generate structured financial analysis / insights for all languages in $.languages.
 
     ## MANDATORY OUTPUT FORMAT
     Return EXACTLY this JSON structure with actual analysis content:
