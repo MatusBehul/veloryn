@@ -67,7 +67,7 @@ root_agent = LlmAgent(
     ## Critical Rules:
     - Each analysis section MUST be an array of strings (except promo_reels_summary, promo_reels_tts_text which is a single string and promote_flag which is a boolean)
     - Do NOT return simple arrays like ["string1", "string2", "string3"], add substantive analysis in each string
-    - Each string should be approximatelly 200-400 characters long
+    - Each string should be approximatelly 100-200 characters long
     - Do NOT return plain text without the proper object structure
 
     ## Focus Areas:
