@@ -1331,6 +1331,7 @@ def content_trigger_function(request):
         request_json = request.get_json(silent=True)
         
         if not request_json:
+            logger.error("No JSON payload provided in request")
             return {'error': 'No JSON payload provided'}, 400
         
         ticker = request_json.get('ticker')
@@ -1338,6 +1339,7 @@ def content_trigger_function(request):
         day_input = request_json.get("day_input")
         
         if not ticker:
+            logger.error("No ticker parameter provided in request")
             return {'error': 'ticker parameter is required'}, 400
         
         # Run async function
