@@ -94,7 +94,7 @@ class FinancialAnalysisResponse(BaseModel):
 
 
 # Retry configuration
-MAX_RETRIES = 3
+MAX_RETRIES = 1
 RETRY_DELAY_BASE = 2  # Base delay in seconds
 VALIDATION_ERROR_RETRY_DELAY = 5  # Additional delay for validation errors
 
@@ -532,8 +532,7 @@ class FinancialAnalysisTrigger:
             json_str = self._fix_common_json_errors(json_str)
             try:
                 parsed_data = json.loads(json_str)
-                # Validate and fix the analysis structure
-                return self._validate_and_fix_analysis(parsed_data)
+                return parsed_data
             except json.JSONDecodeError as e:
                 logger.error(f"Failed to parse extracted JSON from markdown: {e}")
                 logger.error(f"JSON string around error: {json_str[max(0, e.pos-100):e.pos+100]}")
@@ -561,7 +560,7 @@ class FinancialAnalysisTrigger:
                 json_str = self._fix_common_json_errors(json_str)
                 try:
                     parsed_data = json.loads(json_str)
-                    return self._validate_and_fix_analysis(parsed_data)
+                    return parsed_data
                 except json.JSONDecodeError:
                     continue  # Try next array match
         
@@ -587,7 +586,7 @@ class FinancialAnalysisTrigger:
                 json_str = self._fix_common_json_errors(json_str)
                 try:
                     parsed_data = json.loads(json_str)
-                    return self._validate_and_fix_analysis(parsed_data)
+                    return parsed_data
                 except json.JSONDecodeError:
                     continue  # Try next object match
         
@@ -601,7 +600,7 @@ class FinancialAnalysisTrigger:
             json_str = self._fix_common_json_errors(json_str)
             try:
                 parsed_data = json.loads(json_str)
-                return self._validate_and_fix_analysis(parsed_data)
+                return parsed_data
             except json.JSONDecodeError as e:
                 logger.error(f"Failed to parse analysis pattern JSON: {e}")
         
@@ -760,10 +759,6 @@ class FinancialAnalysisTrigger:
         except Exception as e:
             logger.error(f"Unexpected error during validation: {e}")
             raise ValidationRetryError(f"Validation failed with unexpected error: {str(e)}")
-
-    def _validate_and_fix_analysis(self, data: Dict[str, Any]) -> Dict[str, Any]:
-        """Legacy validation function - now redirects to Pydantic validation"""
-        return self._validate_analysis_with_pydantic(data)
     
     async def validate_cloud_run_access(self) -> Dict[str, Any]:
         """Validate that we can access the Cloud Run service"""
