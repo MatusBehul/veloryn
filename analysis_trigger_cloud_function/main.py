@@ -264,9 +264,14 @@ class FinancialAnalysisTrigger:
                                 except json.JSONDecodeError:
                                     full_response += data_content + "\n"
                         if events:
+                            print("Received events:")
+                            for event in events:
+                                print(f" - {event}")
                             last_event = events[-1]
                             result = self._extract_analysis_from_adk_response(last_event)
                         else:
+                            print("Received response:")
+                            print(full_response)
                             result = self._extract_json_from_markdown(full_response)
                     else:
                         response_text = await response.text()
@@ -368,6 +373,8 @@ class FinancialAnalysisTrigger:
             try:
                 # Call the main Cloud Run service
                 result = await self.call_cloud_run_service(payload)
+                print(f"Cloud Run call result:")
+                print(result)
                 
                 if not result['success']:
                     # If the Cloud Run call itself failed, return the error
