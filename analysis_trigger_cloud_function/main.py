@@ -384,10 +384,9 @@ class FinancialAnalysisTrigger:
                     return result
                 
                 # Try to validate the response data
-                validated_data = self._validate_analysis_with_pydantic(result['data'])
+                validated_data = self._validate_analysis_with_pydantic(result['data']['analysis'])
                 
                 # If validation succeeds, return the validated result
-                result['data'] = validated_data
                 result['validation_attempts'] = validation_attempt + 1
                 logger.info(f"Analysis validated successfully on attempt {validation_attempt + 1}")
                 return result
