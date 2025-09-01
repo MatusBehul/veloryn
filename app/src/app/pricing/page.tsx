@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSubscription } from '@/hooks/useSubscription';
@@ -13,6 +13,11 @@ export default function PricingPage() {
   const { user } = useAuth();
   const { createCheckoutSession, hasActiveSubscription, subscriptionTier, loading } = useSubscription();
   const { t } = useTranslation();
+  
+  // Terms of Service modal state
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [pendingPriceId, setPendingPriceId] = useState<string | null>(null);
 
   const handleSubscribe = async (priceId: string) => {
     if (!user) {
@@ -21,11 +26,31 @@ export default function PricingPage() {
       return;
     }
 
+    // Show terms modal instead of proceeding directly
+    setPendingPriceId(priceId);
+    setShowTermsModal(true);
+  };
+
+  const handleTermsAccept = async () => {
+    if (!termsAccepted || !pendingPriceId) {
+      return;
+    }
+
     try {
-      await createCheckoutSession(priceId);
+      await createCheckoutSession(pendingPriceId);
     } catch (error) {
       console.error('Error subscribing:', error);
+    } finally {
+      setShowTermsModal(false);
+      setPendingPriceId(null);
+      setTermsAccepted(false);
     }
+  };
+
+  const handleTermsCancel = () => {
+    setShowTermsModal(false);
+    setPendingPriceId(null);
+    setTermsAccepted(false);
   };
 
     const features = [
@@ -33,6 +58,96 @@ export default function PricingPage() {
     { name: t('email_reports'), free: false, standard: true, premium: true },
     { name: t('historical_data_access'), free: false, standard: true, premium: true },
   ];
+
+  // Terms of Service Modal Component
+  const TermsModal = () => {
+    if (!showTermsModal) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="p-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              {t('checkoutPopupTitle')}
+            </h2>
+            
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+              <p className="text-amber-800 font-medium mb-4">
+                {t('checkoutPopupText1')}:
+              </p>
+              
+              <div className="space-y-3 text-sm text-amber-700">
+                <div className="flex items-start">
+                  <span className="font-semibold mr-2">1.</span>
+                  <span>{t('checkoutPopupText2')}</span>
+                </div>
+                <div className="flex items-start">
+                  <span className="font-semibold mr-2">2.</span>
+                  <span>{t('checkoutPopupText3')}</span>
+                </div>
+                <div className="flex items-start">
+                  <span className="font-semibold mr-2">3.</span>
+                  <span>{t('checkoutPopupText4')}</span>
+                </div>
+                <div className="flex items-start">
+                  <span className="font-semibold mr-2">4.</span>
+                  <span>{t('checkoutPopupText5')}</span>
+                </div>
+                <div className="flex items-start">
+                  <span className="font-semibold mr-2">5.</span>
+                  <span>{t('checkoutPopupText6')}</span>
+                </div>
+                <div className="flex items-start">
+                  <span className="font-semibold mr-2">6.</span>
+                  <span>{t('checkoutPopupText7')} <Link href="/terms" className="text-blue-600 hover:underline">Terms of Service</Link> & <Link href="/privacy" className="text-blue-600 hover:underline">Privacy Policy</Link>.</span>
+                </div>
+                <div className="flex items-start">
+                  <span className="font-semibold mr-2">7.</span>
+                  <span>{t('immediate_access_to_the_service')}</span>
+                </div>
+                <div className="flex items-start">
+                  <span className="font-semibold mr-2">8.</span>
+                  <span>{t('checkoutPopupText7a')}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <label className="flex items-start space-x-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={termsAccepted}
+                  onChange={(e) => setTermsAccepted(e.target.checked)}
+                  className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <span className="text-sm text-gray-900">
+                  {t('checkoutPopupText8')}
+                </span>
+              </label>
+            </div>
+
+            <div className="flex space-x-3">
+              <Button
+                onClick={handleTermsCancel}
+                variant="outline"
+                className="flex-1"
+              >
+                {t('checkoutPopupText9')}
+              </Button>
+              <Button
+                onClick={handleTermsAccept}
+                disabled={!termsAccepted || loading}
+                loading={loading}
+                className="flex-1"
+              >
+                {t('checkoutPopupText10')}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="bg-gray-50 py-24">
@@ -248,6 +363,9 @@ export default function PricingPage() {
           </div>
         </div>
       </div>
+      
+      {/* Terms of Service Modal */}
+      <TermsModal />
     </div>
   );
 }

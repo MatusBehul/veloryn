@@ -4,8 +4,11 @@ import React from 'react';
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/Card';
 import { ArrowLeft, FileText, AlertTriangle, Shield, CreditCard, Users, Scale, Globe, Lock } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function TermsPage() {
+  const { t } = useTranslation();
+
   return (
     <div className="min-h-screen bg-slate-50 py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -13,11 +16,11 @@ export default function TermsPage() {
         <div className="mb-8">
           <Link href="/" className="inline-flex items-center text-blue-500 hover:text-blue-600 mb-4">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Home
+            {t('backToHome')}
           </Link>
-          <h1 className="text-4xl font-bold text-slate-900 mb-4">Terms of Service</h1>
+          <h1 className="text-4xl font-bold text-slate-900 mb-4">{t('termsTitle')}</h1>
           <p className="text-slate-600">
-            Last updated: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+            {t('termsLastUpdated')}: September 1, 2025
           </p>
         </div>
 
@@ -25,16 +28,13 @@ export default function TermsPage() {
         <Card className="mb-8 border-red-200 bg-red-50">
           <CardContent className="py-6">
             <div className="flex items-start space-x-4">
-              <AlertTriangle className="h-8 w-8 text-red-600 mt-1" />
               <div>
-                <h2 className="text-xl font-semibold text-red-900 mb-2">⚠️ Critical Financial Disclaimer</h2>
+                <h2 className="text-xl font-semibold text-red-900 mb-2">{t('importantNoticeTitle')}</h2>
                 <p className="text-red-800 font-medium mb-2">
-                  Veloryn provides AI-generated financial analysis for EDUCATIONAL and INFORMATIONAL purposes ONLY.
+                  {t('importantNoticeText1')}
                 </p>
                 <p className="text-red-700 text-sm">
-                  Our analyses are NOT financial advice, NOT investment insights, and NOT offers to buy or sell securities. 
-                  Past performance does not guarantee future results. All investments carry risk of loss. 
-                  You must consult qualified financial advisors before making any investment decisions.
+                  {t('importantNoticeText2')}
                 </p>
               </div>
             </div>
@@ -46,18 +46,16 @@ export default function TermsPage() {
           <CardContent className="py-6">
             <div className="flex items-center space-x-3 mb-4">
               <FileText className="h-6 w-6 text-gray-600" />
-              <h2 className="text-xl font-semibold text-gray-900">0. Company Information</h2>
+              <h2 className="text-xl font-semibold text-gray-900">0. {t('companyInformationTitle')}</h2>
             </div>
             
             <div className="space-y-4 text-gray-600">
-              <p>
-                William Wadby s.r.o.
-                Registered: Tupeho 34, Bratislava 831 01, Slovakia
-                Company ID (IČO): 53583671
-                VAT ID (IČ DPH): SK2121421643
-                Registered in the Obchodný register Okresného súdu Bratislava III, oddiel: Sro, vložka č. 150525/B
-                Contact: info@wadby.me
-              </p>
+                <p>William Wadby s.r.o.</p>
+                <p>Registered: Tupeho 34, Bratislava 831 01, Slovakia</p>
+                <p>Company ID (IČO): 53583671</p>
+                <p>VAT ID (IČ DPH): SK2121421643</p>
+                <p>Registered in the Obchodný register Okresného súdu Bratislava III, oddiel: Sro, vložka č. 150525/B</p>
+                <p>Contact: info@wadby.me</p>
             </div>
           </CardContent>
         </Card>
@@ -67,23 +65,13 @@ export default function TermsPage() {
           <CardContent className="py-6">
             <div className="flex items-center space-x-3 mb-4">
               <FileText className="h-6 w-6 text-gray-600" />
-              <h2 className="text-xl font-semibold text-gray-900">1. Acceptance of Terms</h2>
+              <h2 className="text-xl font-semibold text-gray-900">1. {t('acceptanceOfTermsTitle')}</h2>
             </div>
             
             <div className="space-y-4 text-gray-600">
-              <p>
-                By accessing and using Veloryn (the "Service"), you agree to be bound by these 
-                Terms of Service ("Terms") and our Privacy Policy. If you do not agree to these terms, 
-                please do not use our service.
-              </p>
-              <p>
-                These Terms constitute a legally binding agreement between you and Veloryn. We may update 
-                these Terms at any time with 30 days' notice. Your continued use of the Service after 
-                any changes constitutes acceptance of the updated Terms.
-              </p>
-              <p>
-                You must be at least 18 years old to use Veloryn. 
-              </p>
+              <p>{t('acceptanceOfTermsText1')}</p>
+              <p>{t('acceptanceOfTermsText2')}</p>
+              <p>{t('acceptanceOfTermsText3')}</p>
             </div>
           </CardContent>
         </Card>
@@ -93,33 +81,33 @@ export default function TermsPage() {
           <CardContent className="py-6">
             <div className="flex items-center space-x-3 mb-4">
               <Shield className="h-6 w-6 text-gray-600" />
-              <h2 className="text-xl font-semibold text-gray-900">2. Service Description</h2>
+              <h2 className="text-xl font-semibold text-gray-900">2. {t('serviceDescriptionTitle')}</h2>
             </div>
             
             <div className="space-y-4">
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">What Veloryn Provides</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">{t('serviceDescriptionText1')}</h3>
                 <ul className="text-gray-600 space-y-1 ml-4">
-                  <li>• <strong>Standard Tier:</strong> AI-generated financial analysis, email reports, custom ticker lists, historical data access</li>
-                  <li>• <strong>Premium Tier:</strong> All Standard features plus bigger daily emails limit, priority support</li>
-                  <li>• Technical analysis, sentiment tracking, and risk assessment tools</li>
-                  <li>• Data visualization and reporting features</li>
-                  <li>• Market research and analysis compilation services</li>
-                  <li>• Educational content about financial markets and investment concepts</li>
-                  <li>• Historical data analysis and trend identification</li>
+                  <li>• <strong>Standard Tier:</strong> {t('serviceDescriptionText2')}</li>
+                  <li>• <strong>Premium Tier:</strong> {t('serviceDescriptionText3')}</li>
+                  <li>• {t('serviceDescriptionText4')}</li>
+                  <li>• {t('serviceDescriptionText5')}</li>
+                  <li>• {t('serviceDescriptionText6')}</li>
+                  <li>• {t('serviceDescriptionText7')}</li>
+                  <li>• {t('serviceDescriptionText8')}</li>
                 </ul>
               </div>
               
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">What Veloryn Does NOT Provide</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">{t('serviceDescriptionText9')}</h3>
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                   <ul className="text-yellow-800 space-y-1 ml-4 text-sm">
-                    <li>• Financial advice, investment insights, or personalized investment strategies</li>
-                    <li>• Guaranteed returns, profit predictions, or investment performance warranties</li>
-                    <li>• Licensed financial advisory, brokerage, or investment management services</li>
-                    <li>• Direct investment execution, trading services, or portfolio management</li>
-                    <li>• Tax advice, legal counsel, or regulatory compliance guidance</li>
-                    <li>• Insurance products, banking services, or credit offerings</li>
+                    <li>• {t('serviceDescriptionText10')}</li>
+                    <li>• {t('serviceDescriptionText11')}</li>
+                    <li>• {t('serviceDescriptionText12')}</li>
+                    <li>• {t('serviceDescriptionText13')}</li>
+                    <li>• {t('serviceDescriptionText14')}</li>
+                    <li>• {t('serviceDescriptionText15')}</li>
                   </ul>
                 </div>
               </div>
@@ -132,62 +120,60 @@ export default function TermsPage() {
           <CardContent className="py-6">
             <div className="flex items-center space-x-3 mb-4">
               <Users className="h-6 w-6 text-gray-600" />
-              <h2 className="text-xl font-semibold text-gray-900">3. User Responsibilities and Conduct</h2>
+              <h2 className="text-xl font-semibold text-gray-900">3. {t('userResponsibilitiesTitle')}</h2>
             </div>
             
             <div className="space-y-4">
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Account Security and Management</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">{t('userResponsibilitiesText1')}</h3>
                 <ul className="text-gray-600 space-y-1 ml-4">
-                  <li>• Maintain the confidentiality and security of your account credentials</li>
-                  <li>• Notify us immediately of any unauthorized access or security breaches</li>
-                  <li>• Use strong passwords and enable two-factor authentication when available</li>
-                  <li>• You are solely responsible for all activities under your account</li>
-                  <li>• Provide accurate and complete registration information</li>
-                  <li>• Keep your account information current and up-to-date</li>
+                  <li>• {t('userResponsibilitiesText2')}</li>
+                  <li>• {t('userResponsibilitiesText3')}</li>
+                  <li>• {t('userResponsibilitiesText4')}</li>
+                  <li>• {t('userResponsibilitiesText5')}</li>
+                  <li>• {t('userResponsibilitiesText6')}</li>
+                  <li>• {t('userResponsibilitiesText7')}</li>
                 </ul>
               </div>
               
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Acceptable Use Policy</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">{t('userResponsibilitiesText8')}</h3>
                 <ul className="text-gray-600 space-y-1 ml-4">
-                  <li>• Use Veloryn only for lawful purposes and personal/educational use</li>
-                  <li>• Comply with all applicable laws, regulations, and third-party rights</li>
-                  <li>• Respect intellectual property rights and terms of use</li>
-                  <li>• Use the Service in a manner consistent with its educational purpose</li>
-                  <li>• Report any bugs, security vulnerabilities, or service issues promptly</li>
+                  <li>• {t('userResponsibilitiesText9')}</li>
+                  <li>• {t('userResponsibilitiesText10')}</li>
+                  <li>• {t('userResponsibilitiesText11')}</li>
+                  <li>• {t('userResponsibilitiesText12')}</li>
+                  <li>• {t('userResponsibilitiesText13')}</li>
                 </ul>
               </div>
               
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Strictly Prohibited Activities</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">{t('userResponsibilitiesText14')}</h3>
                 <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                   <ul className="text-red-800 space-y-1 ml-4 text-sm">
-                    <li>• Reverse engineering, copying, or attempting to extract our AI models or algorithms</li>
-                    <li>• Using our analysis to provide financial advice or investment services to others</li>
-                    <li>• Redistributing, reselling, or commercially exploiting our content without authorization</li>
-                    <li>• Market manipulation, insider trading, or other illegal financial activities</li>
-                    <li>• Creating multiple accounts to circumvent subscription limits or billing</li>
-                    <li>• Sharing account access with unauthorized third parties</li>
-                    <li>• Using automated scripts, bots, or scraping tools to access our Service</li>
-                    <li>• Attempting to overwhelm, disrupt, or compromise our systems or security</li>
-                    <li>• Uploading malicious code, viruses, or harmful content</li>
-                    <li>• Impersonating others or providing false identity information</li>
+                    <li>• {t('userResponsibilitiesText15')}</li>
+                    <li>• {t('userResponsibilitiesText16')}</li>
+                    <li>• {t('userResponsibilitiesText17')}</li>
+                    <li>• {t('userResponsibilitiesText18')}</li>
+                    <li>• {t('userResponsibilitiesText19')}</li>
+                    <li>• {t('userResponsibilitiesText20')}</li>
+                    <li>• {t('userResponsibilitiesText21')}</li>
+                    <li>• {t('userResponsibilitiesText22')}</li>
+                    <li>• {t('userResponsibilitiesText23')}</li>
+                    <li>• {t('userResponsibilitiesText24')}</li>
                   </ul>
                 </div>
               </div>
               
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Investment Decision Responsibility</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">{t('userResponsibilitiesText25')}</h3>
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                  <p className="text-yellow-800 text-sm font-medium mb-2">
-                    Critical Acknowledgment: By using Veloryn, you acknowledge and agree that:
-                  </p>
+                  <p className="text-yellow-800 text-sm font-medium mb-2">{t('userResponsibilitiesText26')}</p>
                   <ul className="text-yellow-800 space-y-1 ml-4 text-sm">
-                    <li>• All investment decisions are your sole responsibility</li>
-                    <li>• You will seek qualified professional advice before making investment decisions</li>
-                    <li>• You understand the risks associated with financial markets and investments</li>
-                    <li>• Veloryn is not liable for any investment losses or missed opportunities</li>
+                    <li>• {t('userResponsibilitiesText27')}</li>
+                    <li>• {t('userResponsibilitiesText28')}</li>
+                    <li>• {t('userResponsibilitiesText29')}</li>
+                    <li>• {t('userResponsibilitiesText30')}</li>
                   </ul>
                 </div>
               </div>
@@ -200,89 +186,91 @@ export default function TermsPage() {
           <CardContent className="py-6">
             <div className="flex items-center space-x-3 mb-4">
               <CreditCard className="h-6 w-6 text-gray-600" />
-              <h2 className="text-xl font-semibold text-gray-900">4. Subscription, Billing, and Payment Terms</h2>
+              <h2 className="text-xl font-semibold text-gray-900">4. {t('subscriptionTermsTitle')}</h2>
             </div>
             
             <div className="space-y-4">
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Subscription Plans and Pricing</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">{t('subscriptionTermsText1')}</h3>
                 <ul className="text-gray-600 space-y-1 ml-4">
-                  <li>• <strong>Standard:</strong> €2 per month - Full AI analysis with basic email capacity (up to 5 daily emails)</li>
-                  <li>• <strong>Premium:</strong> €10 per month - Enhanced analysis with priority support (up to 20 daily emails)</li>
-                  <li>• All subscriptions automatically renew unless cancelled before the next billing cycle</li>
-                  <li>• Full access to tier-appropriate AI analysis features and content</li>
-                  <li>• Pricing subject to change with 30 days' advance notice</li>
-                  <li>• New pricing applies to subsequent billing cycles after notice period</li>
+                  <li>• {t('subscriptionTermsText2')}</li>
+                  <li>• {t('subscriptionTermsText3')}</li>
+                  <li>• {t('subscriptionTermsText4')}</li>
+                  <li>• {t('subscriptionTermsText5')}</li>
+                  <li>• {t('subscriptionTermsText6')}</li>
+                  <li>• {t('subscriptionTermsText7')}</li>
+                  <li>• {t('subscriptionTermsText8')}</li>
+                  <li>• {t('subscriptionTermsText9')}</li>
                 </ul>
               </div>
               
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Payment Processing and Security</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">{t('subscriptionTermsText10')}</h3>
                 <ul className="text-gray-600 space-y-1 ml-4">
-                  <li>• All payments processed securely through Stripe, our payment processor</li>
-                  <li>• We do not store your payment card information on our servers</li>
-                  <li>• Billing occurs at the start of each subscription period</li>
-                  <li>• Failed payments may result in service suspension after grace period</li>
-                  <li>• You must provide valid payment information and authorize automatic billing</li>
-                  <li>• All fees are exclusive of applicable taxes, which you are responsible for</li>
+                  <li>• {t('subscriptionTermsText11')}</li>
+                  <li>• {t('subscriptionTermsText12')}</li>
+                  <li>• {t('subscriptionTermsText13')}</li>
+                  <li>• {t('subscriptionTermsText14')}</li>
+                  <li>• {t('subscriptionTermsText15')}</li>
+                  <li>• {t('subscriptionTermsText16')}</li>
                 </ul>
               </div>
               
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Cancellation and Refund Policy</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">{t('subscriptionTermsText17')}</h3>
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                   <div className="text-blue-800 space-y-2 text-sm">
-                    <p><strong>Cancellation:</strong></p>
+                    <p><strong>{t('subscriptionTermsText18')}:</strong></p>
                     <ul className="ml-4 space-y-1">
-                      <li>• Cancel anytime through your account settings or Stripe billing portal</li>
-                      <li>• Cancellation takes effect at the end of your current billing period</li>
-                      <li>• You retain full access to premium features until subscription expires</li>
-                      <li>• No cancellation fees or penalties</li>
+                      <li>• {t('subscriptionTermsText19')}</li>
+                      <li>• {t('subscriptionTermsText20')}</li>
+                      <li>• {t('subscriptionTermsText21')}</li>
+                      <li>• {t('subscriptionTermsText22')}</li>
                     </ul>
-                    <p><strong>Refunds:</strong></p>
+                    <p><strong>{t('subscriptionTermsText23')}:</strong></p>
                     <ul className="ml-4 space-y-1">
-                      <li>• No refunds for partial months or unused portions of subscription periods</li>
-                      <li>• Refunds may be provided at our discretion for technical issues or service failures</li>
-                      <li>• Refund requests must be submitted within 30 days of billing</li>
+                      <li>• {t('subscriptionTermsText24')}</li>
+                      <li>• {t('subscriptionTermsText25')}</li>
+                      <li>• {t('subscriptionTermsText26')}</li>
                     </ul>
                   </div>
                 </div>
               </div>
               
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Free Trial and Promotional Offers</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">{t('subscriptionTermsText27')}</h3>
                 <ul className="text-gray-600 space-y-1 ml-4">
-                  <li>• Free trials or promotional offers may be available for new users</li>
-                  <li>• Trial periods automatically convert to paid subscriptions unless cancelled</li>
-                  <li>• Promotional pricing is limited-time and subject to specific terms</li>
-                  <li>• One free trial per user; additional trials require our approval</li>
+                  <li>• {t('subscriptionTermsText28')}</li>
+                  <li>• {t('subscriptionTermsText29')}</li>
+                  <li>• {t('subscriptionTermsText30')}</li>
+                  <li>• {t('subscriptionTermsText31')}</li>
                 </ul>
               </div>
               
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Auto-Renewal</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">{t('subscriptionTermsText32')}</h3>
                 <ul className="text-gray-600 space-y-1 ml-4">
-                  <li>• All subscriptions automatically renew at the end of each billing cycle until canceled.</li>
-                  <li>• Renewal charges are billed using the payment method on file.</li>
-                  <li>• We will notify you at least 30 days in advance of any price change; new prices apply to the following billing cycle.</li>
+                  <li>• {t('subscriptionTermsText33')}</li>
+                  <li>• {t('subscriptionTermsText34')}</li>
+                  <li>• {t('subscriptionTermsText35')}</li>
                 </ul>
               </div>
               
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Prices and Taxes</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">{t('subscriptionTermsText36')}</h3>
                 <ul className="text-gray-600 space-y-1 ml-4">
-                  <li>• All prices are shown inclusive of VAT as indicated at checkout.</li>
-                  <li>• For EU customers, VAT is applied according to your Member State under the One-Stop Shop (OSS) scheme.</li>
-                  <li>• For non-EU customers, local taxes may apply and will be displayed at checkout.</li>
+                  <li>• {t('subscriptionTermsText37')}</li>
+                  <li>• {t('subscriptionTermsText38')}</li>
+                  <li>• {t('subscriptionTermsText39')}</li>
                 </ul>
               </div>
               
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Payment Authentication</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">{t('subscriptionTermsText40')}</h3>
                 <ul className="text-gray-600 space-y-1 ml-4">
-                  <li>• Payments are processed by Stripe.</li>
-                  <li>• You may be required to complete Strong Customer Authentication (SCA) (e.g., 3-D Secure) when paying with EU/EEA cards.</li>
-                  <li>• By saving a payment method, you authorize Stripe to charge recurring subscription fees on your behalf.</li>
+                  <li>• {t('subscriptionTermsText41')}</li>
+                  <li>• {t('subscriptionTermsText42')}</li>
+                  <li>• {t('subscriptionTermsText43')}</li>
                 </ul>
               </div>
             </div>
@@ -294,15 +282,15 @@ export default function TermsPage() {
           <CardContent className="py-6">
             <div className="flex items-center space-x-3 mb-4">
               <AlertTriangle className="h-6 w-6 text-gray-600" />
-              <h2 className="text-xl font-semibold text-gray-900">4A. Right of Withdrawal</h2>
+              <h2 className="text-xl font-semibold text-gray-900">4A. {t('rightOfWithdrawalTitle')}</h2>
             </div>
             
             <div className="space-y-4">
               <div>
                 <ul className="text-gray-600 space-y-1 ml-4">
-                  <li>• If you are an EU consumer, you have 14 days from the date of subscription to withdraw without giving any reason.</li>
-                  <li>• To exercise this right, email info@wadby.me with your withdrawal request.</li>
-                  <li>• However, if you request immediate access to the Service and explicitly agree that performance begins before the withdrawal period ends, you acknowledge that you lose your withdrawal right once digital content has been fully delivered.</li>
+                  <li>• {t('rightOfWithdrawalText1')}</li>
+                  <li>• {t('rightOfWithdrawalText2')}</li>
+                  <li>• {t('rightOfWithdrawalText3')}</li>
                 </ul>
               </div>
             </div>
@@ -314,48 +302,48 @@ export default function TermsPage() {
           <CardContent className="py-6">
             <div className="flex items-center space-x-3 mb-4">
               <AlertTriangle className="h-6 w-6 text-gray-600" />
-              <h2 className="text-xl font-semibold text-gray-900">5. Disclaimers and Risk Acknowledgments</h2>
+              <h2 className="text-xl font-semibold text-gray-900">5. {t('disclaimersAndLimitationsTitle')}</h2>
             </div>
             
             <div className="space-y-4">
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Financial and Investment Disclaimers</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">{t('disclaimersAndLimitationsText1')}</h3>
                 <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                   <p className="text-sm text-red-800 font-medium mb-3">
-                    CRITICAL INVESTMENT RISK DISCLOSURE:
+                    {t('disclaimersAndLimitationsText2')}:
                   </p>
                   <ul className="text-sm text-red-700 space-y-1">
-                    <li>• <strong>NOT FINANCIAL ADVICE:</strong> All content is for educational purposes only</li>
-                    <li>• <strong>NO GUARANTEES:</strong> Past performance does not predict future results</li>
-                    <li>• <strong>INVESTMENT RISKS:</strong> All investments carry risk of total loss</li>
-                    <li>• <strong>AI LIMITATIONS:</strong> AI analysis may contain errors, biases, or inaccuracies</li>
-                    <li>• <strong>MARKET VOLATILITY:</strong> Financial markets are unpredictable and volatile</li>
-                    <li>• <strong>PROFESSIONAL ADVICE REQUIRED:</strong> Consult qualified advisors before investing</li>
-                    <li>• <strong>NO LICENSED SERVICES:</strong> We are not licensed financial advisors or brokers</li>
+                    <li>• {t('disclaimersAndLimitationsText3')}</li>
+                    <li>• {t('disclaimersAndLimitationsText4')}</li>
+                    <li>• {t('disclaimersAndLimitationsText5')}</li>
+                    <li>• {t('disclaimersAndLimitationsText6')}</li>
+                    <li>• {t('disclaimersAndLimitationsText7')}</li>
+                    <li>• {t('disclaimersAndLimitationsText8')}</li>
+                    <li>• {t('disclaimersAndLimitationsText9')}</li>
                   </ul>
                 </div>
               </div>
               
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Service Availability and Performance</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">{t('disclaimersAndLimitationsText10')}</h3>
                 <ul className="text-gray-600 space-y-1 ml-4">
-                  <li>• We strive for 99.9% uptime but cannot guarantee uninterrupted service</li>
-                  <li>• Scheduled maintenance windows may temporarily limit access</li>
-                  <li>• Third-party data providers may experience outages affecting our service</li>
-                  <li>• AI models may occasionally produce unexpected or erroneous results</li>
-                  <li>• Internet connectivity issues may impact your access to the Service</li>
-                  <li>• We reserve the right to modify or discontinue features with notice</li>
+                  <li>• {t('disclaimersAndLimitationsText11')}</li>
+                  <li>• {t('disclaimersAndLimitationsText12')}</li>
+                  <li>• {t('disclaimersAndLimitationsText13')}</li>
+                  <li>• {t('disclaimersAndLimitationsText14')}</li>
+                  <li>• {t('disclaimersAndLimitationsText15')}</li>
+                  <li>• {t('disclaimersAndLimitationsText16')}</li>
                 </ul>
               </div>
               
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Data Accuracy and Reliability</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">{t('disclaimersAndLimitationsText17')}</h3>
                 <ul className="text-gray-600 space-y-1 ml-4">
-                  <li>• Financial data is sourced from third parties and may contain errors or delays</li>
-                  <li>• AI analysis is based on historical data and algorithmic models</li>
-                  <li>• Market conditions can change rapidly, making analysis outdated</li>
-                  <li>• We do not warrant the accuracy, completeness, or timeliness of any data</li>
-                  <li>• Users should verify important information through independent sources</li>
+                  <li>• {t('disclaimersAndLimitationsText18')}</li>
+                  <li>• {t('disclaimersAndLimitationsText19')}</li>
+                  <li>• {t('disclaimersAndLimitationsText20')}</li>
+                  <li>• {t('disclaimersAndLimitationsText21')}</li>
+                  <li>• {t('disclaimersAndLimitationsText22')}</li>
                 </ul>
               </div>
             </div>
@@ -367,49 +355,42 @@ export default function TermsPage() {
           <CardContent className="py-6">
             <div className="flex items-center space-x-3 mb-4">
               <Scale className="h-6 w-6 text-gray-600" />
-              <h2 className="text-xl font-semibold text-gray-900">6. Limitation of Liability and Indemnification</h2>
+              <h2 className="text-xl font-semibold text-gray-900">6. {t('limitationOfLiabilityTitle')}</h2>
             </div>
             
             <div className="space-y-4">
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Limitation of Liability</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">{t('limitationOfLiabilityText1')}</h3>
                 <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                   <p className="text-sm text-gray-800 font-medium mb-2">
-                    TO THE MAXIMUM EXTENT PERMITTED BY LAW:
+                    {t('limitationOfLiabilityText2')}:
                   </p>
                   <ul className="text-sm text-gray-700 space-y-1 ml-4">
-                    <li>• Veloryn's total liability is limited to the amount you paid in the 12 months prior to the claim</li>
-                    <li>• We are not liable for any indirect, incidental, consequential, or punitive damages</li>
-                    <li>• We are not liable for investment losses, missed opportunities, or financial damages</li>
-                    <li>• We are not liable for losses due to service interruptions, data breaches, or technical failures</li>
-                    <li>• We are not liable for third-party actions, data, or services</li>
-                    <li>• We are not liable for damages arising from your violation of these Terms</li>
+                    <li>• {t('limitationOfLiabilityText3')}</li>
+                    <li>• {t('limitationOfLiabilityText4')}</li>
+                    <li>• {t('limitationOfLiabilityText5')}</li>
+                    <li>• {t('limitationOfLiabilityText6')}</li>
+                    <li>• {t('limitationOfLiabilityText7')}</li>
+                    <li>• {t('limitationOfLiabilityText8')}</li>
                   </ul>
                 </div>
               </div>
               
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">User Indemnification</h3>
-                <p className="text-gray-600 mb-2">
-                  You agree to indemnify and hold harmless Veloryn and its officers, directors, employees, 
-                  and agents from any claims, damages, or expenses arising from:
-                </p>
+                <h3 className="font-semibold text-gray-900 mb-2">{t('limitationOfLiabilityText9')}</h3>
+                <p className="text-gray-600 mb-2">{t('limitationOfLiabilityText10')}</p>
                 <ul className="text-gray-600 space-y-1 ml-4">
-                  <li>• Your use of the Service or reliance on our analysis</li>
-                  <li>• Your investment decisions or financial losses</li>
-                  <li>• Your violation of these Terms or applicable laws</li>
-                  <li>• Your infringement of third-party rights</li>
-                  <li>• Your negligent or wrongful conduct</li>
+                  <li>• {t('limitationOfLiabilityText11')}</li>
+                  <li>• {t('limitationOfLiabilityText12')}</li>
+                  <li>• {t('limitationOfLiabilityText13')}</li>
+                  <li>• {t('limitationOfLiabilityText14')}</li>
+                  <li>• {t('limitationOfLiabilityText15')}</li>
                 </ul>
               </div>
               
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Force Majeure</h3>
-                <p className="text-gray-600">
-                  Veloryn is not liable for any failure to perform due to circumstances beyond our reasonable 
-                  control, including natural disasters, government actions, pandemics, cyber attacks, or 
-                  infrastructure failures.
-                </p>
+                <h3 className="font-semibold text-gray-900 mb-2">{t('limitationOfLiabilityText16')}</h3>
+                <p className="text-gray-600">{t('limitationOfLiabilityText17')}</p>
               </div>
             </div>
           </CardContent>
@@ -420,57 +401,53 @@ export default function TermsPage() {
           <CardContent className="py-6">
             <div className="flex items-center space-x-3 mb-4">
               <Lock className="h-6 w-6 text-gray-600" />
-              <h2 className="text-xl font-semibold text-gray-900">7. Intellectual Property Rights</h2>
+              <h2 className="text-xl font-semibold text-gray-900">7. {t('intellectualPropertyTitle')}</h2>
             </div>
             
             <div className="space-y-4">
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Veloryn's Intellectual Property</h3>
-                <p className="text-gray-600 mb-2">
-                  Veloryn retains all rights, title, and interest in and to the Service, including:
-                </p>
+                <h3 className="font-semibold text-gray-900 mb-2">{t('intellectualPropertyText1')}</h3>
+                <p className="text-gray-600 mb-2">{t('intellectualPropertyText2')}</p>
                 <ul className="text-gray-600 space-y-1 ml-4">
-                  <li>• AI models, algorithms, and analysis methodologies</li>
-                  <li>• Software, platform design, and user interface</li>
-                  <li>• Trademarks, logos, and branding materials</li>
-                  <li>• Proprietary analysis frameworks and data processing techniques</li>
-                  <li>• Documentation, training materials, and educational content</li>
+                  <li>• {t('intellectualPropertyText3')}</li>
+                  <li>• {t('intellectualPropertyText4')}</li>
+                  <li>• {t('intellectualPropertyText5')}</li>
+                  <li>• {t('intellectualPropertyText6')}</li>
+                  <li>• {t('intellectualPropertyText7')}</li>
                 </ul>
               </div>
               
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">User License</h3>
-                <p className="text-gray-600 mb-2">
-                  We grant you a limited, non-exclusive, non-transferable, revocable license to:
-                </p>
+                <h3 className="font-semibold text-gray-900 mb-2">{t('intellectualPropertyText8')}</h3>
+                <p className="text-gray-600 mb-2">{t('intellectualPropertyText9')}</p>
                 <ul className="text-gray-600 space-y-1 ml-4">
-                  <li>• Access and use the Service for personal, non-commercial purposes</li>
-                  <li>• View and download analysis reports for your own educational use</li>
-                  <li>• Use our Service in compliance with these Terms</li>
+                  <li>• {t('intellectualPropertyText10')}</li>
+                  <li>• {t('intellectualPropertyText11')}</li>
+                  <li>• {t('intellectualPropertyText12')}</li>
                 </ul>
               </div>
               
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">User Content and Data</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">{t('intellectualPropertyText13')}</h3>
                 <ul className="text-gray-600 space-y-1 ml-4">
-                  <li>• You retain ownership of any data you input to our system</li>
-                  <li>• You grant us a license to use your data to provide and improve our services</li>
-                  <li>• We may use aggregated, anonymized data for analytics and service enhancement</li>
-                  <li>• Analysis reports generated for you remain your property for personal use</li>
-                  <li>• We may retain copies of analysis for service improvement and quality assurance</li>
+                  <li>• {t('intellectualPropertyText14')}</li>
+                  <li>• {t('intellectualPropertyText15')}</li>
+                  <li>• {t('intellectualPropertyText16')}</li>
+                  <li>• {t('intellectualPropertyText17')}</li>
+                  <li>• {t('intellectualPropertyText18')}</li>
                 </ul>
               </div>
               
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Restrictions on Use</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">{t('intellectualPropertyText19')}</h3>
                 <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-                  <p className="text-orange-800 text-sm font-medium mb-2">You may NOT:</p>
+                  <p className="text-orange-800 text-sm font-medium mb-2">{t('intellectualPropertyText20')}:</p>
                   <ul className="text-orange-700 text-sm space-y-1 ml-4">
-                    <li>• Copy, modify, or create derivative works of our Service</li>
-                    <li>• Reverse engineer, decompile, or attempt to extract our source code</li>
-                    <li>• Use our Service to create competing products or services</li>
-                    <li>• Remove or alter any proprietary notices or branding</li>
-                    <li>• Sublicense, redistribute, or transfer your access rights</li>
+                    <li>• {t('intellectualPropertyText21')}</li>
+                    <li>• {t('intellectualPropertyText22')}</li>
+                    <li>• {t('intellectualPropertyText23')}</li>
+                    <li>• {t('intellectualPropertyText24')}</li>
+                    <li>• {t('intellectualPropertyText25')}</li>
                   </ul>
                 </div>
               </div>
@@ -483,14 +460,14 @@ export default function TermsPage() {
           <CardContent className="py-6">
             <div className="flex items-center space-x-3 mb-4">
               <Shield className="h-6 w-6 text-gray-600" />
-              <h2 className="text-xl font-semibold text-gray-900">8. Privacy and Data Protection</h2>
+              <h2 className="text-xl font-semibold text-gray-900">8. {t('privacyAndDataProtectionTitle')}</h2>
             </div>
             
             <div className="space-y-4 text-gray-600">              
               <div>
                 <ul className="text-gray-600 space-y-1 ml-4">
-                  <li>• We process your personal data as described in our <Link href="/privacy" className="text-blue-600 underline"> Privacy Policy</Link>.</li>
-                  <li>• This includes identifying William Wadby s.r.o. and Veloryn platform as the controller, naming our processors (Stripe, Google Cloud Platform), explaining international transfers, your GDPR rights (access, deletion, rectification, portability), and your right to lodge a complaint with the Slovak Data Protection Authority (Úrad na ochranu osobných údajov SR).</li>
+                  <li>• {t('privacyAndDataProtectionText1')} <Link href="/privacy" className="text-blue-600 underline"> Privacy Policy</Link>.</li>
+                  <li>• {t('privacyAndDataProtectionText2')}</li>
                 </ul>
               </div>
             </div>
@@ -502,41 +479,41 @@ export default function TermsPage() {
           <CardContent className="py-6">
             <div className="flex items-center space-x-3 mb-4">
               <AlertTriangle className="h-6 w-6 text-gray-600" />
-              <h2 className="text-xl font-semibold text-gray-900">9. Account Termination and Suspension</h2>
+              <h2 className="text-xl font-semibold text-gray-900">9. {t('accountTerminationAndSuspensionTitle')}</h2>
             </div>
             
             <div className="space-y-4">
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Termination by User</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">{t('accountTerminationAndSuspensionText1')}</h3>
                 <ul className="text-gray-600 space-y-1 ml-4">
-                  <li>• You may terminate your account at any time through account settings</li>
-                  <li>• Subscription cancellation can be done through your billing portal</li>
-                  <li>• Account deletion results in permanent loss of all data and analysis history</li>
-                  <li>• We may retain certain information as required by law or for legitimate business purposes</li>
+                  <li>• {t('accountTerminationAndSuspensionText2')}</li>
+                  <li>• {t('accountTerminationAndSuspensionText3')}</li>
+                  <li>• {t('accountTerminationAndSuspensionText4')}</li>
+                  <li>• {t('accountTerminationAndSuspensionText5')}</li>
                 </ul>
               </div>
               
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Termination by Veloryn</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">{t('accountTerminationAndSuspensionText6')}</h3>
                 <p className="text-gray-600 mb-2">
-                  We may suspend or terminate your account immediately if you:
+                  {t('accountTerminationAndSuspensionText7')}:
                 </p>
                 <ul className="text-gray-600 space-y-1 ml-4">
-                  <li>• Violate these Terms of Service or our Privacy Policy</li>
-                  <li>• Engage in prohibited activities or misuse our Service</li>
-                  <li>• Fail to pay subscription fees after reasonable notice</li>
-                  <li>• Provide false information or engage in fraudulent activity</li>
-                  <li>• Pose a security risk or threaten the integrity of our Service</li>
+                  <li>• {t('accountTerminationAndSuspensionText8')}</li>
+                  <li>• {t('accountTerminationAndSuspensionText9')}</li>
+                  <li>• {t('accountTerminationAndSuspensionText10')}</li>
+                  <li>• {t('accountTerminationAndSuspensionText11')}</li>
+                  <li>• {t('accountTerminationAndSuspensionText12')}</li>
                 </ul>
               </div>
               
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Effect of Termination</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">{t('accountTerminationAndSuspensionText13')}</h3>
                 <ul className="text-gray-600 space-y-1 ml-4">
-                  <li>• Your right to access and use the Service immediately ceases</li>
-                  <li>• All licenses granted to you under these Terms are revoked</li>
-                  <li>• You remain liable for any fees owed prior to termination</li>
-                  <li>• Sections regarding liability, indemnification, and disputes survive termination</li>
+                  <li>• {t('accountTerminationAndSuspensionText14')}</li>
+                  <li>• {t('accountTerminationAndSuspensionText15')}</li>
+                  <li>• {t('accountTerminationAndSuspensionText16')}</li>
+                  <li>• {t('accountTerminationAndSuspensionText17')}</li>
                 </ul>
               </div>
             </div>
@@ -548,44 +525,42 @@ export default function TermsPage() {
           <CardContent className="py-6">
             <div className="flex items-center space-x-3 mb-4">
               <Globe className="h-6 w-6 text-gray-600" />
-              <h2 className="text-xl font-semibold text-gray-900">10. Governing Law and Dispute Resolution</h2>
+              <h2 className="text-xl font-semibold text-gray-900">10. {t('governingLawTitle')}</h2>
             </div>
             
             <div className="space-y-4">
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Applicable Law</h3>
-                <p className="text-gray-600">
-                  These Terms and any disputes arising out of or in connection with them are governed by the laws of the Slovak Republic. Consumers residing in the EU retain any mandatory protections provided by their national consumer laws. Exclusive jurisdiction lies with the courts of Bratislava I, unless otherwise required by EU consumer protection law.
-                </p>
+                <h3 className="font-semibold text-gray-900 mb-2">{t('governingLawText1')}</h3>
+                <p className="text-gray-600">{t('governingLawText2')}</p>
               </div>
               
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Dispute Resolution Process</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">{t('governingLawText3')}</h3>
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <p className="text-blue-800 text-sm font-medium mb-2">We encourage resolving disputes through these steps:</p>
+                  <p className="text-blue-800 text-sm font-medium mb-2">{t('governingLawText4')}:</p>
                   <ol className="text-blue-700 text-sm space-y-1 ml-4 list-decimal">
-                    <li><strong>Direct Communication:</strong> Contact our support team at info@wadby.me</li>
-                    <li><strong>Informal Resolution:</strong> We'll work with you to resolve issues within 30 days</li>
-                    <li><strong>Mediation:</strong> If needed, we may agree to mediation through a neutral third party</li>
-                    <li><strong>Arbitration/Courts:</strong> As a last resort, disputes may proceed to binding arbitration or courts</li>
+                    <li>{t('governingLawText5')} info@wadby.me</li>
+                    <li>{t('governingLawText6')}</li>
+                    <li>{t('governingLawText7')}</li>
+                    <li>{t('governingLawText8')}</li>
                   </ol>
                 </div>
               </div>
               
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Jurisdiction and Venue</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">{t('governingLawText9')}</h3>
                 <ul className="text-gray-600 space-y-1 ml-4">
-                  <li>• Any legal proceedings must be brought in the courts of our jurisdiction</li>
-                  <li>• You consent to the personal jurisdiction of such courts</li>
-                  <li>• EU residents may have additional rights under European law</li>
-                  <li>• Consumer protection laws may provide additional remedies</li>
+                  <li>• {t('governingLawText10')}</li>
+                  <li>• {t('governingLawText11')}</li>
+                  <li>• {t('governingLawText12')}</li>
+                  <li>• {t('governingLawText13')}</li>
                 </ul>
               </div>
               
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Online Dispute Resolution (EU)</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">{t('governingLawText14')}</h3>
                 <ul className="text-gray-600 space-y-1 ml-4">
-                  <li>• Consumers may also submit complaints through the EU Online Dispute Resolution (ODR) platform at https://ec.europa.eu/consumers/odr/ .</li>
+                  <li>• {t('governingLawText15')} https://ec.europa.eu/consumers/odr/ .</li>
                 </ul>
               </div>
             </div>
@@ -597,39 +572,34 @@ export default function TermsPage() {
           <CardContent className="py-6">
             <div className="flex items-center space-x-3 mb-4">
               <FileText className="h-6 w-6 text-gray-600" />
-              <h2 className="text-xl font-semibold text-gray-900">11. Changes to Terms and Service</h2>
+              <h2 className="text-xl font-semibold text-gray-900">11. {t('updatesAndChangesTitle')}</h2>
             </div>
             
             <div className="space-y-4">
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Terms Updates</h3>
-                <p className="text-gray-600 mb-2">
-                  We may update these Terms from time to time to reflect:
-                </p>
+                <h3 className="font-semibold text-gray-900 mb-2">{t('updatesAndChangesText1')}</h3>
+                <p className="text-gray-600 mb-2">{t('updatesAndChangesText2')}:</p>
                 <ul className="text-gray-600 space-y-1 ml-4">
-                  <li>• Changes in our services or business practices</li>
-                  <li>• Legal or regulatory requirements</li>
-                  <li>• Security or technical improvements</li>
-                  <li>• User feedback and service enhancements</li>
+                  <li>• {t('updatesAndChangesText3')}</li>
+                  <li>• {t('updatesAndChangesText4')}</li>
+                  <li>• {t('updatesAndChangesText5')}</li>
+                  <li>• {t('updatesAndChangesText6')}</li>
                 </ul>
               </div>
               
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Notification Process</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">{t('updatesAndChangesText7')}</h3>
                 <ul className="text-gray-600 space-y-1 ml-4">
-                  <li>• Material changes will be announced with 30 days' advance notice</li>
-                  <li>• Notification via email to your registered email address</li>
-                  <li>• Prominent notice on our website and in the Service</li>
-                  <li>• Updated "Last Updated" date at the top of these Terms</li>
+                  <li>• {t('updatesAndChangesText8')}</li>
+                  <li>• {t('updatesAndChangesText9')}</li>
+                  <li>• {t('updatesAndChangesText10')}</li>
+                  <li>• {t('updatesAndChangesText11')}</li>
                 </ul>
               </div>
               
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Service Modifications</h3>
-                <p className="text-gray-600">
-                  We reserve the right to modify, suspend, or discontinue any part of our Service at any time. 
-                  We will provide reasonable notice for significant changes that affect core functionality.
-                </p>
+                <h3 className="font-semibold text-gray-900 mb-2">{t('updatesAndChangesText12')}</h3>
+                <p className="text-gray-600">{t('updatesAndChangesText13')}</p>
               </div>
             </div>
           </CardContent>
@@ -640,34 +610,28 @@ export default function TermsPage() {
           <CardContent className="py-6">
             <div className="flex items-center space-x-3 mb-4">
               <Users className="h-6 w-6 text-green-600" />
-              <h2 className="text-xl font-semibold text-green-900">12. Contact Information</h2>
+              <h2 className="text-xl font-semibold text-green-900">12. {t('contactInformationTitle')}</h2>
             </div>
             
             <div className="space-y-4">
-              <p className="text-green-800 mb-4">
-                Questions about these Terms of Service? We're here to help:
-              </p>
-              
+              <p className="text-green-800 mb-4">{t('contactInformationText1')}:</p>
               <div>
-                <h3 className="font-semibold text-green-900 mb-2">Legal and Terms Questions</h3>
+                <h3 className="font-semibold text-green-900 mb-2">{t('contactInformationText2')}</h3>
                 <div className="text-green-800 space-y-2">
-                  <p><strong>Support:</strong> info@wadby.me</p>
-                  <p><strong>Response Time:</strong> Within 48 hours for terms-related inquiries</p>
+                  <p><strong>{t('contactInformationText3')}:</strong> info@wadby.me</p>
+                  <p>{t('contactInformationText4')}</p>
                 </div>
               </div>
               
               <div>
-                <h3 className="font-semibold text-green-900 mb-2">General Support</h3>
+                <h3 className="font-semibold text-green-900 mb-2">{t('contactInformationText5')}</h3>
                 <div className="text-green-800 space-y-1">
-                  <p><strong>Support:</strong> info@wadby.me</p>
+                  <p><strong>{t('contactInformationText6')}:</strong> info@wadby.me</p>
                 </div>
               </div>
               
               <div className="pt-2 border-t border-green-200">
-                <p className="text-green-700 text-sm">
-                  For urgent legal matters or compliance issues, please email info@wadby.me 
-                  with "URGENT" in the subject line.
-                </p>
+                <p className="text-green-700 text-sm">{t('contactInformationText7')}</p>
               </div>
             </div>
           </CardContent>
@@ -678,14 +642,14 @@ export default function TermsPage() {
           <CardContent className="py-6">
             <div className="flex items-center space-x-3 mb-4">
               <Users className="h-6 w-6 text-green-600" />
-              <h2 className="text-xl font-semibold text-green-900">13. Accessibility</h2>
+              <h2 className="text-xl font-semibold text-green-900">13. {t('accessibilityTitle')}</h2>
             </div>
             
             <div className="space-y-4">
               <div>
-                <h3 className="font-semibold text-green-900 mb-2">Accessibility</h3>
+                <h3 className="font-semibold text-green-900 mb-2">{t('accessibilityTitle')}</h3>
                 <div className="text-green-800 space-y-2">
-                  <p>William Wadby, s.r.o. and Veloryn platform is committed to meeting the requirements of the European Accessibility Act (Directive (EU) 2019/882). Our services are designed to be accessible in line with WCAG 2.1 AA standards. See our Accessibility Statement for details, known limitations, and how to contact us with accessibility feedback.</p>
+                  <p>{t('accessibilityText1')}</p>
                 </div>
               </div>
             </div>
@@ -696,31 +660,26 @@ export default function TermsPage() {
         <div className="text-center bg-blue-50 border border-blue-200 rounded-lg p-6">
           <div className="flex items-center justify-center mb-4">
             <Shield className="h-8 w-8 text-blue-600 mr-3" />
-            <h3 className="text-lg font-semibold text-blue-900">Terms Acknowledgment</h3>
+            <h3 className="text-lg font-semibold text-blue-900">{t('termsAcknowledgmentTitle')}</h3>
           </div>
-          <p className="text-blue-800 font-medium mb-3">
-            By using Veloryn, you acknowledge that you have read, understood, and agree to be bound by these 
-            Terms of Service and our Privacy Policy.
-          </p>
+          <p className="text-blue-800 font-medium mb-3">{t('termsAcknowledgmentText1')}</p>
           <div className="bg-blue-100 rounded-lg p-4 text-sm text-blue-800">
-            <p className="font-medium mb-2">You specifically acknowledge and understand that:</p>
+            <p className="font-medium mb-2">{t('termsAcknowledgmentText2')}:</p>
             <ul className="text-left space-y-1 ml-4">
-              <li>• Veloryn provides educational content only, not financial advice</li>
-              <li>• All investment decisions are your sole responsibility</li>
-              <li>• You should consult qualified financial advisors before investing</li>
-              <li>• Past performance does not guarantee future results</li>
-              <li>• All investments carry risk of loss</li>
+              <li>• {t('termsAcknowledgmentText3')}</li>
+              <li>• {t('termsAcknowledgmentText4')}</li>
+              <li>• {t('termsAcknowledgmentText5')}</li>
+              <li>• {t('termsAcknowledgmentText6')}</li>
+              <li>• {t('termsAcknowledgmentText7')}</li>
             </ul>
           </div>
         </div>
         
         {/* Footer */}
         <div className="text-center py-8 border-t border-gray-200 mt-8">
-          <p className="text-gray-500 text-sm">
-            These Terms of Service are effective as of August 22, 2025 and apply to all users of Veloryn.
-          </p>
+          <p className="text-gray-500 text-sm">{t('termsFooter1')}</p>
           <p className="text-gray-500 text-sm mt-2">
-            © {new Date().getFullYear()} Veloryn. All rights reserved.
+            © {new Date().getFullYear()} Veloryn. {t('termsFooter2')}
           </p>
         </div>
 

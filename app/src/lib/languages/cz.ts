@@ -116,6 +116,19 @@ export const CZ_TRANSLATIONS = {
     is_my_data_secure: 'Jsou má data v bezpečí?',
     is_my_data_secure_answer: 'Ano, používáme bezpečnostní opatření na úrovni odvětví, včetně autentizace Firebase a šifrovaného ukládání dat. Neukládáme vaše finanční data, platební údaje ani osobní informace (kromě emailu pro identifikaci). Pro manipulaci s daty používáme zabezpečená API a osvědčené postupy. Naši partneři jsou Google Cloud Firebase (autentizace) a Stripe (platby).',
     
+    checkoutPopupTitle: 'PODMÍNKY POUŽÍVÁNÍ – RYCHLÉ POTVRZENÍ',
+    checkoutPopupText1: 'Před dokončením předplatného prosím potvrďte, že rozumíte a souhlasíte',
+    checkoutPopupText2: 'Veloryn poskytuje finanční analýzy generované AI POUZE pro VZDĚLÁVACÍ a INFORMAČNÍ účely.',
+    checkoutPopupText3: 'Veloryn neposkytuje FINANČNÍ PORADENSTVÍ, investiční strategie ani záruky výnosů.',
+    checkoutPopupText4: 'Všechna investiční rozhodnutí jsou výhradně vaší odpovědností a měli byste se poradit s odbornými poradci.',
+    checkoutPopupText5: 'Členství je služba předplatného (Standard: 2 €/měsíc, Premium: 10 €/měsíc) a automaticky se obnovuje, pokud není zrušeno.',
+    checkoutPopupText6: 'Za částečné měsíce nebo nevyužené části předplatného se neposkytují refundace.',
+    checkoutPopupText7: 'Předplacením přijímáte naše ',
+    checkoutPopupText7a: 'Po zaplacení získáte okamžitý přístup ke službě. Všechny účtenky budou dostupné prostřednictvím Stripe konzole (Dashboard > Nastavení účtu > Aktualizovat platební metodu). Podmínky používání a zásady ochrany osobních údajů naleznete ve spodní části každé stránky nebo na /terms.',
+    checkoutPopupText8: 'Přečetl(a) jsem si a souhlasím s Podmínkami používání',
+    checkoutPopupText9: 'Zrušit',
+    checkoutPopupText10: 'Pokračovat k platbě',
+
     // Footer
     all_rights_reserved: 'Všechna práva vyhrazena',
     educational_use_only: 'Pouze pro vzdělávací účely - Není finanční poradenství',

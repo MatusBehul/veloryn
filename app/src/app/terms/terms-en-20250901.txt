@@ -1,0 +1,184 @@
+TERMS OF SERVICE  
+Last updated: September 1, 2025  
+
+------------------------------------------------------------
+⚠️ CRITICAL FINANCIAL DISCLAIMER
+Veloryn provides AI-generated financial analysis for EDUCATIONAL and INFORMATIONAL purposes ONLY.  
+Our analyses are NOT financial advice, NOT investment insights, and NOT offers to buy or sell securities.  
+Past performance does not guarantee future results. All investments carry risk of loss.  
+You must consult qualified financial advisors before making any investment decisions.  
+------------------------------------------------------------
+
+COMPANY INFORMATION  
+Veloryn is operated by William Wadby, s.r.o.
+
+------------------------------------------------------------
+ACCEPTANCE OF TERMS  
+By accessing and using Veloryn (the "Service"), you agree to be bound by these Terms of Service ("Terms") and our Privacy Policy.  
+If you do not agree, please do not use our Service.  
+
+These Terms constitute a legally binding agreement between you and Veloryn.  
+We may update these Terms at any time with 30 days' notice.  
+Your continued use of the Service after changes constitutes acceptance.  
+
+You must be at least 18 years old to use Veloryn.  
+
+------------------------------------------------------------
+SERVICE DESCRIPTION  
+What Veloryn Provides:  
+- AI-generated financial analysis  
+- Email reports and custom ticker lists  
+- Historical data access  
+- Technical analysis, sentiment tracking, and risk assessment tools  
+- Data visualization and reporting features  
+- Market research and analysis compilation services  
+- Educational content about financial markets and investment concepts  
+- Historical data analysis and trend identification  
+
+What Veloryn Does NOT Provide:  
+- Financial advice, investment insights, or personalized investment strategies  
+- Guaranteed returns, profit predictions, or warranties  
+- Licensed financial advisory, brokerage, or investment management services  
+- Direct investment execution, trading services, or portfolio management  
+- Tax advice, legal counsel, or regulatory compliance guidance  
+- Insurance products, banking services, or credit offerings  
+
+------------------------------------------------------------
+USER RESPONSIBILITIES AND CONDUCT  
+
+Account Security and Management:  
+- Maintain confidentiality of account credentials  
+- Notify us immediately of unauthorized access  
+- Use strong passwords and enable two-factor authentication  
+- You are responsible for all activity under your account  
+- Provide accurate and up-to-date registration information  
+
+Acceptable Use Policy:  
+- Use Veloryn only for lawful, personal, and educational purposes  
+- Comply with all applicable laws and regulations  
+- Respect intellectual property rights  
+- Report bugs, vulnerabilities, or issues promptly  
+
+Strictly Prohibited Activities include but are not limited to:  
+- Reverse engineering or extracting AI models/algorithms  
+- Using analysis to provide financial advice to others  
+- Redistributing or reselling Veloryn content  
+- Market manipulation or illegal financial activities  
+- Sharing account access with unauthorized users  
+- Automated scraping, bot use, or attacks on our systems  
+- Uploading harmful content or impersonating others  
+
+Investment Decision Responsibility:  
+By using Veloryn, you acknowledge:  
+- All investment decisions are solely your responsibility  
+- You will seek professional advice before investing  
+- You understand investment risks  
+- Veloryn is not liable for losses or missed opportunities  
+
+------------------------------------------------------------
+SUBSCRIPTION, BILLING, AND PAYMENT TERMS  
+
+Plans and Pricing:  
+- Standard: €2/month (basic AI analysis, 5 daily emails)  
+- Premium: €10/month (enhanced analysis, priority support, 20 daily emails)  
+
+General Terms:  
+- Subscriptions automatically renew unless cancelled  
+- Pricing may change with 30 days’ notice  
+- Payments are processed securely by Stripe  
+- Failed payments may result in suspension  
+- All fees exclude taxes; applicable taxes are your responsibility  
+
+Cancellation and Refunds:  
+- Cancel anytime through account settings or Stripe  
+- Access remains until the end of the billing period  
+- No partial refunds; discretionary refunds may apply in cases of technical failure  
+
+Right of Withdrawal (EU consumers):  
+- You may withdraw within 14 days of subscription by emailing info@wadby.me  
+- If you request immediate access, you waive your withdrawal right once digital content is delivered  
+
+------------------------------------------------------------
+DISCLAIMERS AND LIMITATIONS  
+
+Financial Risk Disclaimers:  
+- All content is educational only  
+- Past performance does not predict future results  
+- All investments carry risk of total loss  
+- AI may contain errors or inaccuracies  
+- Professional financial advice is required  
+
+Service Availability:  
+- We strive for 99.9% uptime but cannot guarantee it  
+- Third-party outages or maintenance may impact availability  
+
+Data Accuracy:  
+- Market data may contain errors or delays  
+- Users should independently verify critical information  
+
+Limitation of Liability:  
+- Veloryn’s liability is limited to amounts you paid in the last 12 months  
+- We are not liable for indirect, incidental, or consequential damages  
+- We are not liable for losses from investment decisions  
+
+Indemnification:  
+You agree to indemnify Veloryn against claims arising from your use of the Service, your investment decisions, or your violation of these Terms.  
+
+Force Majeure:  
+We are not liable for failures due to circumstances beyond our control.  
+
+------------------------------------------------------------
+INTELLECTUAL PROPERTY  
+- William Wadby, s.r.o. retains ownership of all intellectual property (AI models, algorithms, software, branding, educational content).  
+- Users are granted a limited, non-exclusive, non-transferable license for personal use only.  
+- You may not copy, reverse engineer, resell, or create competing services.  
+
+------------------------------------------------------------
+PRIVACY AND DATA PROTECTION  
+We process your personal data in compliance with GDPR.  
+Data controllers: William Wadby, s.r.o. and Veloryn platform.  
+Processors: Stripe, Google Cloud Platform.  
+You have rights of access, deletion, rectification, portability, and the right to lodge a complaint with the Slovak Data Protection Authority.  
+
+------------------------------------------------------------
+ACCOUNT TERMINATION AND SUSPENSION  
+- You may terminate your account at any time.  
+- Veloryn may suspend or terminate accounts for violations, non-payment, or fraudulent activity.  
+- Upon termination, your right to use the Service ceases immediately.  
+
+------------------------------------------------------------
+GOVERNING LAW AND DISPUTE RESOLUTION  
+- These Terms are governed by Slovak law.  
+- EU consumers retain protections under national consumer laws.  
+- Courts of Bratislava I have jurisdiction unless EU law requires otherwise.  
+- Consumers may also use the EU Online Dispute Resolution platform.  
+
+------------------------------------------------------------
+CHANGES TO TERMS AND SERVICE  
+- We may update Terms with 30 days’ notice via email or on our site.  
+- The “Last Updated” date will always reflect the current version.  
+- We may modify or discontinue features with notice.  
+
+------------------------------------------------------------
+CONTACT INFORMATION  
+- Legal questions: info@wadby.me  
+- Support inquiries: via Support portal  
+- Response time: within 48 hours (terms-related inquiries)  
+- Urgent matters: email info@wadby.me with "URGENT" in subject  
+
+------------------------------------------------------------
+ACCESSIBILITY  
+Veloryn is committed to compliance with the European Accessibility Act and WCAG 2.1 AA standards. See our Accessibility Statement for details.  
+
+------------------------------------------------------------
+ACKNOWLEDGMENT  
+By using Veloryn, you acknowledge and agree that:  
+- Veloryn provides educational content only  
+- All investment decisions are your responsibility  
+- You should consult financial advisors before investing  
+- Past performance does not guarantee future results  
+- All investments carry risk of loss  
+
+------------------------------------------------------------
+These Terms of Service are effective as of September 1, 2025 and apply to all users of Veloryn.  
+All rights reserved.  

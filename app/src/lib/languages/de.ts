@@ -116,6 +116,19 @@ export const DE_TRANSLATIONS = {
     is_my_data_secure: 'Sind meine Daten sicher?',
     is_my_data_secure_answer: 'Ja, wir verwenden branchenübliche Sicherheitsmaßnahmen, einschließlich Firebase-Authentifizierung und verschlüsselter Datenspeicherung. Wir speichern weder Ihre Finanzdaten noch Zahlungsdetails oder persönlichen Informationen (außer Ihrer E-Mail zur Identifizierung). Für alle Datenzugriffe nutzen wir sichere APIs und Best Practices. Unsere Partner hierfür sind Google Cloud Firebase (Authentifizierung) und Stripe (Zahlungsabwicklung).',
     
+    checkoutPopupTitle: 'NUTZUNGSBEDINGUNGEN – SCHNELLE BESTÄTIGUNG',
+    checkoutPopupText1: 'Bitte bestätigen Sie vor Abschluss Ihres Abonnements, dass Sie dies verstehen und akzeptieren',
+    checkoutPopupText2: 'Veloryn bietet von KI generierte Finanzanalysen NUR zu BILDUNGS- und INFORMATIONSSZWECKEN an.',
+    checkoutPopupText3: 'Veloryn bietet KEINE Finanzberatung, Anlagestrategien oder Renditegarantien.',
+    checkoutPopupText4: 'Alle Investitionsentscheidungen liegen allein in Ihrer Verantwortung, und Sie sollten professionelle Berater konsultieren.',
+    checkoutPopupText5: 'Die Mitgliedschaft ist ein Abonnementdienst (Standard: 2 €/Monat, Premium: 10 €/Monat) und verlängert sich automatisch, sofern sie nicht gekündigt wird.',
+    checkoutPopupText6: 'Es werden keine Rückerstattungen für angebrochene Monate oder ungenutzte Teile der Abonnementlaufzeit gewährt.',
+    checkoutPopupText7: 'Mit dem Abonnement akzeptieren Sie unsere ',
+    checkoutPopupText7a: 'Nach der Zahlung erhalten Sie sofortigen Zugriff auf den Service. Alle Belege sind über die Stripe-Konsole verfügbar (Dashboard > Kontoeinstellungen > Meine Zahlungsmethode aktualisieren). Die Nutzungsbedingungen und die Datenschutzerklärung finden Sie unten auf jeder Seite oder unter /terms.',
+    checkoutPopupText8: 'Ich habe die Nutzungsbedingungen gelesen und stimme ihnen zu',
+    checkoutPopupText9: 'Abbrechen',
+    checkoutPopupText10: 'Weiter zur Kasse',
+
     // Fußzeile
     all_rights_reserved: 'Alle Rechte vorbehalten',
     educational_use_only: 'Nur zu Bildungszwecken – Keine Finanzberatung',

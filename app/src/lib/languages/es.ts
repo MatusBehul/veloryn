@@ -116,6 +116,19 @@ export const ES_TRANSLATIONS = {
     is_my_data_secure: '¿Mis datos están seguros?',
     is_my_data_secure_answer: 'Sí, utilizamos medidas de seguridad estándar de la industria, incluida la autenticación con Firebase y el almacenamiento cifrado de datos. No almacenamos sus datos financieros, detalles de pago ni información personal (excepto su correo electrónico para identificarle). Usamos API seguras y buenas prácticas para proteger sus datos. Nuestros socios son Google Cloud Firebase (autenticación) y Stripe (pagos).',
     
+    checkoutPopupTitle: 'TÉRMINOS DE SERVICIO – CONFIRMACIÓN RÁPIDA',
+    checkoutPopupText1: 'Antes de completar tu suscripción, confirma que entiendes y aceptas',
+    checkoutPopupText2: 'Veloryn proporciona análisis financieros generados por IA SOLO con fines EDUCATIVOS e INFORMATIVOS.',
+    checkoutPopupText3: 'Veloryn NO proporciona asesoramiento financiero, estrategias de inversión ni garantías de rentabilidad.',
+    checkoutPopupText4: 'Todas las decisiones de inversión son únicamente tu responsabilidad y debes consultar con asesores profesionales.',
+    checkoutPopupText5: 'La membresía es un servicio de suscripción (Estándar: 2 €/mes, Premium: 10 €/mes) y se renueva automáticamente a menos que se cancele.',
+    checkoutPopupText6: 'No se ofrecen reembolsos por meses parciales o períodos no utilizados de la suscripción.',
+    checkoutPopupText7: 'Al suscribirte, aceptas nuestros ',
+    checkoutPopupText7a: 'Obtendrás acceso inmediato al servicio tras el pago. Todos los recibos estarán disponibles a través de la consola de Stripe (Panel > Configuración de la cuenta > Actualizar mi método de pago). Los términos de servicio y la política de privacidad se encuentran al pie de cada página o en /terms.',
+    checkoutPopupText8: 'He leído y acepto los Términos de servicio',
+    checkoutPopupText9: 'Cancelar',
+    checkoutPopupText10: 'Continuar al pago',
+
     // Pie de página
     all_rights_reserved: 'Todos los derechos reservados',
     educational_use_only: 'Solo para uso educativo - No es asesoramiento financiero',

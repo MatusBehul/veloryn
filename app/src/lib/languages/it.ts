@@ -116,6 +116,19 @@ export const IT_TRANSLATIONS = {
     is_my_data_secure: 'I miei dati sono sicuri?',
     is_my_data_secure_answer: 'Sì, utilizziamo misure di sicurezza standard di settore, inclusa l’autenticazione Firebase e l’archiviazione cifrata dei dati. Non memorizziamo i tuoi dati finanziari, dettagli di pagamento o informazioni personali (eccetto l’email per identificarti). Usiamo API sicure e best practice per proteggere i dati. I nostri partner sono Google Cloud Firebase (autenticazione) e Stripe (pagamenti).',
     
+    checkoutPopupTitle: 'TERMINI DI SERVIZIO – CONFERMA RAPIDA',
+    checkoutPopupText1: 'Prima di completare l’abbonamento, conferma di aver compreso e accettato',
+    checkoutPopupText2: 'Veloryn fornisce analisi finanziarie generate da IA SOLO a scopo DIDATTICO e INFORMATIVO.',
+    checkoutPopupText3: 'Veloryn NON fornisce consulenza finanziaria, strategie di investimento o garanzie di rendimento.',
+    checkoutPopupText4: 'Tutte le decisioni di investimento sono esclusivamente tua responsabilità e dovresti consultare consulenti professionali.',
+    checkoutPopupText5: 'L’abbonamento è un servizio a pagamento (Standard: 2 €/mese, Premium: 10 €/mese) e si rinnova automaticamente salvo disdetta.',
+    checkoutPopupText6: 'Non sono previsti rimborsi per mesi parziali o periodi di abbonamento non utilizzati.',
+    checkoutPopupText7: 'Abbonandoti, accetti i nostri ',
+    checkoutPopupText7a: 'Dopo il pagamento avrai accesso immediato al servizio. Tutte le ricevute saranno disponibili tramite la console Stripe (Dashboard > Impostazioni account > Aggiorna il mio metodo di pagamento). I termini di servizio e l’informativa sulla privacy sono disponibili in fondo a ogni pagina o su /terms.',
+    checkoutPopupText8: 'Ho letto e accetto i Termini di servizio',
+    checkoutPopupText9: 'Annulla',
+    checkoutPopupText10: 'Procedi al pagamento',
+
     // Footer
     all_rights_reserved: 'Tutti i diritti riservati',
     educational_use_only: 'Solo per scopi educativi - Non è consulenza finanziaria',

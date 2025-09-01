@@ -790,6 +790,7 @@ class FinancialAnalysisTrigger:
                     return {'valid': True, 'status_code': response.status, 'note': 'Service accessible but returned non-200 status'}
                     
         except Exception as e:
+            print(traceback.format_exc())
             return {'valid': False, 'error': f'Validation failed: {str(e)}'}
     
     def publish_instagram_promotion(self, title: str, subtitle, promo_reels_tts_text: str, promo_reels_summary: str, hourly_prices: list) -> Dict[str, Any]:

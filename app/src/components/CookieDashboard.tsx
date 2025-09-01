@@ -55,9 +55,10 @@ export function CookieDashboard() {
     
     const newPreferences = {
       ...preferences,
-      [type]: enabled
+      [type]: enabled,
+      source: 'settings'
     };
-    updatePreferences(newPreferences, 'settings');
+    updatePreferences(newPreferences);
   };
 
   return (
