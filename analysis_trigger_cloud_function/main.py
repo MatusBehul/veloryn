@@ -9,7 +9,7 @@ import logging
 import traceback
 import random
 from datetime import datetime, timezone, timedelta
-from typing import Dict, Any
+from typing import Dict, Any, List, Optional
 import asyncio
 import aiohttp
 from google.cloud import firestore
@@ -17,6 +17,7 @@ from google.cloud import pubsub_v1
 from get_stock_data_tool import get_stock_data_tool
 import functions_framework
 from data_tool_model import ComprehensiveStockDataModel
+from pydantic import BaseModel, ValidationError, field_validator
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -38,6 +39,69 @@ COSTS_COLLECTION = 'cost_tracking'
 db = firestore.Client(project=PROJECT_ID)
 # Initialize Pub/Sub publisher client
 publisher = pubsub_v1.PublisherClient()
+
+
+class FinancialAnalysisItem(BaseModel):
+    """Pydantic model for individual financial analysis item"""
+    language: str
+    overall_analysis: List[str]
+    technical_analysis: List[str]
+    fundamental_analysis: List[str]
+    sentiment_analysis: List[str]
+    risk_analysis: List[str]
+    investment_insights: List[str]
+    investment_narrative: List[str]
+    promo_reels_summary: str
+    promo_reels_tts_text: str
+    promote_flag: bool
+
+    @field_validator('language')
+    @classmethod
+    def validate_language(cls, v):
+        if not v or not isinstance(v, str) or len(v.strip()) == 0:
+            raise ValueError('Language must be a non-empty string')
+        return v.strip()
+    
+    @field_validator('overall_analysis', 'technical_analysis', 'fundamental_analysis', 
+                    'sentiment_analysis', 'risk_analysis', 'investment_insights', 'investment_narrative')
+    @classmethod
+    def validate_analysis_lists(cls, v):
+        if not isinstance(v, list) or len(v) == 0:
+            raise ValueError('Analysis sections must be non-empty lists of strings')
+        for item in v:
+            if not isinstance(item, str) or len(item.strip()) == 0:
+                raise ValueError('Analysis items must be non-empty strings')
+        return [item.strip() for item in v]
+    
+    @field_validator('promo_reels_summary', 'promo_reels_tts_text')
+    @classmethod
+    def validate_single_string_key(cls, v):
+        if not v or not isinstance(v, str) or len(v.strip()) == 0:
+            raise ValueError('Value for single string key must be a non-empty string')
+        return v.strip()
+
+
+class FinancialAnalysisResponse(BaseModel):
+    """Pydantic model for the complete financial analysis response"""
+    analysis: List[FinancialAnalysisItem]
+    
+    @field_validator('analysis')
+    @classmethod
+    def validate_analysis(cls, v):
+        if not isinstance(v, list) or len(v) == 0:
+            raise ValueError('Analysis must be a non-empty list')
+        return v
+
+
+# Retry configuration
+MAX_RETRIES = 3
+RETRY_DELAY_BASE = 2  # Base delay in seconds
+VALIDATION_ERROR_RETRY_DELAY = 5  # Additional delay for validation errors
+
+
+class ValidationRetryError(Exception):
+    """Custom exception for validation retry scenarios"""
+    pass
 
 class FinancialAnalysisTrigger:
     """Main class for handling financial analysis triggers"""
@@ -296,6 +360,65 @@ class FinancialAnalysisTrigger:
             'status_code': last_status
         }
     
+    async def call_cloud_run_with_validation_retry(self, payload: Dict[str, Any]) -> Dict[str, Any]:
+        """Call Cloud Run service with additional retry logic for validation errors"""
+        validation_attempt = 0
+        
+        while validation_attempt < MAX_RETRIES:
+            try:
+                # Call the main Cloud Run service
+                result = await self.call_cloud_run_service(payload)
+                
+                if not result['success']:
+                    # If the Cloud Run call itself failed, return the error
+                    return result
+                
+                # Try to validate the response data
+                validated_data = self._validate_analysis_with_pydantic(result['data'])
+                
+                # If validation succeeds, return the validated result
+                result['data'] = validated_data
+                result['validation_attempts'] = validation_attempt + 1
+                logger.info(f"Analysis validated successfully on attempt {validation_attempt + 1}")
+                return result
+                
+            except ValidationRetryError as e:
+                validation_attempt += 1
+                logger.warning(f"Validation failed on attempt {validation_attempt}: {e}")
+                
+                if validation_attempt >= MAX_RETRIES:
+                    logger.error(f"Validation failed after {MAX_RETRIES} attempts. Last error: {e}")
+                    return {
+                        'success': False,
+                        'error': f"Validation failed after {MAX_RETRIES} attempts: {str(e)}",
+                        'validation_attempts': validation_attempt,
+                        'validation_errors': str(e)
+                    }
+                
+                # Add delay before retry with exponential backoff
+                delay = VALIDATION_ERROR_RETRY_DELAY * (RETRY_DELAY_BASE ** (validation_attempt - 1))
+                # Add jitter to prevent thundering herd
+                jitter = random.uniform(0.8, 1.2)
+                actual_delay = delay * jitter
+                
+                logger.info(f"Retrying analysis due to validation error in {actual_delay:.1f}s (attempt {validation_attempt + 1} of {MAX_RETRIES})")
+                await asyncio.sleep(actual_delay)
+            
+            except Exception as e:
+                logger.error(f"Unexpected error during validation retry: {e}")
+                return {
+                    'success': False,
+                    'error': f"Unexpected validation error: {str(e)}",
+                    'validation_attempts': validation_attempt + 1
+                }
+        
+        # This should never be reached due to the break conditions above
+        return {
+            'success': False,
+            'error': 'Unexpected end of validation retry loop',
+            'validation_attempts': validation_attempt
+        }
+
     def _get_access_token(self) -> str:
         """Get access token for Cloud Run authentication with correct audience"""
         try:
@@ -579,133 +702,59 @@ class FinancialAnalysisTrigger:
         
         return json_str
     
-    def _validate_and_fix_analysis(self, data: Dict[str, Any]) -> Dict[str, Any]:
-        """Validate and fix analysis data structure"""
+    def _validate_analysis_with_pydantic(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        """Validate analysis data using Pydantic models"""
         try:
-            # Basic validation - ensure we have data
-            if not isinstance(data, (dict, list)):
-                return {"error": "Analysis data is not a dictionary or list", "raw_data": data}
-            
-            # Handle new array format: [{"language": "string", "overall_analysis": [...], ...}]
+            # Handle different data formats
             if isinstance(data, list):
-                if len(data) > 0:
-                    # Filter out any non-dict items that might have crept in
-                    valid_items = [item for item in data if isinstance(item, dict)]
-                    
-                    if valid_items:
-                        analysis_item = valid_items[0]  # Take the first valid analysis item
-                        
-                        # Validate it has the expected structure
-                        expected_keys = ['language', 'overall_analysis', 'technical_analysis', 'fundamental_analysis', 
-                                       'sentiment_analysis', 'risk_analysis', 'investment_insights', 'investment_narrative']
-                        
-                        # Check if this looks like a valid analysis object
-                        analysis_keys_found = [key for key in expected_keys if key in analysis_item]
-                        
-                        if len(analysis_keys_found) >= 3:  # At least 3 expected keys found
-                            logger.info(f"Valid analysis structure found with keys: {analysis_keys_found}")
-                            return {"analysis": valid_items}  # Return all valid items
-                        else:
-                            logger.warning(f"Analysis item missing expected keys. Found: {list(analysis_item.keys())}, Expected some of: {expected_keys}")
-                            # Try to salvage what we can
-                            if any(key in analysis_item for key in ['overall_analysis', 'technical_analysis', 'fundamental_analysis']):
-                                logger.info("Found minimal required analysis keys, proceeding")
-                                return {"analysis": valid_items}
-                            else:
-                                return {"error": "Analysis missing critical fields", "found_keys": list(analysis_item.keys()), "raw_data": data}
-                    else:
-                        return {"error": "Analysis array contains no valid dictionary items", "raw_data": data}
-                else:
-                    return {"error": "Analysis array is empty", "raw_data": data}
-            
-            # Handle legacy dictionary format: {"overall_analysis": [...], ...}
+                # Direct array format
+                validation_data = {"analysis": data}
             elif isinstance(data, dict):
-                # Check for direct error in the data
-                if 'error' in data:
-                    logger.warning(f"Found error in analysis data: {data.get('error')}")
-                    return data  # Return the error as-is
-                
-                # Check for legacy format keys
-                legacy_keys = ['overall_analysis', 'technical_analysis', 'fundamental_analysis', 
-                             'sentiment_analysis', 'risk_analysis', 'investment_insights', 'investment_narrative']
-                
-                found_legacy_keys = [key for key in legacy_keys if key in data]
-                
-                if found_legacy_keys:
-                    logger.info(f"Converting legacy format to new array format. Found keys: {found_legacy_keys}")
-                    # Convert legacy format to new array format
-                    converted_data = [{
-                        "language": "en",  # Default language
-                        **data  # Spread the existing data
-                    }]
-                    return {"analysis": converted_data}
-                
-                # If data looks like it's already wrapped (e.g., {"analysis": [...]})
                 if 'analysis' in data:
-                    if isinstance(data['analysis'], list):
-                        # Validate the nested array
-                        if len(data['analysis']) > 0:
-                            first_item = data['analysis'][0]
-                            if isinstance(first_item, dict):
-                                expected_keys = ['overall_analysis', 'technical_analysis', 'fundamental_analysis']
-                                if any(key in first_item for key in expected_keys):
-                                    logger.info("Found valid nested analysis array structure")
-                                    return data  # Already in correct format
-                        
-                        logger.warning("Nested analysis array appears invalid or empty")
-                        return {"error": "Invalid nested analysis array", "raw_data": data}
-                        
-                    elif isinstance(data['analysis'], dict):
-                        # Convert wrapped dict to array format
-                        analysis_dict = data['analysis']
-                        expected_keys = ['overall_analysis', 'technical_analysis', 'fundamental_analysis']
-                        
-                        if any(key in analysis_dict for key in expected_keys):
-                            converted_data = [{
-                                "language": "en",
-                                **analysis_dict
-                            }]
-                            return {"analysis": converted_data}
-                        else:
-                            return {"error": "Wrapped analysis dict missing expected fields", "raw_data": data}
-                
-                # If it's some other dict structure, check if it might be a partial response
-                if 'raw_content' in data and 'error' in data:
-                    # This looks like an error response, check if we can extract anything useful
-                    raw_content = data.get('raw_content', '')
-                    if isinstance(raw_content, str) and len(raw_content) > 100:
-                        # Try to parse the raw content one more time
-                        logger.info("Attempting to re-parse raw content from error response")
-                        try:
-                            # Look for JSON-like structures in the raw content
-                            import re
-                            
-                            # Try to find array patterns with analysis data
-                            analysis_pattern = r'\[\s*\{\s*"language":\s*"[^"]*"[\s\S]*?"overall_analysis"[\s\S]*?\]'
-                            match = re.search(analysis_pattern, raw_content, re.IGNORECASE)
-                            
-                            if match:
-                                potential_json = match.group(0)
-                                # Try basic fixes
-                                potential_json = self._fix_common_json_errors(potential_json)
-                                try:
-                                    reparsed_data = json.loads(potential_json)
-                                    if isinstance(reparsed_data, list) and len(reparsed_data) > 0:
-                                        logger.info("Successfully reparsed analysis from raw content")
-                                        return {"analysis": reparsed_data}
-                                except json.JSONDecodeError:
-                                    pass
-                        except Exception as e:
-                            logger.warning(f"Failed to reparse raw content: {e}")
-                
-                # Final fallback for unknown dict structure
-                return {"error": "Unknown dictionary structure", "found_keys": list(data.keys()), "raw_data": data}
+                    # Already wrapped format
+                    validation_data = data
+                elif any(key in data for key in ['overall_analysis', 'technical_analysis', 'fundamental_analysis']):
+                    # Legacy single object format - convert to array
+                    analysis_item = data.copy()
+                    if 'language' not in analysis_item:
+                        analysis_item['language'] = 'en'
+                    validation_data = {"analysis": [analysis_item]}
+                else:
+                    # Handle error responses or unknown format
+                    if 'error' in data:
+                        logger.warning(f"Found error in analysis data: {data.get('error')}")
+                        return data
+                    else:
+                        raise ValidationRetryError(f"Unknown dictionary structure. Found keys: {list(data.keys())}")
+            else:
+                raise ValidationRetryError(f"Analysis data must be a dictionary or list, got {type(data)}")
             
-            return {"error": "Unexpected data type", "raw_data": data}
+            # Validate with Pydantic
+            validated_analysis = FinancialAnalysisResponse(**validation_data)
+            
+            # Return validated data as dict
+            return validated_analysis.model_dump()
+            
+        except ValidationError as e:
+            # Log detailed validation errors
+            error_details = []
+            for error in e.errors():
+                field_path = " -> ".join(str(x) for x in error['loc'])
+                error_details.append(f"{field_path}: {error['msg']}")
+            
+            error_message = f"Validation failed: {'; '.join(error_details)}"
+            logger.error(f"Pydantic validation error: {error_message}")
+            
+            # Raise custom exception to trigger retry
+            raise ValidationRetryError(error_message)
             
         except Exception as e:
-            logger.error(f"Error validating analysis data: {e}")
-            return {"error": f"Validation failed: {str(e)}", "raw_data": data}
+            logger.error(f"Unexpected error during validation: {e}")
+            raise ValidationRetryError(f"Validation failed with unexpected error: {str(e)}")
+
+    def _validate_and_fix_analysis(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        """Legacy validation function - now redirects to Pydantic validation"""
+        return self._validate_analysis_with_pydantic(data)
     
     async def validate_cloud_run_access(self) -> Dict[str, Any]:
         """Validate that we can access the Cloud Run service"""
@@ -1185,8 +1234,8 @@ async def process_financial_analysis(ticker: str, day_input: str = None, user_id
 
             logger.info(f"Starting financial analysis for {ticker} with session {session_id}")
 
-            # Call Cloud Run service
-            result = await analyzer.call_cloud_run_service(payload)
+            # Call Cloud Run service with validation retry
+            result = await analyzer.call_cloud_run_with_validation_retry(payload)
 
             print("Retrieved response from LLM Agent:", result)
 
@@ -1194,145 +1243,25 @@ async def process_financial_analysis(ticker: str, day_input: str = None, user_id
             function_execution_time = time.time() - function_start_time
             result['function_execution_time'] = function_execution_time
 
-            # --- VALIDATION LOGIC ---
-            analysis_data = result.get('data', {})
-            error_detected = False
-            error_message = None
+            # --- SIMPLIFIED VALIDATION LOGIC ---
+            # Validation is now handled by Pydantic in call_cloud_run_with_validation_retry
+            logger.info(f"Analysis result for {ticker}: success={result.get('success')}, validation_attempts={result.get('validation_attempts', 1)}")
 
-            logger.info(f"Validating analysis data for {ticker}: type={type(analysis_data)}, keys={list(analysis_data.keys()) if isinstance(analysis_data, dict) else 'N/A'}")
-
-            # DEBUG: Log the full analysis data structure for troubleshooting
-            logger.error(f"DEBUG - Full analysis_data for {ticker}: {json.dumps(analysis_data, indent=2, default=str)[:2000]}...")  # Truncate to avoid huge logs
-
-            # Check for error in result
-            if not result.get('success'):
-                error_detected = True
-                error_message = result.get('error', 'Unknown error')
-            elif not analysis_data:
-                error_detected = True
-                error_message = 'No analysis data returned'
-            else:
-                # Check for errors in the analysis data structure
-                if isinstance(analysis_data, dict):
-                    # Check for direct error in analysis_data
-                    if 'error' in analysis_data:
-                        error_detected = True
-                        error_message = analysis_data.get('error')
-                    else:
-                        # Check for analysis array structure
-                        analysis_content = analysis_data.get('analysis', [])
-                        logger.info(f"Analysis content for {ticker}: type={type(analysis_content)}, length={len(analysis_content) if isinstance(analysis_content, list) else 'N/A'}")
-                        
-                        # DEBUG: Log the analysis content structure
-                        logger.error(f"DEBUG - Analysis content for {ticker}: {json.dumps(analysis_content, indent=2, default=str)[:1500]}...")  # Truncate to avoid huge logs
-                        
-                        if isinstance(analysis_content, list):
-                            if len(analysis_content) == 0:
-                                error_detected = True
-                                error_message = 'Analysis array is empty'
-                            else:
-                                # Check first analysis item for errors
-                                first_analysis = analysis_content[0]
-                                logger.info(f"First analysis item for {ticker}: type={type(first_analysis)}, keys={list(first_analysis.keys()) if isinstance(first_analysis, dict) else 'N/A'}")
-                                
-                                # DEBUG: Log the first analysis item structure
-                                logger.error(f"DEBUG - First analysis item for {ticker}: {json.dumps(first_analysis, indent=2, default=str)[:1000]}...")  # Truncate to avoid huge logs
-                                
-                                if isinstance(first_analysis, dict):
-                                    if 'error' in first_analysis:
-                                        error_detected = True
-                                        error_message = first_analysis.get('error')
-                                    else:
-                                        # Validate that we have the expected structure
-                                        expected_keys = ['overall_analysis', 'technical_analysis', 'fundamental_analysis']
-                                        found_keys = [key for key in expected_keys if key in first_analysis]
-                                        logger.error(f"DEBUG - Expected keys check for {ticker}: expected={expected_keys}, found={found_keys}, all_keys={list(first_analysis.keys())}")
-                                        
-                                        if not any(key in first_analysis for key in expected_keys):
-                                            error_detected = True
-                                            error_message = 'Analysis missing required fields'
-                                        else:
-                                            logger.info(f"Analysis validation passed for {ticker}")
-                                else:
-                                    error_detected = True
-                                    error_message = 'Analysis item is not a valid object'
-                        elif isinstance(analysis_content, dict):
-                            # Handle case where analysis_content is a dict
-                            logger.error(f"DEBUG - Dict analysis content for {ticker}: {json.dumps(analysis_content, indent=2, default=str)[:1000]}...")  # Truncate to avoid huge logs
-                            
-                            if 'error' in analysis_content:
-                                error_detected = True
-                                error_message = analysis_content.get('error')
-                            else:
-                                # Check if this dict has a nested 'analysis' key with an array
-                                if 'analysis' in analysis_content and isinstance(analysis_content['analysis'], list):
-                                    # Handle nested structure: {"analysis": [{"language": "en", "overall_analysis": [...], ...}]}
-                                    nested_analysis_array = analysis_content['analysis']
-                                    if len(nested_analysis_array) == 0:
-                                        error_detected = True
-                                        error_message = 'Nested analysis array is empty'
-                                    else:
-                                        first_nested_analysis = nested_analysis_array[0]
-                                        logger.error(f"DEBUG - First nested analysis item for {ticker}: {json.dumps(first_nested_analysis, indent=2, default=str)[:1000]}...")
-                                        
-                                        if isinstance(first_nested_analysis, dict):
-                                            if 'error' in first_nested_analysis:
-                                                error_detected = True
-                                                error_message = first_nested_analysis.get('error')
-                                            else:
-                                                # Validate that we have the expected structure
-                                                expected_keys = ['overall_analysis', 'technical_analysis', 'fundamental_analysis']
-                                                found_keys = [key for key in expected_keys if key in first_nested_analysis]
-                                                logger.error(f"DEBUG - Expected keys check for {ticker} (nested dict): expected={expected_keys}, found={found_keys}, all_keys={list(first_nested_analysis.keys())}")
-                                                
-                                                if not any(key in first_nested_analysis for key in expected_keys):
-                                                    error_detected = True
-                                                    error_message = 'Nested analysis missing required fields'
-                                                else:
-                                                    logger.info(f"Analysis validation passed for {ticker} (nested dict format)")
-                                        else:
-                                            error_detected = True
-                                            error_message = 'Nested analysis item is not a valid object'
-                                else:
-                                    # Check if this is a direct analysis object (legacy format)
-                                    expected_keys = ['overall_analysis', 'technical_analysis', 'fundamental_analysis']
-                                    found_keys = [key for key in expected_keys if key in analysis_content]
-                                    logger.error(f"DEBUG - Expected keys check for {ticker} (direct dict): expected={expected_keys}, found={found_keys}, all_keys={list(analysis_content.keys())}")
-                                    
-                                    if not any(key in analysis_content for key in expected_keys):
-                                        error_detected = True
-                                        error_message = 'Analysis missing required fields'
-                                    else:
-                                        logger.info(f"Analysis validation passed for {ticker} (direct dict format)")
-                        else:
-                            # analysis_content is neither a list nor a dict
-                            error_detected = True
-                            error_message = f'Analysis content has unexpected type: {type(analysis_content)}'
-                else:
-                    error_detected = True
-                    error_message = f'Analysis data is not a dictionary: {type(analysis_data)}'
-
-            # Save analysis result with correct success/error
-            result_to_save = dict(result)
-            if error_detected:
-                logger.error(f"Analysis for {ticker} failed or invalid: {error_message}")
-                result_to_save['success'] = False
-                result_to_save['error'] = error_message
-                # Optionally, trigger a retry or alert here (log for now)
-                logger.warning(f"Analysis for {ticker} will be retried or flagged for review.")
-            else:
-                result_to_save['success'] = True
-                result_to_save['error'] = None
-                
+            # Log any validation information
+            if result.get('validation_attempts', 1) > 1:
+                logger.warning(f"Analysis for {ticker} required {result['validation_attempts']} validation attempts")
+            
+            if result.get('validation_errors'):
+                logger.error(f"Validation errors for {ticker}: {result['validation_errors']}")
 
             # Save analysis result
-            result_doc_id = analyzer.save_analysis_result(ticker, result_to_save, raw_analysis_data)
+            result_doc_id = analyzer.save_analysis_result(ticker, result, raw_analysis_data)
             # Save performance metrics
-            analyzer.save_performance_metrics(ticker, result_to_save, session_id)
+            analyzer.save_performance_metrics(ticker, result, session_id)
             # Save metadata
             analyzer.save_metadata(ticker, payload, result_doc_id, session_id)
             # Save cost tracking
-            analyzer.save_cost_tracking(ticker, result_to_save, session_id)
+            analyzer.save_cost_tracking(ticker, result, session_id)
 
             # Check for Instagram promotion flag and publish to Pub/Sub if needed
             promotion_result = {'promoted': False}
@@ -1340,7 +1269,8 @@ async def process_financial_analysis(ticker: str, day_input: str = None, user_id
                 promote_flag = False
                 tts_text = ""
                 summary_text = ""
-                for analysis in result_to_save.get('data', {}).get('analysis', {}).get("analysis", []):
+                analysis_data = result.get('data', {})
+                for analysis in analysis_data.get('analysis', []):
                     if isinstance(analysis, dict) and analysis.get("language") == "en":
                         if str(analysis.get("promote_flag")).lower() == 'true':
                             promote_flag = True
@@ -1371,12 +1301,11 @@ async def process_financial_analysis(ticker: str, day_input: str = None, user_id
             logger.info(f"Completed financial analysis for {ticker}")
 
             return {
-                'success': not error_detected,
+                'success': True,
                 'ticker': ticker,
                 'session_id': session_id,
                 'result_document_id': result_doc_id,
                 'execution_time': function_execution_time,
-                'analysis_success': not error_detected,
                 'promotion': promotion_result
             }
 
