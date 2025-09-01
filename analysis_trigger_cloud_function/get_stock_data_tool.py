@@ -660,15 +660,13 @@ class FinancialDataTool:
             
             # Apply stock split adjustments to historical prices
             if isinstance(stock_splits_data, list) and len(stock_splits_data) > 0:
-                print(f"Applying stock split adjustments for {symbol}...")
                 stock_hourly_quote = self.apply_split_adjustments(stock_hourly_quote, stock_splits_data) if isinstance(stock_hourly_quote, list) else stock_hourly_quote
                 stock_daily_quote = self.apply_split_adjustments(stock_daily_quote, stock_splits_data) if isinstance(stock_daily_quote, list) else stock_daily_quote
                 stock_weekly_quote = self.apply_split_adjustments(stock_weekly_quote, stock_splits_data) if isinstance(stock_weekly_quote, list) else stock_weekly_quote
                 stock_monthly_quote = self.apply_split_adjustments(stock_monthly_quote, stock_splits_data) if isinstance(stock_monthly_quote, list) else stock_monthly_quote
-                print(f"✅ Split adjustments applied for {symbol}")
             else:
-                print(f"No stock splits found for {symbol} - no price adjustments needed")
-            
+                pass
+
             # Structure the response
             comprehensive_data = ComprehensiveStockDataModel(
                 languages=os.environ.get('LANGUAGES', 'en').split("#"),
@@ -1008,11 +1006,7 @@ class FinancialDataTool:
         try:
             # Sort splits by effective date (newest first to oldest)
             sorted_splits = sorted(splits_data, key=lambda x: x.effective_date, reverse=True)
-            
-            print(f"Found {len(sorted_splits)} stock splits to process:")
-            for split in sorted_splits:
-                print(f"  - {split.effective_date}: {split.split_factor}:1 split")
-            
+
             # Create adjusted price data list
             adjusted_prices = []
             
@@ -1041,7 +1035,6 @@ class FinancialDataTool:
                 
                 adjusted_prices.append(adjusted_price)
             
-            print(f"✅ Successfully applied split adjustments to {len(adjusted_prices)} price points")
             return adjusted_prices
             
         except Exception as e:
