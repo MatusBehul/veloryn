@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 PROJECT_ID = os.environ.get('GCP_PROJECT', 'lab-quoriant-dev')
 EMAIL_TOPIC = os.environ.get('EMAIL_PUBSUB_TOPIC', 'email-analysis-requests')
 ANALYSIS_BATCH_SIZE = int(os.environ.get('ANALYSIS_BATCH_SIZE', '50'))  # Process analyses in batches
-LOOKBACK_HOURS = int(os.environ.get('LOOKBACK_HOURS', '1'))  # How far back to look for new analyses
+LOOKBACK_HOURS = int(os.environ.get('LOOKBACK_HOURS', '24'))  # How far back to look for new analyses
 SUPPORTED_LANGUAGES = os.environ.get('LANGUAGES', 'en').split('#')
 
 # Initialize clients
