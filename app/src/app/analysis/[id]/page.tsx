@@ -367,10 +367,10 @@ Educational use only - Not financial advice
                   <Share className="h-4 w-4 mr-2" />
                   {t('analysisDetailShare')}
                 </Button>
-                <Button variant="outline" size="sm" onClick={handleDownload}>
+                {/* <Button variant="outline" size="sm" onClick={handleDownload}>
                   <Download className="h-4 w-4 mr-2" />
                   {t('analysisDetailDownload')}
-                </Button>
+                </Button> */}
                 <Button 
                   variant="outline" 
                   size="sm" 

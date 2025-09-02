@@ -138,6 +138,8 @@ def format_analysis_for_email_comprehensive(analysis: Dict[str, Any], language: 
     """)
 
     # Overall Analysis
+    print("DEBUG", analysis.get('analysis_overview'))
+    print("DEBUG", language)    
     overall_analysis = analysis.get('analysis_overview', {}).get('analysis_data', {}).get(language, {}).get('overall_analysis')
     if overall_analysis:
         html_sections.append(f"""
