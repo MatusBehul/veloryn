@@ -352,6 +352,8 @@ export const SK_TRANSLATIONS = {
     subscriptionSyncError: 'Nepodarilo sa synchronizovať dáta predplatného. Skúste znova.',
 
     // Stránka Analýzy
+    analysisPageEnrichmentMessage1: 'Nevidíte svoju obľúbenú akciu? Našu databázu neustále rozširujeme o nové akcie a analýzy.',
+    analysisPageEnrichmentMessage2: 'Ak máte konkrétnu požiadavku, kontaktujte nás na info@wadby.me',
     analysisLoading: 'Načítavam...',
     analysisAuthenticationRequired: 'Vyžaduje sa prihlásenie',
     analysisAuthenticationDescription: 'Pre zobrazenie analýz sa prihláste.',
@@ -605,9 +607,9 @@ export const SK_TRANSLATIONS = {
     subscriptionTermsText42: 'Pri platbe kartami EÚ/EEA môžete byť vyzvaní na silnú autentifikáciu zákazníka (SCA), napríklad 3-D Secure.',
     subscriptionTermsText43: 'Uložením spôsobu platby oprávňujete Stripe účtovať opakované poplatky za predplatné vo vašom mene.',
     rightOfWithdrawalTitle: 'Právo na odstúpenie',
-    rightOfWithdrawalText1: 'Ak ste spotrebiteľ z EÚ, máte 14 dní od dátumu predplatného na odstúpenie bez udania dôvodu.',
-    rightOfWithdrawalText2: 'Na uplatnenie tohto práva pošlite e-mail na info@wadby.me so žiadosťou o odstúpenie.',
-    rightOfWithdrawalText3: 'Ak však požiadate o okamžitý prístup k Službe a výslovne súhlasíte, že poskytovanie začne pred uplynutím lehoty na odstúpenie, beriete na vedomie, že okamihom úplného poskytnutia digitálneho obsahu strácate právo na odstúpenie.',
+    rightOfWithdrawalText1: 'Ako spotrebiteľ máte štandardne právo do 14 dní od uzavretia predplatného odstúpiť od zmluvy bez udania dôvodu.',
+    rightOfWithdrawalText2: 'Toto právo sa však podľa čl. 16 písm. m) smernice Európskeho parlamentu a Rady 2011/83/EÚ a § 7 ods. 6 písm. l) zákona č. 102/2014 Z. z. nevzťahuje na poskytovanie digitálneho obsahu, ak sa jeho poskytovanie začalo s vaším predchádzajúcim výslovným súhlasom a potvrdili ste, že tým strácate právo na odstúpenie.',
+    rightOfWithdrawalText3: 'Keďže pri objednávke výslovne súhlasíte so začatím poskytovania služby okamžite po zaplatení, beriete na vedomie, že po zaplatení už nemáte toto právo na odstúpenie.',
     disclaimersAndLimitationsTitle: 'Vylúčenia zodpovednosti a uznanie rizík',
     disclaimersAndLimitationsText1: 'Finančné a investičné vyhlásenia',
     disclaimersAndLimitationsText2: 'KRITICKÉ UPOZORNENIE NA INVESTIČNÉ RIZIKO',

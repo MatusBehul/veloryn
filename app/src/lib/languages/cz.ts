@@ -352,6 +352,8 @@ export const CZ_TRANSLATIONS = {
     subscriptionSyncError: 'Synchronizace dat předplatného selhala. Zkuste to znovu.',
 
     // Stránka Analýzy
+    analysisPageEnrichmentMessage1: 'Nevidíte svou oblíbenou akcii? Neustále rozšiřujeme naši databázi o nové akcie a analýzy.',
+    analysisPageEnrichmentMessage2: 'Pokud máte konkrétní požadavek, kontaktujte nás na info@wadby.me',
     analysisLoading: 'Načítání...',
     analysisAuthenticationRequired: 'Vyžadováno přihlášení',
     analysisAuthenticationDescription: 'Pro zobrazení finančních analýz se prosím přihlaste.',

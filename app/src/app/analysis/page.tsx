@@ -293,6 +293,11 @@ export default function AnalysisPage() {
           <p className="text-slate-600">{t('analysisPageSubtitle')}</p>
         </div>
 
+        <div className="mb-8">
+          <p className="text-slate-900">{t('analysisPageEnrichmentMessage1')}</p>
+          <p className="text-slate-900">{t('analysisPageEnrichmentMessage2')}</p>
+        </div>
+
         {/* Search and Filters */}
         <Card className="mb-8">
           <CardContent className="py-6">

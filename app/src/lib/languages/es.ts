@@ -352,6 +352,8 @@ export const ES_TRANSLATIONS = {
     subscriptionSyncError: 'Error al sincronizar datos de suscripción. Intente de nuevo.',
     
     // Página de Análisis
+    analysisPageEnrichmentMessage1: '¿No ves tu acción favorita? Estamos enriqueciendo constantemente nuestra base de datos con nuevas acciones y análisis.',
+    analysisPageEnrichmentMessage2: 'Si tienes una solicitud específica, por favor contáctanos en info@wadby.me',
     analysisLoading: 'Cargando...',
     analysisAuthenticationRequired: 'Autenticación requerida',
     analysisAuthenticationDescription: 'Por favor, inicie sesión para ver análisis financieros.',

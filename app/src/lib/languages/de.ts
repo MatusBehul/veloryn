@@ -352,6 +352,8 @@ export const DE_TRANSLATIONS = {
     subscriptionSyncError: 'Fehler beim Synchronisieren der Abonnementdaten. Bitte erneut versuchen.',
     
     // Analyse-Seite (großer Block)
+    analysisPageEnrichmentMessage1: 'Sehen Sie Ihre Lieblingsaktie nicht? Wir erweitern unsere Datenbank ständig um neue Aktien und Analysen.',
+    analysisPageEnrichmentMessage2: 'Wenn Sie eine spezielle Anfrage haben, kontaktieren Sie uns bitte unter info@wadby.me',
     analysisLoading: 'Lädt...',
     analysisAuthenticationRequired: 'Authentifizierung erforderlich',
     analysisAuthenticationDescription: 'Bitte melden Sie sich an, um Finanzanalysen zu sehen.',

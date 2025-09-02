@@ -352,6 +352,8 @@ export const IT_TRANSLATIONS = {
     subscriptionSyncError: 'Sincronizzazione dati abbonamento non riuscita. Riprova.',
 
     // Pagina Analisi
+    analysisPageEnrichmentMessage1: 'Non vedi la tua azione preferita? Stiamo continuamente arricchendo il nostro database con nuove azioni e analisi.',
+    analysisPageEnrichmentMessage2: 'Se hai una richiesta specifica, contattaci a info@wadby.me',
     analysisLoading: 'Caricamento...',
     analysisAuthenticationRequired: 'Autenticazione richiesta',
     analysisAuthenticationDescription: 'Accedi per visualizzare le analisi finanziarie.',

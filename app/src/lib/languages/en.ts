@@ -352,6 +352,8 @@ export const EN_TRANSLATIONS = {
     subscriptionSyncError: 'Failed to sync subscription data. Please try again.',
 
     // Analysis Page translations
+    analysisPageEnrichmentMessage1: 'You dont see your favourite stock? We are constantly enriching our database with new stocks and analyses.',
+    analysisPageEnrichmentMessage2: 'If you have a specific request, please contact us at info@wadby.me',
     analysisLoading: 'Loading...',
     analysisAuthenticationRequired: 'Authentication Required',
     analysisAuthenticationDescription: 'Please log in to view financial analyses.',
@@ -605,9 +607,9 @@ export const EN_TRANSLATIONS = {
     subscriptionTermsText42: 'You may be required to complete Strong Customer Authentication (SCA) (e.g., 3-D Secure) when paying with EU/EEA cards.',
     subscriptionTermsText43: 'By saving a payment method, you authorize Stripe to charge recurring subscription fees on your behalf.',
     rightOfWithdrawalTitle: 'Right of Withdrawal',
-    rightOfWithdrawalText1: 'If you are an EU consumer, you have 14 days from the date of subscription to withdraw without giving any reason.',
-    rightOfWithdrawalText2: 'To exercise this right, email info@wadby.me with your withdrawal request.',
-    rightOfWithdrawalText3: 'However, if you request immediate access to the Service and explicitly agree that performance begins before the withdrawal period ends, you acknowledge that you lose your withdrawal right once digital content has been fully delivered.',
+    rightOfWithdrawalText1: 'As a consumer, you generally have the right to withdraw from the subscription contract within 14 days of conclusion without giving any reason.',
+    rightOfWithdrawalText2: 'However, under Article 16(m) of Directive 2011/83/EU of the European Parliament and of the Council and Section 7(6)(l) of Slovak Act No. 102/2014 Coll., this right does not apply to the supply of digital content if the performance has begun with your prior express consent and you have acknowledged that you thereby lose your right of withdrawal.',
+    rightOfWithdrawalText3: 'Since you expressly agree, at the time of ordering, that the service will begin immediately after payment, you acknowledge that after payment you no longer have this right of withdrawal.',
     disclaimersAndLimitationsTitle: 'Disclaimers and Risk Acknowledgments',
     disclaimersAndLimitationsText1: 'Financial and Investment Disclaimers',
     disclaimersAndLimitationsText2: 'CRITICAL INVESTMENT RISK DISCLOSURE',

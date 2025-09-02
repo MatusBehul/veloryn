@@ -352,6 +352,8 @@ export const FR_TRANSLATIONS = {
     subscriptionSyncError: 'Échec de la synchronisation des données d’abonnement. Veuillez réessayer.',
     
     // Analysis Page translations
+    analysisPageEnrichmentMessage1: 'Vous ne voyez pas votre action préférée ? Nous enrichissons constamment notre base de données avec de nouvelles actions et analyses.',
+    analysisPageEnrichmentMessage2: 'Si vous avez une demande spécifique, veuillez nous contacter à info@wadby.me',
     analysisLoading: 'Chargement...',
     analysisAuthenticationRequired: 'Authentification requise',
     analysisAuthenticationDescription: 'Veuillez vous connecter pour consulter les analyses financières.',
