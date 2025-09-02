@@ -5,7 +5,7 @@ root_agent = LlmAgent(
     model="gemini-2.5-pro",  # Much faster and cheaper than 2.5-pro
     description=(
         "Veloryn is an AI-powered financial analysis tool that delivers institutional-quality "
-        "investment analysis through optimized workflow in under 2 minutes. "
+        "investment analysis through optimized workflow in ideally under 1 minute. "
         "Provides market intelligence, technical analysis, sentiment analysis, strategy "
         "development, execution planning, risk assessment, and content consolidation "
         "with focus on speed and actionable insights."
@@ -27,36 +27,36 @@ root_agent = LlmAgent(
         {
             "language": "en",
             "overall_analysis": [
-                "Key market highlights and price movement analysis",
-                "Significant events and overall market outlook", 
-                "Current positioning and immediate trends"
+                "Key market highlights and price movement analysis (100-150 characters)",
+                "Significant events and overall market outlook (100-150 characters)", 
+                "Current positioning and immediate trends (100-150 characters)"
             ],
             "technical_analysis": [
-                "Technical indicators analysis (RSI, MACD, moving averages)",
-                "Chart patterns and support/resistance levels",
-                "Technical outlook and key levels to watch"
+                "Technical indicators analysis (RSI, MACD, moving averages) (100-150 characters)",
+                "Chart patterns and support/resistance levels (100-150 characters)",
+                "Technical outlook and key levels to watch (100-150 characters)"
             ],
             "fundamental_analysis": [
-                "Financial metrics and earnings analysis",
-                "Company health and growth prospects",
-                "Valuation assessment and competitive position"
+                "Financial metrics and earnings analysis (100-150 characters)",
+                "Company health and growth prospects (100-150 characters)",
+                "Valuation assessment and competitive position (100-150 characters)"
             ],
             "sentiment_analysis": [
-                "Market sentiment and investor mood",
-                "News sentiment and analyst ratings impact"
+                "Market sentiment and investor mood (100-150 characters)",
+                "News sentiment and analyst ratings impact (100-150 characters)"
             ],
             "risk_analysis": [
-                "Volatility analysis and risk metrics",
-                "Key risks and risk management considerations"
+                "Volatility analysis and risk metrics (100-150 characters)",
+                "Key risks and risk management considerations (100-150 characters)"
             ],
             "investment_insights": [
-                "Actionable investment recommendation with reasoning",
-                "Target price, stop loss, and time horizon"
+                "Actionable investment recommendation with reasoning (100-150 characters)",
+                "Target price, stop loss, and time horizon (100-150 characters)"
             ],
             "investment_narrative": [
-                "Detailed investment narrative paragraph 1...",
-                "Detailed investment narrative paragraph 2...",
-                "Detailed investment narrative paragraph 3..."
+                "Investment narrative paragraph 1... (100-150 characters)",
+                "Investment narrative paragraph 2... (100-150 characters)",
+                "Investment narrative paragraph 3... (100-150 characters)"
             ],
             "promo_reels_summary": "Short summary for social media reels (max 300 characters) summarizing news and price trend points. Keep in mind NOT to provide financial advice. Provide some insights! With 20 relevant hashtags on top of those 300 characters (we want to be searched).",
             "promo_reels_tts_text": "Short script for TTS narration in social media reels (max 280 characters) summarizing news and price and trend points. Keep in mind NOT to provide financial advice. Provide some insights!",
