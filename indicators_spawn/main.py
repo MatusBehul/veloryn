@@ -5,7 +5,7 @@ import json
 
 # Configuration: list of tickers to process
 TICKERS = [
-    "AAPL", "MSFT", "GOOGL", "AMZN", "TSLA",
+    "AAPL", "MSFT", "GOOG", "AMZN", "TSLA",
     "NVDA", "META", "BRK.B", "UNH", "V", "JNJ",
     "WMT", "JPM", "PG", "MA", "HD", "BAC", "DIS",
     "XOM", "VZ", "ADBE", "NFLX", "PYPL", "CMCSA",

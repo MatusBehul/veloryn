@@ -13,7 +13,7 @@ def get_news_sentiment(ticker: str, price_data: dict[str, dict[str, float]] = {}
     url = 'https://www.alphavantage.co/query'
     params = {
         'function': 'NEWS_SENTIMENT',
-        'symbol': ticker,
+        'tickers': ticker,
         'apikey': ALPHAVANTAGE_API_KEY,
         'limit': '1000'
     }
