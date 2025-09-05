@@ -20,7 +20,7 @@ def get_news_sentiment(ticker: str, price_data: dict[str, dict[str, float]] = {}
     retrieved_data = {}
 
     response = requests.get(url, params=params)
-    print("Received data")
+    print(f"[{ticker}][NEWS_SENTIMENT]: Received data")
     if response.status_code == 200:
         data = response.json()
         if 'feed' in data:
@@ -33,15 +33,15 @@ def get_news_sentiment(ticker: str, price_data: dict[str, dict[str, float]] = {}
                         retrieved_data[time_published] = 0.00
                     ticker_sentiment = item.get('ticker_sentiment', [])
                     for sentiment in ticker_sentiment:
-                        if sentiment.get('ticker') == 'GOOG':
+                        if sentiment.get('ticker') == ticker:
                             retrieved_data[time_published] += float(sentiment.get('ticker_sentiment_score', 0)) * float(sentiment.get('relevance_score', 0))
                 else:
-                    print("No 'time_published' found for an item.")
+                    print(f"[{ticker}][NEWS_SENTIMENT]: No 'time_published' found for an item.")
         else:
-            print("No 'feed' key found in the response.")
+            print(f"[{ticker}][NEWS_SENTIMENT]: No 'feed' key found in the response.")
     else:
-        print(f"Error: Received status code {response.status_code}")
-    
+        print(f"[{ticker}][NEWS_SENTIMENT]: Error: Received status code {response.status_code}")
+
     for timestamp, information in price_data.items():
         sentiment_15min = 0.0
         sentiment_60min = 0.0
@@ -82,7 +82,7 @@ def get_day_prices(ticker: str):
     }
 
     response = requests.get(url, params=params)
-    print("Received data")
+    print(f"[{ticker}][TIME_SERIES_DAILY]: Received data")
     if response.status_code == 200:
         data = response.json()
         if 'Time Series (Daily)' in data:
@@ -97,9 +97,9 @@ def get_day_prices(ticker: str):
                 for timestamp, values in data['Time Series (Daily)'].items()
             }
         else:
-            print("No 'Time Series (Daily)' key found in the response.")
+            print(f"[{ticker}][TIME_SERIES_DAILY]: No 'Time Series (Daily)' key found in the response.")
     else:
-        print(f"Error: Received status code {response.status_code}")
+        print(f"[{ticker}][TIME_SERIES_DAILY]: Error: Received status code {response.status_code}")
 
 def get_sma_ema_wma_dema_tema_trima_kama_mama_t3(ticker: str, price_data: dict[str, dict[str, float]] = {}):
     url = 'https://www.alphavantage.co/query'
@@ -117,7 +117,7 @@ def get_sma_ema_wma_dema_tema_trima_kama_mama_t3(ticker: str, price_data: dict[s
             }
 
             response = requests.get(url, params=params)
-            print("Received data")
+            print(f"[{ticker}][{func}, {time_period}]: Received data")
             if response.status_code == 200:
                 data = response.json()
                 if f'Technical Analysis: {func}' in data:
@@ -126,10 +126,10 @@ def get_sma_ema_wma_dema_tema_trima_kama_mama_t3(ticker: str, price_data: dict[s
                         if timestamp_adj in price_data:
                             price_data[timestamp_adj][f'{func.lower()}_{time_period}'] = float(values[func])
                 else:
-                    print(f"No 'Technical Analysis: {func}' key found in the response.")
+                    print(f"[{ticker}][{func}, {time_period}]: No 'Technical Analysis: {func}' key found in the response.")
             else:
-                print(f"Error: Received status code {response.status_code}")
-    
+                print(f"[{ticker}][{func}, {time_period}]: Error: Received status code {response.status_code}")
+
     return price_data
 
 def get_macd_apo_ppo_ultosc_bop_sar_trange_adosc_obv_htdcphase(ticker: str, price_data: dict[str, dict[str, float]] = {}):
@@ -146,7 +146,7 @@ def get_macd_apo_ppo_ultosc_bop_sar_trange_adosc_obv_htdcphase(ticker: str, pric
         }
 
         response = requests.get(url, params=params)
-        print("Received data")
+        print(f"[{ticker}][{func}]: Received data")
         if response.status_code == 200:
             data = response.json()
             if f'Technical Analysis: {func}' in data:
@@ -159,10 +159,10 @@ def get_macd_apo_ppo_ultosc_bop_sar_trange_adosc_obv_htdcphase(ticker: str, pric
                             f'{func.lower()}_hist': float(values[f'{func}_Hist']),
                         })
             else:
-                print(f"No 'Technical Analysis: {func}' key found in the response.")
+                print(f"[{ticker}][{func}]: No 'Technical Analysis: {func}' key found in the response.")
         else:
-            print(f"Error: Received status code {response.status_code}")
-    
+            print(f"[{ticker}][{func}]: Error: Received status code {response.status_code}")
+
     return price_data
 
 def get_stoch_stochf(ticker: str, price_data: dict[str, dict[str, float]] = {}):
@@ -181,7 +181,7 @@ def get_stoch_stochf(ticker: str, price_data: dict[str, dict[str, float]] = {}):
             }
 
             response = requests.get(url, params=params)
-            print("Received data")
+            print(f"[{ticker}][{func}]: Received data")
             if response.status_code == 200:
                 data = response.json()
                 if f'Technical Analysis: {func}' in data:
@@ -192,10 +192,10 @@ def get_stoch_stochf(ticker: str, price_data: dict[str, dict[str, float]] = {}):
                                 f'{func.lower()}_{keys[1].lower()}': float(values[keys[1]]),
                             })
                 else:
-                    print(f"No 'Technical Analysis: {func}' key found in the response.")
+                    print(f"[{ticker}][{func}]: No 'Technical Analysis: {func}' key found in the response.")
             else:
-                print(f"Error: Received status code {response.status_code}")
-    
+                print(f"[{ticker}][{func}]: Error: Received status code {response.status_code}")
+
     return price_data
 
 def get_httredmode(ticker: str, price_data: dict[str, dict[str, float]] = {}):
@@ -213,7 +213,7 @@ def get_httredmode(ticker: str, price_data: dict[str, dict[str, float]] = {}):
             }
 
             response = requests.get(url, params=params)
-            print("Received data")
+            print(f"[{ticker}][{func}]: Received data")
             if response.status_code == 200:
                 data = response.json()
                 if f'Technical Analysis: {func}' in data:
@@ -224,10 +224,10 @@ def get_httredmode(ticker: str, price_data: dict[str, dict[str, float]] = {}):
                                 f'{func.lower()}_{keys[0].lower()}': float(values[keys[0]]),
                             })
                 else:
-                    print(f"No 'Technical Analysis: {func}' key found in the response.")
+                    print(f"[{ticker}][{func}]: No 'Technical Analysis: {func}' key found in the response.")
             else:
-                print(f"Error: Received status code {response.status_code}")
-    
+                print(f"[{ticker}][{func}]: Error: Received status code {response.status_code}")
+
     return price_data
 
 def get_stochrsi_aroon_bbands(ticker: str, price_data: dict[str, dict[str, float]] = {}):
@@ -248,7 +248,7 @@ def get_stochrsi_aroon_bbands(ticker: str, price_data: dict[str, dict[str, float
             }
 
             response = requests.get(url, params=params)
-            print("Received data")
+            print(f"[{ticker}][{func}, {time_period}]: Received data")
             if response.status_code == 200:
                 data = response.json()
                 if f'Technical Analysis: {func}' in data:
@@ -260,10 +260,10 @@ def get_stochrsi_aroon_bbands(ticker: str, price_data: dict[str, dict[str, float
                                     f'{func.lower()}_{time_period}_{keys[i].replace(" ", "").lower()}': float(values[keys[i]]),
                                 })
                 else:
-                    print(f"No 'Technical Analysis: {func}' key found in the response.")
+                    print(f"[{ticker}][{func}, {time_period}]: No 'Technical Analysis: {func}' key found in the response.")
             else:
-                print(f"Error: Received status code {response.status_code}")
-    
+                print(f"[{ticker}][{func}, {time_period}]: Error: Received status code {response.status_code}")
+
     return price_data
 
 def get_rsi_willr_adx_adxr_mom_cmo_roc_rocr_trix_cci_mfi_aroonsc_dx_minusdi_plusdi_minusdm_plusdm_midpoint_midprice_atr_natr(ticker: str, price_data: dict[str, dict[str, float]] = {}):
@@ -285,7 +285,7 @@ def get_rsi_willr_adx_adxr_mom_cmo_roc_rocr_trix_cci_mfi_aroonsc_dx_minusdi_plus
             }
 
             response = requests.get(url, params=params)
-            print("Received data")
+            print(f"[{ticker}][{func}, {time_period}]: Received data")
             if response.status_code == 200:
                 data = response.json()
                 if f'Technical Analysis: {func}' in data:
@@ -294,10 +294,10 @@ def get_rsi_willr_adx_adxr_mom_cmo_roc_rocr_trix_cci_mfi_aroonsc_dx_minusdi_plus
                         if timestamp_adj in price_data:
                             price_data[timestamp_adj][f'{func.lower()}_{time_period}'] = float(values[func])
                 else:
-                    print(f"No 'Technical Analysis: {func}' key found in the response.")
+                    print(f"[{ticker}][{func}, {time_period}]: No 'Technical Analysis: {func}' key found in the response.")
             else:
-                print(f"Error: Received status code {response.status_code}")
-    
+                print(f"[{ticker}][{func}, {time_period}]: Error: Received status code {response.status_code}")
+
     return price_data
 
 def get_ad(ticker: str, price_data: dict[str, dict[str, float]] = {}):
@@ -315,7 +315,7 @@ def get_ad(ticker: str, price_data: dict[str, dict[str, float]] = {}):
         }
 
         response = requests.get(url, params=params)
-        print("Received data")
+        print(f"[{ticker}][{func}]: Received data")
         if response.status_code == 200:
             data = response.json()
             if f'Technical Analysis: {func}' in data:
@@ -324,10 +324,10 @@ def get_ad(ticker: str, price_data: dict[str, dict[str, float]] = {}):
                     if timestamp_adj in price_data:
                         price_data[timestamp_adj][f'{func.lower()}'] = float(values[key])
             else:
-                print(f"No 'Technical Analysis: {key}' key found in the response.")
+                print(f"[{ticker}][{func}]: No 'Technical Analysis: {key}' key found in the response.")
         else:
-            print(f"Error: Received status code {response.status_code}")
-    
+            print(f"[{ticker}][{func}]: Error: Received status code {response.status_code}")
+
     return price_data
 
 def get_httredmode(ticker: str, price_data: dict[str, dict[str, float]] = {}):
@@ -346,7 +346,7 @@ def get_httredmode(ticker: str, price_data: dict[str, dict[str, float]] = {}):
             }
 
             response = requests.get(url, params=params)
-            print("Received data")
+            print(f"[{ticker}][{func}]: Received data")
             if response.status_code == 200:
                 data = response.json()
                 if f'Technical Analysis: {func}' in data:
@@ -360,10 +360,10 @@ def get_httredmode(ticker: str, price_data: dict[str, dict[str, float]] = {}):
                                 f'{func.lower()}_{keys[1].replace(" ", "").lower()}': float(values[keys[1]]),
                             })
                 else:
-                    print(f"No 'Technical Analysis: {func}' key found in the response.")
+                    print(f"[{ticker}][{func}]: No 'Technical Analysis: {func}' key found in the response.")
             else:
-                print(f"Error: Received status code {response.status_code}")
-    
+                print(f"[{ticker}][{func}]: Error: Received status code {response.status_code}")
+
     return price_data
 
 def save_to_bigquery(data: dict, ticker: str, project_id: str, dataset_id: str, table_id: str):
@@ -397,9 +397,9 @@ def save_to_bigquery(data: dict, ticker: str, project_id: str, dataset_id: str, 
     else:
         errors = []
     if errors:
-        print(f"Encountered errors while inserting rows: {errors}")
+        print(f"[{ticker}]: Encountered errors while inserting rows: {errors}")
     else:
-        print("Rows successfully inserted into BigQuery.")
+        print(f"[{ticker}]: Rows successfully inserted into BigQuery.")
 
 # Cloud Function entry point
 @functions_framework.cloud_event
@@ -420,6 +420,7 @@ def execute_collection(cloud_event):
         print("ALPHAVANTAGE_API_KEY environment variable is not set.")
         raise ValueError("ALPHAVANTAGE_API_KEY environment variable is not set.")
 
+    print(f"[{ticker}]: Starting data collection")
     data = get_day_prices(ticker)
     data = get_news_sentiment(ticker, data)
     data = get_rsi_willr_adx_adxr_mom_cmo_roc_rocr_trix_cci_mfi_aroonsc_dx_minusdi_plusdi_minusdm_plusdm_midpoint_midprice_atr_natr(ticker, data)
@@ -427,8 +428,9 @@ def execute_collection(cloud_event):
     data = get_stoch_stochf(ticker, data)
     data = get_stochrsi_aroon_bbands(ticker, data)
     data = get_httredmode(ticker, data)
-
+    print(f"[{ticker}]: Finished data collection, starting data insertion")
     save_to_bigquery(data, ticker, GCP_PROJECT, 'stock_data', 'daily_all')
+    print(f"[{ticker}]: Finished data insertion")
 
 if __name__ == "__main__":    
     ticker = 'ASTS'
