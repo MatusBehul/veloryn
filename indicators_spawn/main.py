@@ -3,8 +3,8 @@ from google.cloud import pubsub_v1
 import os
 import json
 
-# Configuration: list of items to process
-ITEMS = [
+# Configuration: list of tickers to process
+TICKERS = [
     "AAPL", "MSFT", "GOOGL", "AMZN", "TSLA",
     "NVDA", "META", "BRK.B", "UNH", "V", "JNJ",
     "WMT", "JPM", "PG", "MA", "HD", "BAC", "DIS",
@@ -18,7 +18,7 @@ ITEMS = [
     "ASTS", "EOSE", "NBR", "TDW", "GLAD", "FRO",
     "RIG", "DO", "HP", "NOV", "SLB", "HAL",
     "BKR", "WTI", "XLE", "USO"
-]  # Replace with your actual items
+]  # Replace with your actual tickers
 GCP_PROJECT = os.environ.get("GCP_PROJECT", "veloryn-prod")
 
 
@@ -27,6 +27,6 @@ def execute_trigger_spawning(cloud_event):
     publisher = pubsub_v1.PublisherClient()
     topic_path = publisher.topic_path(GCP_PROJECT, "indicators-collect-trigger")
 
-    for item in ITEMS:
-        message_data = json.dumps({"item": item}).encode("utf-8")
+    for ticker in TICKERS:
+        message_data = json.dumps({"ticker": ticker}).encode("utf-8")
         publisher.publish(topic_path, message_data)
