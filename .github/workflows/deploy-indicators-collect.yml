@@ -1,4 +1,4 @@
-name: Deploy Cloud Scheduler Jobs
+name: Deploy Indicator collect Functions and Schedulers
 
 on:
   workflow_dispatch:
