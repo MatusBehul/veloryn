@@ -1,0 +1,150 @@
+name: Deploy Cloud Scheduler Jobs
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'test'
+        type: choice
+        options:
+        - test
+        - prod
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      action:
+        required: false
+        type: string
+        default: 'create-or-update'
+
+jobs:
+  deploy-schedulers:
+    name: Deploy Cloud Scheduler Jobs
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || inputs.environment || 'test' }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+      with:
+        project_id: ${{ vars.GOOGLE_CLOUD_PROJECT }}
+
+    - name: Create or update daily indicators collect trigger
+      run: |
+        echo "📅 Creating/updating daily indicators collect trigger..."
+
+        JOB_NAME="daily-indicators-collect-trigger"
+
+        # Check if job already exists
+        if gcloud scheduler jobs describe "$JOB_NAME" --location=${{ vars.GOOGLE_CLOUD_LOCATION }} --project=${{ vars.GOOGLE_CLOUD_PROJECT }} &>/dev/null; then
+          echo "Job $JOB_NAME already exists, updating..."
+          
+          gcloud scheduler jobs update pubsub "$JOB_NAME" \
+            --location=${{ vars.GOOGLE_CLOUD_LOCATION }} \
+            --schedule="0 20 * * *" \
+            --time-zone="UTC" \
+            --topic="indicators-collect-trigger" \
+            --message-body='{"trigger":"daily-check"}' \
+            --description="Triggers daily indicators collect to send emails for new analyses" \
+            --project=${{ vars.GOOGLE_CLOUD_PROJECT }} || {
+              echo "❌ Failed to update daily indicators collect trigger"
+            }
+          
+          echo "✅ Updated daily indicators collect trigger"
+        else
+          echo "Job $JOB_NAME does not exist, creating..."
+          
+          gcloud scheduler jobs create pubsub "$JOB_NAME" \
+            --location=${{ vars.GOOGLE_CLOUD_LOCATION }} \
+            --schedule="0 6 * * *" \
+            --time-zone="UTC" \
+            --topic="indicators-collect-trigger" \
+            --message-body='{"trigger":"daily-check"}' \
+            --description="Triggers daily indicators collect to send emails for new analyses" \
+            --project=${{ vars.GOOGLE_CLOUD_PROJECT }} || {
+              echo "❌ Failed to create daily indicators collect trigger"
+            }
+          
+          echo "✅ Created daily indicators collect trigger"
+        fi
+
+        cd indicators_collect
+
+        echo "🚀 Deploying indicators collecting function..."
+
+        gcloud functions deploy indicators_collect \
+          --gen2 \
+          --runtime=python311 \
+          --region=${{ vars.GOOGLE_CLOUD_LOCATION }} \
+          --source=. \
+          --entry-point=execute_collection \
+          --trigger-topic=indicators-collect-trigger \
+          --timeout 540s \
+          --project="${{ vars.GOOGLE_CLOUD_PROJECT }}" \
+          --set-env-vars=GCP_PROJECT=${{ vars.GOOGLE_CLOUD_PROJECT }},ALPHAVANTAGE_API_KEY=${{ secrets.ALPHAVANTAGE_API_KEY }} 
+
+    - name: Create or update daily indicators collect spawner
+      run: |
+        echo "📅 Creating/updating daily indicators collect spawner..."
+
+        JOB_NAME="daily-indicators-collect-spawner"
+
+        # Check if job already exists
+        if gcloud scheduler jobs describe "$JOB_NAME" --location=${{ vars.GOOGLE_CLOUD_LOCATION }} --project=${{ vars.GOOGLE_CLOUD_PROJECT }} &>/dev/null; then
+          echo "Job $JOB_NAME already exists, updating..."
+          
+          gcloud scheduler jobs update pubsub "$JOB_NAME" \
+            --location=${{ vars.GOOGLE_CLOUD_LOCATION }} \
+            --schedule="0 20 * * *" \
+            --time-zone="UTC" \
+            --topic="indicators-collect-spawner" \
+            --message-body='{"spawner":"daily-check"}' \
+            --description="spawner daily indicators collect to send emails for new analyses" \
+            --project=${{ vars.GOOGLE_CLOUD_PROJECT }} || {
+              echo "❌ Failed to update daily indicators collect spawner"
+            }
+
+          echo "✅ Updated daily indicators collect spawner"
+        else
+          echo "Job $JOB_NAME does not exist, creating..."
+          
+          gcloud scheduler jobs create pubsub "$JOB_NAME" \
+            --location=${{ vars.GOOGLE_CLOUD_LOCATION }} \
+            --schedule="0 6 * * *" \
+            --time-zone="UTC" \
+            --topic="indicators-collect-spawner" \
+            --message-body='{"spawner":"daily-check"}' \
+            --description="spawner daily indicators collect to send emails for new analyses" \
+            --project=${{ vars.GOOGLE_CLOUD_PROJECT }} || {
+              echo "❌ Failed to create daily indicators collect spawner"
+            }
+
+          echo "✅ Created daily indicators collect spawner"
+        fi
+
+        cd indicators_spawn
+
+        echo "🚀 Deploying indicators trigger spawner function..."
+
+        gcloud functions deploy indicators_trigger_spawner \
+          --gen2 \
+          --runtime=python311 \
+          --region=${{ vars.GOOGLE_CLOUD_LOCATION }} \
+          --source=. \
+          --entry-point=execute_trigger_spawning \
+          --trigger-topic=indicators-collect-spawner \
+          --timeout 540s \
+          --project="${{ vars.GOOGLE_CLOUD_PROJECT }}" \
+          --set-env-vars=GCP_PROJECT=${{ vars.GOOGLE_CLOUD_PROJECT }} 

@@ -1,0 +1,4 @@
+# Google Cloud Function dependencies
+functions-framework==3.*
+
+google-cloud-pubsub==2.*
