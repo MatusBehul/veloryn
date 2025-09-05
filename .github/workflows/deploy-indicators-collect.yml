@@ -56,7 +56,6 @@ jobs:
           --trigger-topic=indicators-collect-trigger \
           --timeout 540s \
           --max-instances 1 \
-          --max 1 \
           --project="${{ vars.GOOGLE_CLOUD_PROJECT }}" \
           --set-env-vars=GCP_PROJECT=${{ vars.GOOGLE_CLOUD_PROJECT }},ALPHAVANTAGE_API_KEY=${{ secrets.ALPHAVANTAGE_API_KEY }} 
 
