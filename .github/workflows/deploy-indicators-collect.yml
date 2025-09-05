@@ -43,43 +43,6 @@ jobs:
 
     - name: Create or update daily indicators collect trigger
       run: |
-        echo "📅 Creating/updating daily indicators collect trigger..."
-
-        JOB_NAME="daily-indicators-collect-trigger"
-
-        # Check if job already exists
-        if gcloud scheduler jobs describe "$JOB_NAME" --location=${{ vars.GOOGLE_CLOUD_LOCATION }} --project=${{ vars.GOOGLE_CLOUD_PROJECT }} &>/dev/null; then
-          echo "Job $JOB_NAME already exists, updating..."
-          
-          gcloud scheduler jobs update pubsub "$JOB_NAME" \
-            --location=${{ vars.GOOGLE_CLOUD_LOCATION }} \
-            --schedule="0 20 * * *" \
-            --time-zone="UTC" \
-            --topic="indicators-collect-trigger" \
-            --message-body='{"trigger":"daily-check"}' \
-            --description="Triggers daily indicators collect to send emails for new analyses" \
-            --project=${{ vars.GOOGLE_CLOUD_PROJECT }} || {
-              echo "❌ Failed to update daily indicators collect trigger"
-            }
-          
-          echo "✅ Updated daily indicators collect trigger"
-        else
-          echo "Job $JOB_NAME does not exist, creating..."
-          
-          gcloud scheduler jobs create pubsub "$JOB_NAME" \
-            --location=${{ vars.GOOGLE_CLOUD_LOCATION }} \
-            --schedule="0 6 * * *" \
-            --time-zone="UTC" \
-            --topic="indicators-collect-trigger" \
-            --message-body='{"trigger":"daily-check"}' \
-            --description="Triggers daily indicators collect to send emails for new analyses" \
-            --project=${{ vars.GOOGLE_CLOUD_PROJECT }} || {
-              echo "❌ Failed to create daily indicators collect trigger"
-            }
-          
-          echo "✅ Created daily indicators collect trigger"
-        fi
-
         cd indicators_collect
 
         echo "🚀 Deploying indicators collecting function..."
@@ -122,7 +85,7 @@ jobs:
           
           gcloud scheduler jobs create pubsub "$JOB_NAME" \
             --location=${{ vars.GOOGLE_CLOUD_LOCATION }} \
-            --schedule="0 6 * * *" \
+            --schedule="0 20 * * *" \
             --time-zone="UTC" \
             --topic="indicators-collect-spawner" \
             --message-body='{"spawner":"daily-check"}' \
